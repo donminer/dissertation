@@ -1,22 +1,79 @@
-\chapter{CHAPTER-TITLE}
+\chapter{Introduction and Motivation}
 \thispagestyle{plain}
 
-\label{CHAPTER-LABEL}
+\label{Introduction and Motivation}
 
-INSERT-CHAPTER-TEXT-HERE
 
-\section{SECTION-TITLE}
-\label{SECTION-LABEL}
+% general aims. What are we trying to accomplish? We are trying to provide researchers and users of ABMs insight into the workings of ABMs.
+% Definition of ABM.
+% Developed a framework that learns both a forward mapping and a reverse mapping of a system.
+% These mappings can be used to predict and control behavior in a ABM.
 
-\section{SECTION-TITLE}
-\label{SECTION-LABEL}
 
-\cite{Smith2006}
+\section{Classic Control of Agent-Based Models}
 
-\subsection{SECTION-TITLE}
-\label{SECTION-LABEL}
+% ABMs, according to their definition are governed by the agent-based programs. Introduce Boids in NetLogo example.
+% Quick background on NetLogo. NetLogo is our ABM of choice for examples and experiments in this dissertation.
+% NetLogo is freely available online for download and is supported by ongoing development at Northwestern University.
+% NetLogo's language is easy to learn. Based on Logo, Agent-Based, Extensive online documentation.
+% NetLogo has an extensive model library, containing several systems with interesting and diverse properties and behaviors. NetLogo is discussed in more detail in this dissertation's Background chapter.
 
-\subsection{SECTION-TITLE}
-\label{SECTION-LABEL}
+% Agent-based control parameters adjust the agent-based programs, but what is interesting is the system-level behavior [diagram]. Example.
+% These system-level obvervations are typicall made by the user viewing the visualization of the world.
+% Human users can generate a qualitative mapping about a world how the underlying parameters control it.
+% Show example [with figures] the difference between two different systems with different qualitative system-level behaviors (boids?)
+% Many emergent behaviors can be measured quantitatively to aid the user in understanding the behavior
+%  This is done in netlogo with labels... as seen in figure...
+
+
+% Controlling agent-based models is: unintuitive (learning curve), /elaborate: conceptual disconnect/, example
+%   user-time intensive, /elaborate: many sliders/, example
+%   difficult to get a high-level view given only the agent-level parameters, /elaborate/, example
+
+\section{The \framework}
+
+% Our specific goals: provide insight and more intuitive control to agent-based models with a approach that is domain independent, algorithm independent, accurate and fast for the user.
+% Domain independence is important because the variety in which ABMs come. We want the same general approach to work for a forest fire simulation, a boid flock or particle swarm optimization.
+% Algorithm independence is important because different algorithms will model different domains better. Also, as new regression techniques are implemented in the future, they can be plugged in to increase the accuracy of \fw.
+
+% My contribution is: a \framework that alleviates the common problems in interacting with agent based models, while being domain independent, algorithm independent, and accurate.
+%   an indepth look of the problem of building models of agent-based models (meta-models). How do we build them? What properties can they model? How accurately can the behavior of a ABM be predicted and controlled?
+%   a learning framework that builds these models and provides users with an interface to the models.
+%   I also discuss additional research topics that relate to building and using meta-models.
+
+% The framework consists of four stages: sampling, building the forward mapping, building the reverse mapping, and providing an interface to interact with the models.
+% Sampling is done to generate a offline data set to use to train our regression models.
+% Next, the relationship between agent-level parameters and quantitative system-level properties are developed.
+% This is framed into two problems: the forward mapping problem and the reverse mapping problem.
+% Finally, the framework provides standard interfaces and tools to use the two mappings to predict behavior in ABMs and control behavior in ABMs.
+
+% \fw Reduces the learning curve of the system significantly since users are dealing with a control that directly controls the system-level behavior.
+% Reduces the amount of time the users physically interacts with the system because they have a reduced number of controls to deal with.
+% It is easier to make qualitative determinations from a collection of system-level properties, than the values of the agent-based controls.
+%   For example, give a list of agent-level controls and the resultant system-level property values... argue that the system-level property values give more information about the system.
+
+% Our framework is domain independent, because it reduces the forward mapping problem to a classical regression problem of learning the correlation between the agent-level parameters and the system-level properties..
+% We introduce a domain-independent approach to solve the reverse mapping problem that uses standard regression to build a space of configurations that would produce desired behavior.
+% Our framework is algorithm independent, because any regression algorithm (e.g., ...) can be used to develop the forward mapping and the reverse mapping
+
+% Our framework is as accurate as the regression algorithms used and the data set sampled from the agent-based model. /elaborate/
+% In general, I prefer spending longer sampling to generate an exhaustive data set increase accuracy and reducing user interaction delays when querying for a prediction or a suggestion for controlling.
+% This shifts most of the computation time offline, instead of online, reducing user interaction time when querying the forward or reverse mappings.
+
+
+\section{Dissertation Organization}
+
+%This dissertation is divided into nine chapters, including this one:
+
+% Chapter Two (The \framework) provides an in depth view of the framework, including a step-by-step overview of the procedure it uses to build meta-models. In addition, we introduce key concepts and definitions used throughout this dissertation.
+% Chapter Three (Related Work) provides an insight to approaches similar to \fw in motivation.
+% Chapter Four (Background) is a survey of concepts in the machine learning literature and agent-based modeling literature that \fw uses.
+% Chapters Five and Six define the forward and reverse mapping problems, and give an in depth analysis of how to solve them.
+% Chapter Seven (Using Meta-Models) outlines useful ways to use ABM meta-models generated by \fw
+% Chapter Eight (Results) surveys a number of experiments I performed to measure the effectiveness of \fw. The experiments are organized by domain, so they also serve as examples of how to apply \fw to ABMs.
+% Chapter Nine (Conclusions and Future Work) summarizes this dissertation, provides additional thoughts I have regarding this work and possible directions for future work. 
+
+
+
 
 
