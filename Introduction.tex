@@ -3,14 +3,17 @@
 
 \label{Introduction and Motivation}
 
-
 % general aims. What are we trying to accomplish? We are trying to provide researchers and users of ABMs insight into the workings of ABMs.
 % Definition of ABM.
 % Developed a framework that learns both a forward mapping and a reverse mapping of a system.
 % These mappings can be used to predict and control behavior in a ABM.
+The behavior of individual agents in an agent-based model (ABM) is typically well understood because the agent's program directly controls its local behaviors.
+What is typically not understood is how changing these programs' agent-level control parameters affect the observed system-level behaviors of the ABM.
+The aim of this dissertation is to provide researchers and users of ABMs insight into how these agent-level parameters affect system-level properties.
+In this dissertation, I discuss a framework named the \framework (\fw) that I have developed that can be used to predict and control system-level behaviors of agent-based models.
+With this framework, users can interact with ABMs in terms of intuitive system-level concepts, instead of with agent-level controls that only indirectly affect system-level behaviors.
 
-
-\section{Classic Control of Agent-Based Models}
+\section{Agent-Based Models}
 
 % ABMs, according to their definition are governed by the agent-based programs. Introduce Boids in NetLogo example.
 % Quick background on NetLogo. NetLogo is our ABM of choice for examples and experiments in this dissertation.
@@ -18,17 +21,103 @@
 % NetLogo's language is easy to learn. Based on Logo, Agent-Based, Extensive online documentation.
 % NetLogo has an extensive model library, containing several systems with interesting and diverse properties and behaviors. NetLogo is discussed in more detail in this dissertation's Background chapter.
 
+
+Agent-based models are used by scientists to analyze system-level behaviors of complex systems by simulating the system bottom-up.
+At the bottom of these simulations are individual agents that locally interact with other agents and the environment.
+All the behavior in an ABM, from agent-level local interactions to system-level behaviors, emerge from these local interactions, which are governed by the individual \textit{agent programs}.
+ABMs can be used to understand how changes in individuals' \textit{agent-level parameters} affect \textit{system-level properties}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.5]{images/netlogoui.png}
+\caption{A screenshot of NetLogo's graphical user interface while executing a flocking simulation.}
+\label{fig:netlogoui}
+\end{figure}
+
 % Agent-based control parameters adjust the agent-based programs, but what is interesting is the system-level behavior [diagram]. Example.
 % These system-level obvervations are typicall made by the user viewing the visualization of the world.
 % Human users can generate a qualitative mapping about a world how the underlying parameters control it.
 % Show example [with figures] the difference between two different systems with different qualitative system-level behaviors (boids?)
 % Many emergent behaviors can be measured quantitatively to aid the user in understanding the behavior
 %  This is done in netlogo with labels... as seen in figure...
-
+Agent-level control parameters adjust the behaviors of agent-based programs.
+However, scientists are not typically interested in the local interactions between agents--- they are interested in the resulting system-level behaviors that result.
+For example, researchers that studied agent-based models of lane formations in army ants were interested in the traffic patterns of the lanes, not the individual behaviors of the ants \cite{couzin2003sol}.
+In other work, researchers that studied locusts were interested in determining at what critical density locusts begin to swarm and destroy crops \cite{buhl2006dom}.
+Typically, scientists analyze ABMs by viewing visualizations of the environment or gathering statistical data on the simulation.
+For instance, NetLogo, an agent-based modeling programming environment \cite{tisue2004netlogo}, has monitors, plots and visualizations to convey system-level properties to the user.
+In Figure \ref{fig:netlogoui}, monitors are displaying \textit{density}, \textit{average-heading} and \textit{stddev-heading} statistics for a flocking domain.
+In addition, a plot of density shows how it has changed over time.
+These tools are used by a researcher to generate a mental model of how the agent-level control parameters of the flocking domain (the sliders seen in the user interface) affect these system-level properties.
 
 % Controlling agent-based models is: unintuitive (learning curve), /elaborate: conceptual disconnect/, example
 %   user-time intensive, /elaborate: many sliders/, example
 %   difficult to get a high-level view given only the agent-level parameters, /elaborate/, example
+Although using ABMs for researching agent-based systems has proved useful in a number of domains, I suggest there is a glaring conceptual disconnect, from the user's perspective, between the agent-level controls and the system-level properties.
+The classical ABM control method of adjusting agent-level properties is unintuitive because they only indirectly affect the system-level properties.
+With the current methodology, a simulation has to be executed in order to observe what the values of the system-level properties will be.
+The only way to configure the system to have it exhibit a desired system-level behavior is a time consuming iterative process of guess-and-check.
+In summary, a determination of what an ABM will do at a system-level, given only the agent-level parameters, is not possible with current software.
+The main goal of the \framework is to bridge this gap between agent-level parameters and system-level properties.
+
+
+\section{Wolves, Sheep and Grass}
+
+\begin{figure}[ht]
+\centering
+\includegraphics{images/intro_wolfsheep.pdf}
+\caption{A screen shot from NetLogo's Wolf Sheep Predation model.}
+\label{fig:wolfsheep}
+\end{figure}
+
+
+
+Throughout this dissertation, I will use NetLogo's Wolf Sheep Predation model \cite{wolfsheep}, which is bundled with NetLogo's standard Model Library,\footnote{http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation} as an example to explain concepts.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.66667]{images/wolfsheepcontrols.png}
+\includegraphics[scale=.66667]{images/wolfsheepmons.png}
+\caption{The control and monitor interface for the Wolf Sheep Predation model.}
+\label{fig:wolfsheepui}
+\end{figure}
+
+A snapshot of its NetLogo visualization is shown in Figure \ref{fig:wolfsheep}.
+This multi-agent model simulates a food chain consisting of wolf agents, sheep agents and grass in a two-dimensional space.
+The model is controlled by seven agent-level control parameters, and directly affect the following agent behaviors:
+\begin{itemize}
+  \item The system is initialized with \textit{initial-number-sheep} sheep and \textit{initial-number-wolves} wolves.
+  \item Wolves and sheep move randomly though the space.
+  \item Wolves and sheep die if they run out of energy.
+  \item Wolves eat sheep if they occupy the same space in the environment. Wolves gain \textit{wolf-gain-from-food} units of energy from eating sheep. The sheep dies.
+  \item Sheep eat grass if they are on a location of the environment that has grass. Sheep gain \textit{sheep-gain-from-food} units of energy from eating grass. The grass dies in that grid location.
+  \item Every time step, each sheep and each wolf has a chance (\textit{sheep-reproduce} and \textit{wolf-reproduce}) to reproduce asexually. Both the parent and the child split the parent's original energy evenly (i.e., parent's energy divided by two).
+  \item Grass regrows after \textit{grass-regrowth-time} number of time steps.
+\end{itemize}
+
+The system-level concepts we are interested in are the number of sheep, the number of wolves and the number of grid locations containing grass.
+In NetLogo, these properties are displayed with monitors and a plot, as seen in Figure \ref{fig:wolfsheepui}.
+The number of each population of agents may change continuously, but the average number of sheep converges.
+Another interesting feature is some ecosystems fail: either sheep or both sheep and wolves go extinct.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=1]{images/different_sheep.pdf}
+\caption{Differences in populations based on minor changes of the \textit{sheep-gain-from-food} parameter.}
+\label{fig:diffsheep}
+\end{figure}
+
+After working with this ABM for some time, a user will begin to realize that slight changes in the control parameters will yield wildly different behavior.
+For example, by setting \textit{sheep-gain-from-food} to 2, 3, and then 4, major differences in system-level behavior are apparent by viewing the graphs in Figure \ref{fig:diffsheep}.
+When the value of \textit{sheep-gain-from-food} is 4, the system rhythmically exhibits major changes in all three agent populations.
+When the value is 2 or 3, the population remains relatively stable, but the average population values are different.
+When the value is low enough (e.g., 2) the wolves go extinct.
+
+The Wolf Sheep Predation model is a good example of the intuitive disconnect between agent-level parameters and system-level properties.
+There is no clear \textit{explicit} relationship between the controls presented in the user interface and the resulting system-level properties.
+An experienced user may have a qualitative understanding of the correlations, but would not be able to predict quantitative concepts such as the average number of sheep after 2000 time steps.
+In the Results Chapter, I will show that this intuitive disconnect in this domain can be solved by \fw.
+
 
 \section{The \framework}
 
