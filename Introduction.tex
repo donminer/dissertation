@@ -10,7 +10,7 @@
 The behavior of individual agents in an agent-based model (ABM) is typically well understood because the agent's program directly controls its local behaviors.
 What is typically not understood is how changing these programs' agent-level control parameters affect the observed system-level behaviors of the ABM.
 The aim of this dissertation is to provide researchers and users of ABMs insight into how these agent-level parameters affect system-level properties.
-In this dissertation, I discuss a framework named the \framework (\fw) that I have developed that can be used to predict and control system-level behaviors of agent-based models.
+In this dissertation, I discuss a learning framework named the \framework (\fw) that I have developed that can be used to predict and control system-level behaviors of agent-based models.
 With this framework, users can interact with ABMs in terms of intuitive system-level concepts, instead of with agent-level controls that only indirectly affect system-level behaviors.
 
 
@@ -54,11 +54,11 @@ These tools are used by a researcher to generate a mental model of how the agent
 % Controlling agent-based models is: unintuitive (learning curve), /elaborate: conceptual disconnect/, example
 %   user-time intensive, /elaborate: many sliders/, example
 %   difficult to get a high-level view given only the agent-level parameters, /elaborate/, example
-Although using ABMs for researching agent-based systems has proved useful in a number of domains, I suggest there is a glaring conceptual disconnect from the user's perspective, between the agent-level controls and the system-level properties.
-The classical ABM control method of adjusting agent-level properties is unintuitive because they only indirectly affect the system-level properties.
+Although using ABMs for researching agent-based systems has been proven useful in a number of domains, there is a glaring conceptual disconnect from the user's perspective, between the agent-level controls and the system-level properties.
+The classical ABM control method of adjusting agent-level properties is unintuitive because they only indirectly affect the system-level properties through emergence.
 With the current methodology, a simulation has to be executed in order to observe what the values of the system-level properties will be.
 A time consuming iterative process of guess-and-check is the only way to configure the system to have it exhibit a desired system-level behavior.
-In summary, a determination of what an ABM will do at a system-level, given only the agent-level parameters, is not possible with current software.
+A determination of what an ABM will do at a system-level, given only the agent-level parameters, is not possible with current software.
 
 % \fw Reduces the learning curve of the system significantly since users are dealing with a control that directly controls the system-level behavior.
 % Reduces the amount of time the users physically interacts with the system because they have a reduced number of controls to deal with.
@@ -81,16 +81,8 @@ In addition, the models learned by \fw can be inspected to gather quantitative d
 
 
 
+
 Throughout this dissertation, I will use NetLogo's Wolf Sheep Predation model \cite{wolfsheep}, which is bundled with NetLogo's standard Model Library,\footnote{http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation} as an example to explain concepts.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=.66667]{images/wolfsheepcontrols.png}
-\includegraphics[scale=.66667]{images/wolfsheepmons.png}
-\caption{The control and monitor interface for the Wolf Sheep Predation model.}
-\label{fig:wolfsheepui}
-\end{figure}
-
 A snapshot of its NetLogo visualization is shown in Figure \ref{fig:wolfsheep}.
 This multi-agent model simulates a food chain consisting of wolf agents, sheep agents and grass in a two-dimensional space.
 The model is controlled by seven agent-level control parameters, which directly affect the following agent behaviors:
@@ -104,6 +96,14 @@ The model is controlled by seven agent-level control parameters, which directly 
   \item Grass regrows after \textit{grass-regrowth-time} number of time steps.
 \end{itemize}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.66667]{images/wolfsheepcontrols.png}
+\includegraphics[scale=.66667]{images/wolfsheepmons.png}
+\caption{The control and monitor interface for the Wolf Sheep Predation model.}
+\label{fig:wolfsheepui}
+\end{figure}
+
 The system-level concepts we are interested in are the number of sheep, the number of wolves and the number of grid locations containing grass.
 In NetLogo, these properties are displayed with monitors and a plot, as seen in Figure \ref{fig:wolfsheepui}.
 The number of each population of agents may change continuously, but the average number of sheep converges.
@@ -116,7 +116,7 @@ Another interesting feature is some ecosystems fail: either sheep or both sheep 
 \label{fig:diffsheep}
 \end{figure}
 
-After working with this ABM for some time, a user will begin to realize that slight changes in the control parameters will yield wildly different behavior.
+After working with this ABM for some time, a user will begin to realize that changes in the control parameters will yield different types of behavior.
 For example, by setting \textit{sheep-gain-from-food} to 2, 3, and then 4, major differences in system-level behavior are apparent by viewing the graphs in Figure \ref{fig:diffsheep}.
 When the value of \textit{sheep-gain-from-food} is 4, the system rhythmically exhibits major changes in all three agent populations.
 When the value is 2 or 3, the population remains relatively stable, but the average population values are different.
@@ -124,8 +124,8 @@ When the value is low enough (e.g., 2) the wolves go extinct.
 
 The Wolf Sheep Predation model is a good example of the intuitive disconnect between agent-level parameters and system-level properties.
 There is no clear \textit{explicit} relationship between the controls presented in the user interface and the resulting system-level properties.
-An experienced user may have a qualitative understanding of the correlations, but would not be able to predict quantitative concepts such as the average number of sheep after 2000 time steps.
-In  Chapter \ref{Results}: Results, I will show that the intuitive disconnect in this domain can be solved by \fw.
+An experienced user may have a qualitative understanding of the correlations, but would not be able to predict quantitative concepts, such as the average number of sheep after 2000 time steps.
+In  Chapter \ref{Results}: Results, I will show that the intuitive disconnect in this domain can easily be solved by \fw.
 
 
 \section{Overview of The \framework}
@@ -146,12 +146,12 @@ Also, in Chapter \ref{ReverseMapping}, I will discuss alternative methods for so
 % Finally, the framework provides standard interfaces and tools to use the two mappings to predict behavior in ABMs and control behavior in ABMs.
 \fw is simple and has only a few configuration points.
 This allows researchers to focus on the analysis of the system, instead of on the details of \fw.
-The framework consists of three major steps: Sampling, Solving the forward-mapping problem and solving the reverse-mapping problem.
-In these three steps, the only configurations the user must perform are: define how to measure system-level properties of interest, provide the ranges of parameters to be sampled and plug in a regression algorithm.
+The framework consists of three major steps: sampling, solving the forward-mapping problem and solving the reverse-mapping problem.
+In these three steps, the only configurations the user must perform are: define how to measure system-level properties of interest, provide the ranges of parameters to be sampled, and plug in a regression algorithm.
 
 I will show in Chapter \ref{Results}: Results that my framework is able to generate models of system-level behavior.
-For example, I will show that \fw is able to predict the number of sheep and wolves in the Wolf Sheep Predation model, given the configuration parameter values.
-Also, \fw is able to make suggestions for the values for the control parameters, given the the desired system-level property outcome.
+For example, \fw is able to predict the number of sheep and wolves in the Wolf Sheep Predation model, given the configuration parameter values (the forward-mapping problem).
+Also, \fw is able to make suggestions for the values for the control parameters, given the the desired system-level property outcome (the reverse-mapping problem).
 
 A more comprehensive overview of \fw is provided in Chapter \ref{Framework}: The \framework.
 
@@ -165,7 +165,7 @@ A more comprehensive overview of \fw is provided in Chapter \ref{Framework}: The
 %   I also discuss additional research topics that relate to building and using meta-models.
 
 My main contribution presented in this dissertation is an in-depth analysis of meta-models of agent-based models.
-This analysis includes a discussion of the natural difficulties in using regression to build models of the correlations between agent-level parameters and system-level properties. 
+This analysis includes a discussion of methods for using regression to build models of the correlations between agent-level parameters and system-level properties. 
 In addition, this dissertation contains a survey of ways that that meta-models can be used to inspect system-level behaviors of agent-based models.
 
 The \framework encapsulates my methodology for building meta-models of ABMs.
