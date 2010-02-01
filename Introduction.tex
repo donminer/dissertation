@@ -13,6 +13,7 @@ The aim of this dissertation is to provide researchers and users of ABMs insight
 In this dissertation, I discuss a framework named the \framework (\fw) that I have developed that can be used to predict and control system-level behaviors of agent-based models.
 With this framework, users can interact with ABMs in terms of intuitive system-level concepts, instead of with agent-level controls that only indirectly affect system-level behaviors.
 
+
 \section{Agent-Based Models}
 
 % ABMs, according to their definition are governed by the agent-based programs. Introduce Boids in NetLogo example.
@@ -53,12 +54,20 @@ These tools are used by a researcher to generate a mental model of how the agent
 % Controlling agent-based models is: unintuitive (learning curve), /elaborate: conceptual disconnect/, example
 %   user-time intensive, /elaborate: many sliders/, example
 %   difficult to get a high-level view given only the agent-level parameters, /elaborate/, example
-Although using ABMs for researching agent-based systems has proved useful in a number of domains, I suggest there is a glaring conceptual disconnect, from the user's perspective, between the agent-level controls and the system-level properties.
+Although using ABMs for researching agent-based systems has proved useful in a number of domains, I suggest there is a glaring conceptual disconnect from the user's perspective, between the agent-level controls and the system-level properties.
 The classical ABM control method of adjusting agent-level properties is unintuitive because they only indirectly affect the system-level properties.
 With the current methodology, a simulation has to be executed in order to observe what the values of the system-level properties will be.
-The only way to configure the system to have it exhibit a desired system-level behavior is a time consuming iterative process of guess-and-check.
+A time consuming iterative process of guess-and-check is the only way to configure the system to have it exhibit a desired system-level behavior.
 In summary, a determination of what an ABM will do at a system-level, given only the agent-level parameters, is not possible with current software.
-The main goal of the \framework is to bridge this gap between agent-level parameters and system-level properties.
+
+% \fw Reduces the learning curve of the system significantly since users are dealing with a control that directly controls the system-level behavior.
+% Reduces the amount of time the users physically interacts with the system because they have a reduced number of controls to deal with.
+% It is easier to make qualitative determinations from a collection of system-level properties, than the values of the agent-based controls.
+%   For example, give a list of agent-level controls and the resultant system-level property values... argue that the system-level property values give more information about the system.
+The main goal of the \framework is to bridge the gap between agent-level parameters and system-level properties.
+\fw reduces the learning curve of an agent-based model since users are interacting with the system at the system-level, instead of at the agent-level.
+Qualitative analysis of an ABM's system-level properties will be a more efficient process since researchers deal with an abstraction of the system's controls.
+In addition, the models learned by \fw can be inspected to gather quantitative data about the correlations between system-level properties and agent-level parameters.
 
 
 \section{Wolves, Sheep and Grass}
@@ -84,7 +93,7 @@ Throughout this dissertation, I will use NetLogo's Wolf Sheep Predation model \c
 
 A snapshot of its NetLogo visualization is shown in Figure \ref{fig:wolfsheep}.
 This multi-agent model simulates a food chain consisting of wolf agents, sheep agents and grass in a two-dimensional space.
-The model is controlled by seven agent-level control parameters, and directly affect the following agent behaviors:
+The model is controlled by seven agent-level control parameters, which directly affect the following agent behaviors:
 \begin{itemize}
   \item The system is initialized with \textit{initial-number-sheep} sheep and \textit{initial-number-wolves} wolves.
   \item Wolves and sheep move randomly though the space.
@@ -103,7 +112,7 @@ Another interesting feature is some ecosystems fail: either sheep or both sheep 
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=1]{images/different_sheep.pdf}
-\caption{Differences in populations based on minor changes of the \textit{sheep-gain-from-food} parameter.}
+\caption{Differences in populations based on changes of the \textit{sheep-gain-from-food} parameter.}
 \label{fig:diffsheep}
 \end{figure}
 
@@ -116,51 +125,75 @@ When the value is low enough (e.g., 2) the wolves go extinct.
 The Wolf Sheep Predation model is a good example of the intuitive disconnect between agent-level parameters and system-level properties.
 There is no clear \textit{explicit} relationship between the controls presented in the user interface and the resulting system-level properties.
 An experienced user may have a qualitative understanding of the correlations, but would not be able to predict quantitative concepts such as the average number of sheep after 2000 time steps.
-In the Results Chapter, I will show that this intuitive disconnect in this domain can be solved by \fw.
+In  Chapter \ref{Results}: Results, I will show that the intuitive disconnect in this domain can be solved by \fw.
 
 
-\section{The \framework}
+\section{Overview of The \framework}
 
-% Our specific goals: provide insight and more intuitive control to agent-based models with a approach that is domain independent, algorithm independent, accurate and fast for the user.
-% Domain independence is important because the variety in which ABMs come. We want the same general approach to work for a forest fire simulation, a boid flock or particle swarm optimization.
-% Algorithm independence is important because different algorithms will model different domains better. Also, as new regression techniques are implemented in the future, they can be plugged in to increase the accuracy of \fw.
 
-% My contribution is: a \framework that alleviates the common problems in interacting with agent based models, while being domain independent, algorithm independent, and accurate.
-%   an indepth look of the problem of building models of agent-based models (meta-models). How do we build them? What properties can they model? How accurately can the behavior of a ABM be predicted and controlled?
-%   a learning framework that builds these models and provides users with an interface to the models.
-%   I also discuss additional research topics that relate to building and using meta-models.
+The foundation of this work is framing the problem of building a meta-model of an ABM as two sub-problems: the \textit{forward-mapping problem} and the \textit{reverse-mapping problem}.
+In Chapter \ref{ForwardMapping}: The Forward-Mapping Problem, I will discuss how \fw maps given values of the agent-level parameters to expected system-level property values with standard regression approaches.
+In Chapter \ref{ReverseMapping}: The Reverse-Mapping Problem, I will discuss how \fw maps a set of desired system-level property values to a set of agent-level parameters that would generate this behavior.
+My general approach to solving the reverse-mapping problem is to interpolate configurations using the forward mapping to approximate a smooth and continuous surface.
+This interpolated surface represents the space of configurations that would satisfy the system-level requirements set out by the user.
+Also, in Chapter \ref{ReverseMapping}, I will discuss alternative methods for solving the revers-mapping problem.
+
 
 % The framework consists of four stages: sampling, building the forward mapping, building the reverse mapping, and providing an interface to interact with the models.
 % Sampling is done to generate a offline data set to use to train our regression models.
 % Next, the relationship between agent-level parameters and quantitative system-level properties are developed.
 % This is framed into two problems: the forward mapping problem and the reverse mapping problem.
 % Finally, the framework provides standard interfaces and tools to use the two mappings to predict behavior in ABMs and control behavior in ABMs.
+\fw is simple and has only a few configuration points.
+This allows researchers to focus on the analysis of the system, instead of on the details of \fw.
+The framework consists of three major steps: Sampling, Solving the forward-mapping problem and solving the reverse-mapping problem.
+In these three steps, the only configurations the user must perform are: define how to measure system-level properties of interest, provide the ranges of parameters to be sampled and plug in a regression algorithm.
 
-% \fw Reduces the learning curve of the system significantly since users are dealing with a control that directly controls the system-level behavior.
-% Reduces the amount of time the users physically interacts with the system because they have a reduced number of controls to deal with.
-% It is easier to make qualitative determinations from a collection of system-level properties, than the values of the agent-based controls.
-%   For example, give a list of agent-level controls and the resultant system-level property values... argue that the system-level property values give more information about the system.
+I will show in Chapter \ref{Results}: Results that my framework is able to generate models of system-level behavior.
+For example, I will show that \fw is able to predict the number of sheep and wolves in the Wolf Sheep Predation model, given the configuration parameter values.
+Also, \fw is able to make suggestions for the values for the control parameters, given the the desired system-level property outcome.
 
-% Our framework is domain independent, because it reduces the forward mapping problem to a classical regression problem of learning the correlation between the agent-level parameters and the system-level properties..
-% We introduce a domain-independent approach to solve the reverse mapping problem that uses standard regression to build a space of configurations that would produce desired behavior.
-% Our framework is algorithm independent, because any regression algorithm (e.g., ...) can be used to develop the forward mapping and the reverse mapping
+A more comprehensive overview of \fw is provided in Chapter \ref{Framework}: The \framework.
 
-% Our framework is as accurate as the regression algorithms used and the data set sampled from the agent-based model. /elaborate/
-% In general, I prefer spending longer sampling to generate an exhaustive data set increase accuracy and reducing user interaction delays when querying for a prediction or a suggestion for controlling.
-% This shifts most of the computation time offline, instead of online, reducing user interaction time when querying the forward or reverse mappings.
+
+
+\section{Summary of Contributions}
+
+% My contribution is: a \framework that alleviates the common problems in interacting with agent based models, while being domain independent, algorithm independent, and accurate.
+%   an indepth look of the problem of building models of agent-based models (meta-models). How do we build them? What properties can they model? How accurately can the behavior of a ABM be predicted and controlled?
+%   a learning framework that builds these models and provides users with an interface to the models.
+%   I also discuss additional research topics that relate to building and using meta-models.
+
+My main contribution presented in this dissertation is an in-depth analysis of meta-models of agent-based models.
+This analysis includes a discussion of the natural difficulties in using regression to build models of the correlations between agent-level parameters and system-level properties. 
+In addition, this dissertation contains a survey of ways that that meta-models can be used to inspect system-level behaviors of agent-based models.
+
+The \framework encapsulates my methodology for building meta-models of ABMs.
+The implementation of \fw as software serves as a proof-of-concept to show that my approach is implementable and applicable to a variety of domains.
+The software itself is a contribution, since it is available to be used by researchers interested in building meta-models of NetLogo ABMs.
+The design of the general framework is a contribution as well, since it could be implemented to interact with other agent-based modeling systems similar to NetLogo, or totally independent agent-based models.
 
 
 \section{Dissertation Organization}
 
 %This dissertation is divided into nine chapters, including this one:
-
-% Chapter Two (The \framework) provides an in depth view of the framework, including a step-by-step overview of the procedure it uses to build meta-models. In addition, we introduce key concepts and definitions used throughout this dissertation.
 % Chapter Three (Related Work) provides an insight to approaches similar to \fw in motivation.
 % Chapter Four (Background) is a survey of concepts in the machine learning literature and agent-based modeling literature that \fw uses.
 % Chapters Five and Six define the forward and reverse mapping problems, and give an in depth analysis of how to solve them.
 % Chapter Seven (Using Meta-Models) outlines useful ways to use ABM meta-models generated by \fw
 % Chapter Eight (Results) surveys a number of experiments I performed to measure the effectiveness of \fw. The experiments are organized by domain, so they also serve as examples of how to apply \fw to ABMs.
-% Chapter Nine (Conclusions and Future Work) summarizes this dissertation, provides additional thoughts I have regarding this work and possible directions for future work. 
+% Chapter Nine (Conclusions and Future Work) summarizes this dissertation, provides additional thoughts I have regarding this work and possible directions for future work.
+This dissertation is divided into nine chapters, including this one.
+Chapter \ref{Framework}: The \framework explains each framework component in detail, explains how a new user would tailor \fw to a new ABM, discusses implementation details and gives an introduction to the forward- and reverse-mapping problems.
+Chapter \ref{RelatedWork}: Related Work compares and contrasts approaches similar to \fw in motivation, with \fw.
+Chapter \ref{Background}: Background provides information about NetLogo and regression algorithms that is useful for understanding \fw completely.
+Chapters \ref{ForwardMapping} and \ref{ReverseMapping} discuss my solutions to the forward- and reverse-mapping problems.
+Chapter \ref{Using}: Using Meta-Models is a survey of different ways the meta-models generated by \fw can be used to analyze system-level properties of ABMs.
+Chapter \ref{Results}: Results evaluates \fw on a domain-by-domain basis and provides explicit examples of how \fw has been used.
+Chapter \ref{Conclusions}: Conclusions and Future Work summarizes this dissertation, provides additional thoughts I have regarding this work and possible directions for future work.
+
+
+ 
 
 
 
