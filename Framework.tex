@@ -3,7 +3,9 @@
 
 \label{Framework}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% What does the framework do? It build meta-models that map between agent-level and system-level.
+% It frames the mapping problem into the forward mapping and the reverse mapping
+% Uses a pluggable regression algorithm to solve these mapping problems
 
 \section{Design Goals of The \framework}
 
@@ -39,7 +41,85 @@ In summary, I am making the assumption that users studying ABMs with \fw are mor
 I discuss this trade off in more detail in Chapter \ref{ReverseMapping}: The Reverse Mapping Problem.
 
 
-\section{Analysis of Implementation vs. Design Goals}
+
+\section{Framework Structure}
+
+% The framework is split into three phases and four major parts.
+% Each phase feeds into the next
+% Many configuration points exist in which users of \fw can change the way the framework works.
+% However, no matter the configuration, the input and output of each phase is the same.
+
+% Diagram  sampling ->  [ FM / RM ] -> usage tools
+
+\subsection{Sampling}
+% The first phase is sampling, in which the framework interacts with the agent-based model to generate a large enough data set for training.
+   % Measurements have to be defined to tell what to sample.
+   % Measurements must be stable (i.e., follow the laws of large numbers); they must converge over time
+   % Wording of the measurement is important (give the example of wolves going extinct)
+
+   % For this dissertation, we either use a random sampling method or a systematic sampling method
+   % Future work: plug in different advanced sampling methods
+
+\subsection{Map Learning}
+
+% The second phase is learning the forward and reverse mapping.
+% This is the main focus of the learning framework.
+% Explain the forward mapping problem; give an example [figure]
+% The forward mapping is a straightforward regression problem
+% Assuming this is a many-to-one relationship (due to the correct definition of the measurement)
+
+% Explain the reverse mapping problem; give an example [figure]
+% The reverse mapping is an "inverted" regression problem.
+% Inverted regression means f^-1 (building an inverted mapping)
+
+% Elude that we will discuss our particular solutions to these problems in later chapters
+
+\subsection{Using the Maps}
+
+% Explain how the maps are queried.
+% Querying the forward mapping (example)
+% Querying the reverse mapping (example)
+
+% Possible uses: prediction and control
+
+
+\subsection{Summary of Configuration Points}
+% Sampling methodology
+% Measurements
+% Forward Mapping Algorithm
+% Reverse Mapping Algorithm
+
+\section{Software Implementation Details}
+% Most of the software is implemented in python, but the interaction with NetLogo is handled with Java, so that I can access the Java API.
+
+% Give a list of agent-level variable ranges/steps
+% Generate the experiments list
+% Samples a NetLogo ABM with Java API, given the list of experiments, save the results
+% Interact with the forward mapping regression algorithm with a python module interface
+% Interact with the reverse mapping approach (discussed more in Chapter X) with a python module interface
+% Different tools for selecting solutions and visualizing slices are separate python scripts.
+
+% An overarching "master script" written in python that glues these together and automatically transitions from one to another. Each stage can be performed one by one
+
+% More about NetLogo is covered in Background.
+
+
+\section{Example: \fw Applied to Wolf Sheep Predation}
+
+% Identification of agent-level control parameters
+% Identify ranges of values for agent-level control parameters
+
+% Definition of system-level measurements.
+% Specifically how to measure them
+
+% Choice of regression algorithm (KNN)  -- More discussion is on FM and RM
+
+% Analysis of the accuracy of our approach against this domain is in the RESULTS chapter.
+
+% Give a glimpse into tools -- More discussion is on using chapter
+
+
+\section{Analysis of \fw  vs. the Design Goals}
 % Our framework is domain independent, because it reduces the forward mapping problem to a classical regression problem of learning the correlation between the agent-level parameters and the system-level properties..
 % We introduce a domain-independent approach to solve the reverse mapping problem that uses standard regression to build a space of configurations that would produce desired behavior.
 
