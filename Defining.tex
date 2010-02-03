@@ -1,0 +1,19 @@
+\chapter{DEFINING SYSTEM-LEVEL PROPERTIES}
+\thispagestyle{plain}
+
+\label{Defining}
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+
+% This is an example explaining the need for stability
+For example, in the Wolf Sheep Predation domain, one simple system-level measurement could be the average number of wolves over a thousand time steps.
+This number can be misleading, because certain configurations will sometimes result in the wolves going extinct (i.e., zero wolves).
+Other times, the same configurations will have the wolves converge to a stable non-zero population.
+Therefore, the expected value for the average number of wolves $\hat w$ to be:
+\[\mathrm{E}(\bar w) = \mathrm{P}(extinct) * (\bar w | extinct) + (1 - \mathrm{P}(extinct)) * (\bar w | \neg extinct) \]
+where $extinct$ is whether the wolves went extinct or not, $\mathrm{P}(extinct)$ is the probability wolves go extinct, and $(\bar w | \neg extinct)$ is the average number of wolves, given they did not go extinct.
+$\hat w$ is not very stable, because sometimes it is zero and sometimes it is $(\bar w | \neg extinct)$.
+Making a prediction based on the expected value of $\hat w$ will always have a specific amount of error associated with it.
+To remedy this problem
+
