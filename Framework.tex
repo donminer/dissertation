@@ -96,6 +96,10 @@ One way to measure stability is to calculate the standard deviation of measured 
    % Wording of the measurement is important (give the example of wolves going extinct)
 The need for this assumption, ways to conform to it and a more detailed explanation of how to define system-level properties is provided in Chapter \ref{Defining}: Defining System-Level Behaviors.
 
+For example, there are several system-level behavior properties we will measure in the Wolf Sheep Predation model.
+Three of the most obvious are the average number of sheep, average number of wolves and average amount of grass over long period of time.
+These are measured by summing the number of sheep/wolves/grass living at each time step and dividing by the number of ticks.
+Although the number of sheep and wolves change rhythmically, the average values converge to a single value after about 10,000 ticks.
 
 \subsection{Sampling}
 % The first phase is sampling, in which the framework interacts with the agent-based model to generate a large enough data set for training.
@@ -134,7 +138,7 @@ In future work, different sampling techniques' effect on accuracy and speed coul
 % Explain the forward mapping problem; give an example [figure]
 The forward-mapping problem is to develop a function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ that maps a provided configuration vector $\mathbf x = \{x_1, x_2, ..., x_n \}$ to a single system-level behavior property $\hat y$:
 \[\hat y \leftarrow f(\mathbf x)\]
-The set of values $\vec x$ consists of all the agent-level parameters (independent variables) in the data set provided by the sample step.
+The set of values $\mathbf x$ consists of all the agent-level parameters (independent variables) in the data set provided by the sample step.
 An individual mapping is learned for each system-level behavior measurement provided by the user.
 % The forward mapping is a straightforward regression problem ... Assuming this is a many-to-one relationship (due to the correct definition of the measurement)
 
@@ -144,7 +148,29 @@ In this phase of \fw, the regression algorithm is ``initialized," if necessary.
 For example, linear regression would need to solve the least-squares problem.
 Meanwhile, an algorithm like k-nearest neighbor would not need to initialize anything.
 % The forward mapping problem returns an object that can be queried for configuration vector x, and returns system-level property y.
-Once this phase is completed, the user is provided with $f$, an interface to the mapping built by the regression algorithm.
+
+Once this phase is completed, the user is presented with $f$, an interface to the mapping built by the regression algorithm.
+The forward mapping is primarily used to \textit{predict} what the system-level property values will be, given the system's configuration.
+For example, a learned mapping could be used to determine the average number of sheep given a configuration vector, without having to run the system.
+Some sample predictions, given particular system configurations, are shown in Table \ref{table:ws_predictions}.
+The values for a system configuration represent \textit{grass-regrowth-time}, \textit{sheep-gain-from-food}, \textit{wolf-gain-from-food}, \textit{sheep-reproduce}, and \textit{wolf-reproduce}, respectively.
+
+\begin{table}[ht]
+  \caption{Sample Predictions of Behavior in the Wolf Sheep Predation Model}
+  \centering
+  \begin{tabular}{c c c c}
+    \hline \hline
+    Configuration & Average \# Sheep & Average \# Wolves & Average \# Grass \\
+    \hline
+    $(30, 4, 20, 4, 5)$ & 162.8 & 76.1 & 964.8 \\
+    $(30, 3, 26, 7, 5)$ & 122.8 & 90.4 & 1135.2 \\
+    $(14, 3, 26, 7, 5)$ & 144.3 & 163.8 & 1621.4 \\
+    $(5, 3, 17, 7, 5)$ & 946.9 & 3.4 & 1065.4 \\
+    \hline
+  \end{tabular}
+  \label{table:ws_predictions}
+\end{table}
+
 
 A more in depth definition of the forward-mapping problem, specific examples of regression methods used in \fw, and the role of regression is given in Chapter \ref{ForwardMapping}: The Forward-Mapping Problem.
 
@@ -167,10 +193,19 @@ Therefore, \fw cannot use standard regression techniques to solve this problem.
 Instead, \fw approximates the inverse of the forward mapping, with a method that I developed.
 As an aside, this approach has the benefit of using the forward mapping to develop the reverse mapping.
 No additional input from the user or data set are needed.
-The intricacies of inverting a functional mapping developed by a regression algorithm are discussed in Chapter \ref{ReverseMapping}: The Reverse-Mapping Problem.
 % Elude that we will discuss our particular solutions to these problems in later chapters
 
-\subsection{Using the Maps}
+The reverse mapping can be used to suggest a system configuration that will exhibit a specific system-level properties.
+I call this process \textit{control} of the ABM, since it is controlling the ABM at a system-level by suggesting configurations.
+For example, the reverse mapping could be used to suggest a configuration of $(30, 4, 20, 4, 5)$  for a desired system-level property of 162.8 average sheep (see Table \ref{table:ws_predictions}).
+However, using the reverse mapping is more involved than using the forward mapping, because $f^{-1}$ returns a set of possible solutions, not a singular suggestion.
+If the mapping is to be used for control, any configuration in this set will satisfy the system-level requirements.
+Therefore, an additional step must be taken to extract a point from the set if it is to be used to control an ABM.
+Reverse mappings can be used to satisfy queries for several system-level properties at once, as well.
+This is done by finding the set intersection of all sets returned by the different reverse mappings.
+
+The implementation details of developing reverse mappings and how to use the reverse mappings are discussed in Chapter \ref{ReverseMapping}: The Reverse-Mapping Problem.
+
 
 % Explain how the maps are queried.
 % Querying the forward mapping (example)
@@ -180,13 +215,62 @@ The intricacies of inverting a functional mapping developed by a regression algo
 
 
 \subsection{Summary of Configuration Points}
+
 % Sampling methodology
 % Measurements
 % Forward Mapping Algorithm
 % Reverse Mapping Algorithm
+The following is a summary of configuration points discussed in this section.
+For each new domain, the user must specify the following:
+\begin{itemize}
+   \item A list of agent-level control parameters, and with what ranges they should be sampled,
+   \item A list of system-level behavior properties and the way to measure them.
+\end{itemize}
+
+In addition, the user may configure the following if they wish to stray from the defaults:
+\begin{itemize}
+   \item The sampling strategy (default: random sampling),
+   \item The regression algorithm to be used for the forward mapping (default: k-nearest neighbor),
+\end{itemize}
+
 
 \section{Software Implementation Details}
+So far, I have discussed \fw in an abstract way and have avoided specific implementation details.
+This is because the framework is a methodology and could be reimplemented in a number of different ways or to work with a number of different ABMs.
+In this section, I will discuss the details of my proof-of-concept implementation that will be used in experiments in Chapter \ref{Results}: Results.
+
 % Most of the software is implemented in python, but the interaction with NetLogo is handled with Java, so that I can access the Java API.
+I designed my implementation to work directly with NetLogo\footnote{More about NetLogo is covered in Chapter \ref{Background}: Background.} to sample, predict and control.
+All interactions with NetLogo, such as running experiments, retrieving a current configuration or pushing a suggested configuration are handled with Java through NetLogo's Java API.
+The rest of the framework, such as learning the mappings, is implemented in Python.
+Each step returns its result  in the form of a file, so that it can be passed on to the next step or saves for later use.
+For example, the forward mapping writes the model to a file so that it can be used by the prediction script and the reverse mapping script.
+
+Since each domain has different variable names and nuaces, the user must implement the Java source code that interacts with NetLogo's API.
+This work is made simple by base classes and examples being available to build off of.
+The user must list the configuration parameters and the ranges of these values so that the sampling can begin.
+Measuring the system-level parameters can either be calculated within NetLogo or in Java.
+For example, I modified the standard Wolf Sheep Predation model to keep track of the number of sheep at each tick.
+Then, to extract the value, I query NetLogo's API to retrieve the sum of the sheep divided by the number of ticks.
+A similar calculation could be performed within the Java source code by retrieving each piece individually, then performing statistics on them.
+Performing the statistics in Java have the benefit of not having to change the NetLogo ABM source code.
+The data set is written to a file, row by row.
+Therefore, the results of several instances of the sampling, executing on different machines, can be easily concatenated.
+
+The regression algorithms have a standard API and are passed into the forward, reverse mapping, prediction and scripts.
+Therefore, no configuration of these core scripts is needed, since the regression algorithm is ``pluggable."
+
+An overarching ``master script," written in Python, is able to run each step automatically if the user wants to limit the amount of interaction with the framework software.
+
+In addition to the framework software, I have developed a user's toolkit that queries the models generated by the forward- and reverse-mapping models.
+The core tools include:
+\begin{itemize}
+   \item Query the forward mapping for a prediction by passing in a configuration,
+   \item Query the reverse mapping for a set of possible solutions by passing in a configuration,
+   \item Query several of reverse mapping sets for the intersecting set,
+\end{itemize}
+Other tools exist for visualizing the mappings and sets and handling special cases of the reverse mapping.
+Each of these will be discussed in detail in Chapter \ref{Using}: Using Meta Models.
 
 % Give a list of agent-level variable ranges/steps
 % Generate the experiments list
@@ -200,27 +284,46 @@ The intricacies of inverting a functional mapping developed by a regression algo
 % More about NetLogo is covered in Background.
 
 
-\section{Example: \fw Applied to Wolf Sheep Predation}
-
-% Identification of agent-level control parameters
-% Identify ranges of values for agent-level control parameters
-
-% Definition of system-level measurements.
-% Specifically how to measure them
-
-% Choice of regression algorithm (KNN)  -- More discussion is on FM and RM
-
-% Analysis of the accuracy of our approach against this domain is in the RESULTS chapter.
-
-% Give a glimpse into tools -- More discussion is on using chapter
-
 
 \section{Analysis of \fw  vs. the Design Goals}
+In summary, I align the actual implementation of \fw with the design goals.
+
+% for my reference...
+%  \item Domain independent -- the design of \fw should minimize the amount of configuration for each domain,
+%  \item Algorithm independent -- any regression algorithm should be able to be plugged into \fw,
+%  \item Accurate -- \fw should generate accurate predictions and control suggestions,
+%  \item Fast for the user -- interactions with the models generated by \fw should require minimal computational time.
+
+
 % Our framework is domain independent, because it reduces the forward mapping problem to a classical regression problem of learning the correlation between the agent-level parameters and the system-level properties..
 % We introduce a domain-independent approach to solve the reverse mapping problem that uses standard regression to build a space of configurations that would produce desired behavior.
+\textit{Domain independence}---
+My framework's implementation is domain independent to an extent. \fw reduces the forward-mapping problem to a classical regression problem of learning the correlation between the agent-level parameters and the system-level properties.
+My reverse-mapping problem solution is also domain independent by interacting exclusively with the forward mapping.
+However, my implementation of \fw still requires the user to specify the agent-level parameters and how to measure the system-level properties.
+This is a reasonable, since automatically detecting configuration points and having a computer determine behaviors of interest in an ABM would be a challenging unsupervised learning problem.
 
 % Our framework is algorithm independent, because any regression algorithm (e.g., ...) can be used to develop the forward mapping and the reverse mapping
+\textit{Algorithm independence}---
+Any regression algorithm can be plugged into my implementation, as long as they maintain the standard API.
+A simple Python wrapper can be programmed to adapt an already existing regression algorithm to work with my implementation of \fw.
+The process of inverting requires nothing special of the regression algorithm, because the inversion learning process uses the algorithm's standard forward-mapping usage.
 
 % Our framework is as accurate as the regression algorithms used and the data set sampled from the agent-based model. /elaborate/
 % In general, I prefer spending longer sampling to generate an exhaustive data set increase accuracy and reducing user interaction delays when querying for a prediction or a suggestion for controlling.
 % This shifts most of the computation time offline, instead of online, reducing user interaction time when querying the forward or reverse mappings.
+\textit{Accuracy}---
+No extra error is incurred by \fw, itself;
+the accuracy of \fw depends on the regression algorithm used and the amount of time spent sampling.
+If \fw is not providing accurate results with state of the art regression algorithms, either the correlations cannot be learned with current technology or not enough time has been spent sampling.
+
+
+\textit{Fast for the user}---
+Most of the computation time is spent in sampling and learning the models.
+These operations are offline and do not affect the response time of real-time interaction with the user.
+The response time of the forward mapping and the reverse mapping are proportional to the running time of the regression algorithms, bur are often require less than a few seconds, at most.
+
+
+
+
+
