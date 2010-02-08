@@ -80,13 +80,6 @@ For example, even though different regression algorithms can be used to learn th
 
 
 
-%% HACK!! I need to physically move this around
-\begin{figure}[H]
-\centering
-\includegraphics[scale=1]{images/framework.pdf}
-\caption{An overview of the phases of \fw and how data flows between them.}
-\label{fig:frameworkdiag}
-\end{figure}
 
 \subsection{Defining System-Level Behavior Properties}
 % Measurements have to be defined to tell what to sample.
@@ -102,6 +95,17 @@ For example, there are several system-level behavior properties we measure in th
 Three of the most obvious are the average number of sheep, average number of wolves, and average amount of grass over a significant number of ticks.
 These are measured by individually summing the number of sheep, wolves, and grass living at each time step and dividing by the number of ticks.
 Although the number of sheep and wolves change rhythmically, the average values typically converge to a single value after about 10,000 ticks.
+
+
+%% HACK!! I need to physically move this around
+\begin{figure}[H]
+\centering
+\includegraphics[scale=1]{images/framework.pdf}
+\caption{An overview of the phases of \fw and how data flows between them.}
+\label{fig:frameworkdiag}
+\end{figure}
+
+
 
 \subsection{Sampling}
 % The first phase is sampling, in which the framework interacts with the agent-based model to generate a large enough data set for training.
