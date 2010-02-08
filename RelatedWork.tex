@@ -3,6 +3,34 @@
 
 \label{RelatedWork}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+\section{Experimentation in ABMs}
+Experimental platform for messing around with ABMs: (Bourjot -- ``A platform for the analysis of artificial self-organized systems'' 2004) (relevant?)
+
+ABMs have been used to study behaviors in biological systems... Domain specific work interested in system-level behavior: ant lane formation \cite{couzin2003sol}, marching locusts \cite{buhl2006dom}, fish schools \cite{parrish2002sof}. Most of these studies are qualitative in nature.
+
+particle swarm optimization: emperical study \cite{shi1998parameter}; more general approach: \cite{van2006study}
+
+\section{Prediction of System-Level Behavior}
+
+physics-based control policy \cite{spears2004dpb} -- similar to our approach, but the models are tightly coupled to the domain. the system was designed with system-level models in mind. Algebraic inversion for inverse mapping is nice. Inspires the nonlinear regression approach in \fw.
+
+Macroscopic models of swarm robot systems \cite{lerman2002mmf}\cite{lerman2005rpm} -- similar in motivation, but models the system in a more specific way (FSAs). Specific to systems in which agents can be modeled as FSAs. Our approach is more general, since it just looks at parameters.
+
+%not entirely relevant -- Idea of system-level control.... robot swarms \cite{mclurkin2004srt} -- tightly coupled with domain, describes the behaviors as actions (not properties), splits behaviors into hierarchies.
+
+
+\section{Inversion of Neural Networks}
+Inversion of neural networks: 
+\begin{itemize}
+\item (A Linden and J Kindermann ``Inversion of multilayer nets'' 1989 -- optimization problem solved by gradient descent) 
+\item (Bao-Liang Lu ``Inverting Feedforward Neural Networks using Linear and Nonlinear programming'' 1990 -- formulate the inverse problem as a nonlinear programming problem, a separable programming problem or a linear programming problem)
+\item (S. Lee and R.M. Kill ``Inverse Mapping of continuous functions using local and global information'' 1989 -- iterative update towards a good solution)
+\item (Michael I. Jordan work with robot arm ``Forward Models: supervised learning with a distal teacher'' -- asks the question, what configuration of the robot arm will yield this behavior?)
+\end{itemize}
+All of these are optimization techniques. They do not return an actual mapping. Also, some of the techniques are restricted to neural networks (and are thus not algorithm-independent).
+
+
+
 
 
