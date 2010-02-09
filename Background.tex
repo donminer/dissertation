@@ -3,6 +3,67 @@
 
 \label{Background}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% Agent-Based Models
+  % Agent perspective
+  % Agents follow rules, or agent programs
+  % low-level interactions emerge into interesting system-level properties
+
+  % //Model// some real or artificial phenomena - abstract simulation - model pieces of interest
+  % Uses: studying social animal behavior, studying human social interactions (traffic, disease propagation), supply chain management
+
+  % To facilitate the creation of new agent-based models, many modeling environments have been developed... (give ~1 paragraph summaries of each)
+    % Swarm
+    % Repast
+    % Breve
+    % MASON
+  % NetLogo - used by this research
+    % Background information on NetLogo
+    % Concept - based off logo, 2d domain of patches, agents are ''turtles''
+    % Agents are asked to perform actions from their context. e.g., ask turtles [ fd 1 ]
+    % Plotting and monitors
+    % BehaviorSpace extension for sampling
+    % Java APIs
+
+% Regression
+  % The reason for regression: we have independent and independent real-valued variables.
+  % What I need in a regression algorithm: can model nonlinear behaviors that are difficult to apply a model to and works in many dimensions; needs to build relatively smooth models for the inverted regression to be smooth.
+  % Figure of Fires domain, boids domain, wolf/sheep predation domain
+  % So far, I have implemented the following regression algorithms to work with \fw: K-Nearest Neighbor, LOESS (Locally weighted scatterplot smoothing, least-squares Non-Linear Regression
+  % K-Nearest Neighbor Regression
+    % Concept - Take k-nearest neighbors and average them
+    % The role of KNN - easy to implement, accurate with large data sets
+    % Slow with large data sets because of all the distance calculations needed.
+      % Can be sped up with advanced nearest neighbor search, such as a kd-tree or local sensitivity hashing.
+      
+  % LOESS
+    % Concept - take some subset of neighbors, weight them, and then perform linear regression on them
+    % Role of the smoothing parameter -- how much data is used to fit each polynomial
+    % Weight function weights points by distance -- most common function is the tri-cube function
+    % Advantages: nonparametric (useful for my domains), 
+    % Role in \fw : accurate and nonparametric. Conceptually, if we sample infinitely with LOESS, we will get a very smooth graph (which makes it nice for inverted regression).
+
+  % NonLinear Regression
+    % Concept - take a model of the data, optimize the parameters to minimize least squares.
+    % Accuracy is largely dependent on the model
+    % Limited (for example, had trouble modeling the simple sigmoid looking thing from the fires domain).
+    % Advantage: fast to query
+    % Role in \fw: algebraically invertible (more in chapter: reverse mapping)
+
+  % Multilinear Interpolation
+    % Concept - given corner points of a hypercube (knots), interpolate some point inside of it with linear interpolation; interpolate dimension my dimension until the point is reached.
+    % Downside - sampling needs to be systematic: remedy- use another regression algorithm to build the knots. This has the benefit of being faster than other approaches (the interpolation is fast, the regression may be slow, and the knots can be built ahead of time)
+    % Faster than some of its counterparts
+    % builds smooth mappings of multi-dimensional spaces
 
 
+% Inverting Regression
+    % Optimization
+       % Minimize the distance from the result of the forward mapping to the actual result
+       % Stochastic Hill Climbing
+           % very simple, works well in domains with not many local minima
+       % Other possible approaches:
+           % Gradient ascent, genetic algorithms
+
+    % Plane Intersection
+       % What does plane intersection do? it takes two hyperplanes and returns the intersection.
+       % Iterative divide and conquer method (printout on my desk)
