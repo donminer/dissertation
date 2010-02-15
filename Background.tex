@@ -3,19 +3,171 @@
 
 \label{Background}
 
+\section{Agent-Based Modeling}
+The \framework is targeted at predicting and controlling behavior in an agent-based model (ABM).
+This section discusses what an ABM is, discusses some examples of ABMs, and lists some existing ABM software frameworks.
+
+Agent-based models are implemented from the agent perspective.
+Agents in ABMS are typically:
+\begin{itemize}
+   \item bounded by a limited global view,
+   \item perform local interactions, affecting their local environment and neighboring agents,
+   \item are autonomous (i.e., not following some top-down control), and
+   \item may be heterogeneous (i.e., agents within the system can have different properties).
+\end{itemize}\cite{epstein1999agent}
+This is opposed to an ``observer" perspective, in which an overarching control system dictates what agents are to do.
+For example, in NetLogo, an agent moves forward two units with the following command:
+\begin{quote}
+\texttt{\small > fd 2}
+\end{quote}
+Notice that this code is agnostic to the direction of the agent or the position of the agent in the environment.
+The code simply tells the agent to move forward two units.
+In contrast, if this were to done from the observer perspective in NetLogo, the following code would be necessary:
+\begin{quote}
+\texttt{\small > set [xcor] of turtle 0\\
+([xcor] of turtle 0 + 2 * cos([heading] of turtle 0))\\
+> set [ycor] of turtle 0\\
+([ycor] of turtle 0 + 2 * sin([heading] of turtle 0))}
+\end{quote}
+This code the change in the x-coordinate and the y-coordinate, given that the agent should move 2 units.
+Then, it adds the result to the agent's original x- and y- coordinates.
+Finally, it sets this turtle's x- and y-coordinates to the new x- and y-coordinates.
+This process is cumbersome.
+
+One of the common uses of ABMs is to discover how local interactions affect emergent behavior of a system, through experimentation.
+The research question is posed well by Epstein as the \textit{Generativist's Question}:
+\begin{quote}
+   How could the decentralized local interactions of heterogeneous autonomous agents generate the given regularity?
+\end{quote}
+To answer this question, Epstein then poses the \textit{Generativist's Experiment}:
+\begin{quote}
+Situate an initial population of autonomous heterogeneous agents in a relevant spatial environment; allow them to interact according to simple local rules, and thereby generate--or ``grow"--the macroscopic regularity from the bottom up. \cite{epstein1999agent}
+\end{quote}
+If a model accurately generates the emergent behavior of the target system, then that ABM could explain why that behavior emerges.
+Agent-based models are particularly well-suited to answer the Generativist's question.
+
+The concept of ABMs can be extended to other uses beyond modeling.
+Many swarm intelligence techniques, such as particle swarm optimization \cite{kennedy1995pso} and ant colony optimization \cite{dorigo2004aco}, use a decentralized agent-based approach to solve optimization problems.
+Although they are inspired by naturally occurring phenomena, their purpose is entirely separate.
+
+Implementing systems as an ABM could be natural than other approaches when the system cannot be defined in an aggregate manner or when individual behavior is complex \cite{bonabeau2002agent}.
+ABMs are often compared to equation-based modeling (EBM), in which the model is a parametrized system of equations that describe system-level behavior (i.e., the observer perspective).
+For example, a supply chain management system could be modeled as an ABM or an EBM \cite{parunak1998agent}.
+In the ABM proposed by Parunak et. al, individual agents represent different companies that trade with one another.
+In contrast, the EBM is a series of ordinary differential equations describing the input and output of different components of the supply network.
+In my example above where the agent moves forward, a relatively simple task of adjusting the position of an agent proved to be overly complicated.
+When more detailed operations need to be performed, the complexity of the observer-perspective model increases drastically.
+
 % Agent-Based Models
   % Agent perspective
   % Agents follow rules, or agent programs
   % low-level interactions emerge into interesting system-level properties
 
+
+
+\subsection{Examples of Agent-Based Models}
+
+ABMs have been used to model a variety of different systems.
+In this subsection, I outline a number of agent-based models that have been developed by other researchers in the past.
+
   % //Model// some real or artificial phenomena - abstract simulation - model pieces of interest
   % Uses: studying social animal behavior, studying human social interactions (traffic, disease propagation), supply chain management
 
+\subsubsection{Reynolds Boid Flocking}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.66667]{images/netlogo_boidflock.png}
+\caption{A boid flock moving through a two-dimensional space.}
+\label{fig:netlogoboids}
+\end{figure}
+
+One of the first popular ABMs was the boid flock \cite{reynolds1987}\cite{reynolds1999sba}, in which agents move through an environment in a similar way to how birds flock.
+A screen shot from NetLogo's boid implementation \cite{flocking} is shown in Figure \ref{fig:netlogoboids}.
+Agents follow three simple rules:
+   \begin{itemize}
+      \item move away from other agents to avoid collisions,
+      \item align to move in the same direction as nearby agents, and
+      \item move towards the central position of local flockmates.
+   \end{itemize}
+These simple agent-level behaviors result in the elegant flocking behavior observed from a top-down view of the system.
+This system naturally lends itself to being implemented as an agent-based model because the agents act autonomously and have local interactions with only their neighbors.
+The flocking behavior is emergent and therefore would be more difficult to program directly.
+
+Boid flocking has been used in a number of applications, such as visualizing time-varying data \cite{1382896}, clustering documents \cite{cui2006flocking}, controlling unmanned air vehicles \cite{crowther2003flocking} and art \cite{Boyd}.
+
+\subsubsection{Social Insect Behavior}
+
+A number of different projects have aimed at modeling insect societies.
+In modeling these systems, researchers are able to gain insights into how individual agent behaviors affect their emergent behavior.
+
+An agent-based model approach has been used to model how army ants form traffic lanes \cite{couzin2003sol}.
+The particular species of army ants discussed in this work form two-way highways to reduce the amount of head-on collisions while ants are searching for food and returning food.
+The authors show how the turning rates and perception of the individual ants affect the efficiency of the ants.
+They found that when the turning rate is too high, ants are too willing to steer off course and intersect the path of other ants.
+On the other hand, when the turning rate is too low, ants will not adjust their heading to avoid head on collisions.
+By tuning their model to optimize the highway performance, they reached an accurate model of the traffic flow in army ants.
+The result of this research is an accurate model that describes the behavior of ants in a traffic situation.
+
+With a different species of ants, researchers were able to produce an agent-based model that simulates the process of collectively selecting a location for a nest \cite{pratt2005agent}.
+This process is interesting, because an entire ant colony converges on one location, even though many of the ants only have scouted one nest site.
+Agents are implemented as state machines, in which agents are either exploring for a site, assessing a site, canvassing a site or committed to a site.
+In each of these phases, the agent performs different actions and at any time may reject the current site and begin exploring once again.
+Over time, all ants converge on a single site as a nest.
+With this model, the authors showed that a colony-level decision can be made by ants following agent-based rules.
+
+An ABM has been developed to simulate swarming locusts \cite{buhl2006dom}.
+Locusts have an interesting property in that when they are isolated, they tend to not stray from their current location.
+However, when locusts are accompanied by several other locusts, they begin to ``march," travelling from one area to another, consuming everything in their path.
+The authors were particularly interested in determining at what density the locusts will begin to march.
+By changing the number of simulated locusts in a confined space, they were able to determine at what density they would begin to march.
+This simulation approach is far more practical than experimenting with real locusts.
+The authors suggest that their models could be used to predict when locust swarms will occur to help warn farmers to protect their crops.
+
+
+\subsection{Models of Human Societies}
+
+Although human behavior is more complicated than insect behavior, local human interactions can often be generalized to build accurate models.
+
+Agent-based models have been used to determine how locals would react to an incident at the Pacific Missile Range Facility (PMRF) in Hawaii \cite{zanbaka}.
+The researchers used census data to represent each islander as an individual agent that either has a positive sentiment or a negative sentiment towards the missile facility.
+Agents can either change its sentiment towards PMRF by either interacting with another agent that has a different sentiment or experiencing a local event.
+The model simulates local events and agent interactions and displays how either positive or negative sentiment propagates throughout the island.
+
+EpiSims is an agent-based simulation tool that models disease outbreaks \cite{eubank2004modelling}.
+It uses estimates of how diseases are transmitted and how humans interact based on census and land-use data to realistic simulate the human society.
+The system simulates individuals going to work and shopping, which exposes them to the disease and exposes the disease to others.
+With this system, researchers are able to predict the effectiveness of mass and targeted vaccination strategies, given a particular community.
+
+STREETS is an agent-based model of pedestrian traffic \cite{schelhorn1999streets}.
+Pedestrian traffic is affected by two major aspects: the layout of the street network and the location of attractions.
+Instead of trying to analyze the behavior of the system from this data alone, STREETS simulates people to determine a number of properties of pedestrian traffic patterns.
+STREETS initialized the system with a statistically accurate distribution of individuals across the environment.
+Next, the agent-based model simulates the movement of agents from their arrival point to and through the urban center.
+Agents visit buildings and attractions and walk between them.
+Researchers using this tool can gain a top-level view that can be used to analyze the effectiveness of the urban center layout.
+Modifications to the environment can be performed in simulation to determine if it would improve the traffic situation.
+
+
+
+\subsection{Agent-Based Modeling Software Frameworks}
   % To facilitate the creation of new agent-based models, many modeling environments have been developed... (give ~1 paragraph summaries of each)
+
+\subsubsection{SWARM}
+   \cite{minar1996swarm}
     % Swarm
+\subsubsection{RePast}
+   \cite{collier2003ref} -- general citation
+   \cite{north2006experiences} -- 3 examples
     % Repast
+\subsubsection{Breve}
+   \cite{kleinbreve}
     % Breve
+\subsubsection{MASON}
+   \cite{Luke}
     % MASON
+\subsubsection{NetLogo}
+   \cite{tisue2004netlogo}
   % NetLogo - used by this research
     % Background information on NetLogo
     % Concept - based off logo, 2d domain of patches, agents are ''turtles''
@@ -24,17 +176,23 @@
     % BehaviorSpace extension for sampling
     % Java APIs
 
+
+\section{Regression}
 % Regression
+   % Give definition of the regression problem
   % The reason for regression: we have independent and independent real-valued variables.
   % What I need in a regression algorithm: can model nonlinear behaviors that are difficult to apply a model to and works in many dimensions; needs to build relatively smooth models for the inverted regression to be smooth.
-  % Figure of Fires domain, boids domain, wolf/sheep predation domain
-  % So far, I have implemented the following regression algorithms to work with \fw: K-Nearest Neighbor, LOESS (Locally weighted scatterplot smoothing, least-squares Non-Linear Regression
+  % Figure of Fires domain, boids domain, wolf/sheep predation domain behavior graphs
+  % So far, I have implemented the following regression algorithms to work with \fw: K-Nearest Neighbor, LOESS (Locally weighted scatterplot smoothing, least-squares Non-Linear Regression, Multilinear Interpolation
+\subsection{K-Nearest Neighbor Regression}
   % K-Nearest Neighbor Regression
     % Concept - Take k-nearest neighbors and average them
     % The role of KNN - easy to implement, accurate with large data sets
     % Slow with large data sets because of all the distance calculations needed.
       % Can be sped up with advanced nearest neighbor search, such as a kd-tree or local sensitivity hashing.
       
+\subsection{Robust Locally Weighted Regression and Smoothing Scatterplots}
+   \cite{cleveland1979robust}\cite{cleveland1988locally}
   % LOESS
     % Concept - take some subset of neighbors, weight them, and then perform linear regression on them
     % Role of the smoothing parameter -- how much data is used to fit each polynomial
@@ -42,6 +200,8 @@
     % Advantages: nonparametric (useful for my domains), 
     % Role in \fw : accurate and nonparametric. Conceptually, if we sample infinitely with LOESS, we will get a very smooth graph (which makes it nice for inverted regression).
 
+\subsection{Nonlinear Regression}
+   \cite{gallant1975nonlinear}
   % NonLinear Regression
     % Concept - take a model of the data, optimize the parameters to minimize least squares.
     % Accuracy is largely dependent on the model
@@ -49,14 +209,34 @@
     % Advantage: fast to query
     % Role in \fw: algebraically invertible (more in chapter: reverse mapping)
 
+\subsection{Multilinear Interpolation}
+   \cite{davies1997multidimensional}
   % Multilinear Interpolation
     % Concept - given corner points of a hypercube (knots), interpolate some point inside of it with linear interpolation; interpolate dimension my dimension until the point is reached.
     % Downside - sampling needs to be systematic: remedy- use another regression algorithm to build the knots. This has the benefit of being faster than other approaches (the interpolation is fast, the regression may be slow, and the knots can be built ahead of time)
     % Faster than some of its counterparts
     % builds smooth mappings of multi-dimensional spaces
 
+\section{Inverting Regression}
+% How does inverting regression fit into \fw? We invert the forward mapping to solve the reverse-mapping problem.
+% Our two major approaches to this are optimization and plane intersection.
+% More approaches are possible and are discussed in Chapter X: The Reverse-Mapping problem, but require limited amount of background information.
 
-% Inverting Regression
+
+\subsection{Plane Intersection}
+   \cite{patrikalakis1993surface}
+    % Plane Intersection
+       % What does plane intersection do? it takes two hyperplanes and returns the intersection.
+       % Iterative divide and conquer method (printout on my desk)
+
+   % How we use plane intersection: The solution to the reverse-mapping problem is the intersection of the forward mapping and the plane representing the desired behavior.
+   % Give example
+   % Figure example
+
+   % Benefits of this approach: gives a space that represents the intersection, instead of just one point.
+   % Slow
+
+\subsection{Optimization}
     % Optimization
        % Minimize the distance from the result of the forward mapping to the actual result
        % Stochastic Hill Climbing
@@ -64,6 +244,8 @@
        % Other possible approaches:
            % Gradient ascent, genetic algorithms
 
-    % Plane Intersection
-       % What does plane intersection do? it takes two hyperplanes and returns the intersection.
-       % Iterative divide and conquer method (printout on my desk)
+   % How we use optimization: Try to minimize the distance between the produced system-level property and the desired system-level property by adjusting the agent-level parameters.
+
+   % Benefits: fast
+   % bad: only finds one solution
+
