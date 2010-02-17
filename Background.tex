@@ -3,9 +3,19 @@
 
 \label{Background}
 
+The purpose of this chapter is to provide necessary background information for understanding concepts related to \fw.
+In contrast to Chapter \ref{RelatedWork}: Related Work, the previous research presented in this chapter do not share my motivation in \fw, but are a foundation for which \fw is built upon. 
+
+The \framework uses preexisting research in two major areas:
+agent-based modeling and regression.
+The \fw is targeted at predicting and controlling behavior in an agent-based model (ABM).
+The next section discusses what an ABM is, discusses some examples of ABMs, and lists some existing multi-agent software frameworks.
+In the following section, I define regression, outline favorable and unfavorable properties that regression algorithms, and outline a number of regression algorithms that have been used by \fw.
+Finally, I discuss methods that are used in solving the reverse-mapping problem: plane intersection and optimization.
+
+
+
 \section{Agent-Based Modeling}
-The \framework is targeted at predicting and controlling behavior in an agent-based model (ABM).
-This section discusses what an ABM is, discusses some examples of ABMs, and lists some existing multi-agent software frameworks.
 
 Agent-based models are implemented from the agent perspective.
 Agents in ABMS are typically:
@@ -280,31 +290,122 @@ This will make my research easily extensible to other ABM systems in the future.
 
 \section{Regression}
 Regression is an integral part of this dissertation research, as it is the foundation of solving the forward- and reverse-mapping problems.
+  % The reason for regression: we have independent and independent real-valued variables.
+Regression techniques are used to predict values of dependent variables, given values for the dependent variables.
+The typical approach is to use a model developed from a sample training set to infer new values that have not been sampled.
+Also, regression can be used to smooth the natural error in sampling.
+
+Linear regression is perhaps the simplest form of regression that fits a line to fit one independent variable with one dependent variable. It takes the form of:
+\[\mathrm{y} = \mathrm{x} + b.\]
+There exists a closed-form solution to determine $m$ and $b$ in order to minimize the sum of least-squares between the training data and the curve.
+
+Unfortunately, linear regression is limited in that it only models linear relationships, and is not able to model nonlinear ones, such as rhythmic oscillations, or quadratic correlations.
+Two paths are generally taken to address this concern.
+The first is to use the kernel trick \cite{muller2001introduction} to map nonlinear data to be linear, but higher dimensional.
+Then, once the data is projected into a space in which it is linear, linear methods (e.g., linear regression, perceptrons \cite{minsky19882perceptrons}, or support vector regression\cite{smola2004tsv}) can be used.
 
 % Regression
    % Give definition of the regression problem
-  % The reason for regression: we have independent and independent real-valued variables.
+The second path are nonlinear methods, which relax the problem to learning a function $f(\cdot)$ that satisfies the following:
+\[y_i = f(\mathbf x) + \varepsilon_i.\]
+In this equation, $y_i$ is a dependent variable, $\mathbf x_i$ is the vector of independent variables associated with $y_i$.
+Also, there is an assumption of some normally distributed and independent error with each point, denoted by $\varepsilon_i$.
+The process of \textit{nonparametric} regression is to estimate this function directly \cite{fox2002r}.
+
+Alternatively, a \textit{parametric} regression model is one in which the form of the function $f(\cdot)$ is relatively fixed.
+Instead of learning $f(\cdot)$ directly, a vector of model parameters $\mathbf \beta$ are optimized to fit the data \cite{fox2002r}:
+\[y_i = f(\mathbf \beta, \mathbf x) + \varepsilon_i.\]
+For example, $f(\cdot)$ could model two-dimensional sinusoidal data with the model:
+\[f(\mathbf \beta, (x_1, x_2)) = \beta_1 + \beta_2 \sin (x_1 - \beta_3) + \beta_4 \sin (x_2 - \beta_5)\]
+Typically, the value of the sum of least-squares metric is minimized to fit the curve to the data.
+
   % What I need in a regression algorithm: can model nonlinear behaviors that are difficult to apply a model to and works in many dimensions; needs to build relatively smooth models for the inverted regression to be smooth.
+While developing the \framework, I needed regression algorithms that satisfied a number of properties.
+The regression algorithm should scale well with dimensionality, since agent-based model behavior spaces (i.e., the space of agent-level parameters and system-level properties) are typically highly dimensional.
+I also needed algorithms that could model nonlinear correlations, since behavior spaces are expansive and rarely maintain linearity throughout the entire space.
+However, in the ABMs I have experimented with, all spaces are very smooth locally.
+That is, there is little variance in values between nearby locations in the behavior space.
+Even in the situation where there is variance, the error is typically evenly distributed and cancels out if the same configuration is sampled a number of times.
+Therefore, nonlinear parametric regression can fit to the overall behavior space, without having to worry about fine grained variations in the data.
+Also, the mappings build by the regression models should be smooth.
+This is important for the tractability of finding the reverse mapping, since bumpy surfaces will yield more intersections than smooth ones.
+Therefore, regression methods that smooth the data, such as LOESS, are effective in this situation.
+
+\textit{[\textbf{TODO}: an image showing graphs of the fires, boids, and sheep/wolf predation behavior spaces (need to make wolf/sheep data set to do this)]}
+
+In the course of testing \fw, I used four regression techniques: k-nearest neighbor, LOESS, least-squares nonlinear regression, and Multilinear Interpolation.
+
   % Figure of Fires domain, boids domain, wolf/sheep predation domain behavior graphs
   % So far, I have implemented the following regression algorithms to work with \fw: K-Nearest Neighbor, LOESS (Locally weighted scatterplot smoothing, least-squares Non-Linear Regression, Multilinear Interpolation
 \subsection{K-Nearest Neighbor Regression}
   % K-Nearest Neighbor Regression
     % Concept - Take k-nearest neighbors and average them
+K-nearest neighbor (KNN), in general is the process of selecting the $k$ nearest points to some point $\mathbf x$.
+These points can then be used for classification or regression.
+In the simplest case, each neighbor's $y$ value is averaged to inter a value $y'$ for the given point $\mathbf x$.
+KNN is easy to implement and accurate with large data sets.
+Accuracy of this regression can be improved by weighting points by distance or by using a secondary regression algorithm (e.g., linear regression) on the neighbors.
+
     % The role of KNN - easy to implement, accurate with large data sets
+We use KNN in our results as a baseline, since it is easy to implemente and accurate with large data sets.
+In addition, it is nonparametric, which makes it agnostic the the shape of the behavior space.
+This results in KNN requiring no configuration or tailoring to a particular domain.
+
     % Slow with large data sets because of all the distance calculations needed.
       % Can be sped up with advanced nearest neighbor search, such as a kd-tree or local sensitivity hashing.
+However, when implemented naively, the run-time scales linearly with the size of the data set because the process of finding the nearest neighbors requires a scan of all data points.
+This search time can be reduced with the implementation of faster searching techniques, such as locality sensitive hashing \cite{gionis1999similarity}, among other methods.
+Even with faster neighbor locating techniques, some sort of search is required for each query to KNN.
+
+The spaces generated by KNN are not continuous (particularly if the neighbors are not weighted).
+This is because similar points will have the same neighbors and, in effect, have the same predicted value.
+There are separations in which on one side the k-nearest neighbors will include a particular data point, meanwhile on the other side it will not.
+At this separation, a noncontinuous jump will occur in predicted values.
+This can be a problem for solving the reverse-mapping problem because the intersection between hyperplanes generated by KNN will not intersect smoothly.
+This can be remedied by using KNN in conjunction with multilinear interpolation.
       
-\subsection{Robust Locally Weighted Regression and Smoothing Scatterplots}
-   \cite{cleveland1979robust}\cite{cleveland1988locally}
-  % LOESS
-    % Concept - take some subset of neighbors, weight them, and then perform linear regression on them
-    % Role of the smoothing parameter -- how much data is used to fit each polynomial
-    % Weight function weights points by distance -- most common function is the tri-cube function
+\subsection{Robust Locally Weighted Regression and Smoothing Scatterplots (LOESS)}
+
+
     % Advantages: nonparametric (useful for my domains), 
     % Role in \fw : accurate and nonparametric. Conceptually, if we sample infinitely with LOESS, we will get a very smooth graph (which makes it nice for inverted regression).
+Robust Locally Weighted Regression and Smoothing Scatterplots (LOESS) is a mature nonparametric regression technique for fitting curves to data   \cite{cleveland1979robust}\cite{cleveland1988locally}.
+Similar to k-nearest neighbor, LOESS uses local points to infer values of data points.
+LOESS also iteratively smooths the regression curve, allowing for variable magnitudes of smoothing.
+This is important for particularly noisy data sets.
+The role of LOESS in the testing of \fw is it is more robust than KNN, yet still nonparametric.
+
+    % Concept - take some subset of neighbors, weight them, and then perform linear regression on them
+Abstractly, LOESS fits a new $\hat y_i$ to every $\mathbf x_i$ to replace the original noisy $y_i$.
+Then, LOESS iteratively smooths each $\hat y_i$ to reduce variability.
+Specifically, LOESS follows the following steps:
+\begin{enumerate}
+   \item Initialization step -- for each $\mathbf x_i$, weight all other points $x_j$, where $j = 1...n$, based on a weighting function $W(\mathbf x_i, \mathbf x_j)$. $W$ weights closer points higher. Perform weighted linear regression to infer $\hat y_i$.
+   \item Smoothing step -- For each $\mathbf x_i$, weight all other points based on $w_i$, as well as a new weight function $\delta$, which returns magnitude inversely proportional to $y_i - \hat y_i$ (i.e., the larger the distance, the lesser the weight). Perform weighted linear regression to infer $\hat y_i'$.
+   \item Set each $\hat y_i$ to $\hat y_i'$.
+   \item Repeat the the smoothing step as many times as necessary.
+\end{enumerate}
+Values in between $\mathbf x$s can be now be interpolated.
+
+    % Role of the smoothing parameter -- how much data is used to fit each polynomial
+LOESS can be customized in a number of ways.
+The different weighting functions can be changed to change the amount of influence other points give to the linear regression step.
+Typically, these weighting functions have a ``smoothing" parameter, when increases the influence of further away points, effectively reducing the strong influence of local points.
+Adjusting the smoothing parameter is important because if it is too low, the regression curve will be erratic, meanwhile, if the smoothing parameter is too high, some features of the curve may be eliminated.
+
+  % LOESS
+    % Weight function weights points by distance -- most common function is the tri-cube function
+LOESS is relatively computationally expensive in comparison to other approaches.
+This is because more weights are applied and points are readjusted iteratively a number of times.
+However, the model can be built offline and then stored.
+Once the $\hat y_i$ values are inferred, they can be used to interpolate new points (similar to multilinear regression) in response to queries.
+This provides a quick response time to users wanting to infer to $\hat y$ values.
+This fits one of the design criteria of \fw: the regression algorithm should be fast for the user.
+
+The \textit{R} statistical package\footnote{R website: http://www.r-project.org/} has a built in LOESS function.
 
 \subsection{Nonlinear Regression}
-   \cite{gallant1975nonlinear}
+\cite{gallant1975nonlinear}
   % NonLinear Regression
     % Concept - take a model of the data, optimize the parameters to minimize least squares.
     % Accuracy is largely dependent on the model
@@ -313,10 +414,21 @@ Regression is an integral part of this dissertation research, as it is the found
     % Role in \fw: algebraically invertible (more in chapter: reverse mapping)
 
 \subsection{Multilinear Interpolation}
-   \cite{davies1997multidimensional}
+
   % Multilinear Interpolation
     % Concept - given corner points of a hypercube (knots), interpolate some point inside of it with linear interpolation; interpolate dimension my dimension until the point is reached.
+Multilinear interpolation is a dynamic approach that uses multi-dimensional interpolation between ``knots" to generate a smooth surface across a space of any dimension \cite{davies1997multidimensional}.
+Knots are sampled data points, scattered across the behavior space in a regular fashion such that the knots, when connected, form hypercubes.
+When a point $\mathbf x$ is queried, multidimensional interpolation is performed using the corners of the hypercube to infer the value of $\hat y$.
+
     % Downside - sampling needs to be systematic: remedy- use another regression algorithm to build the knots. This has the benefit of being faster than other approaches (the interpolation is fast, the regression may be slow, and the knots can be built ahead of time)
+The major downside to multilinear interpolation is that the sampling needs to be systematic and even spaced.
+To remedy this situation, another regression algorithm is used to compile a set of evenly spaced points.
+These evenly spaced inferred points area then passed to a traditional multilinear interpolation approach.
+
+In this dissertation, I typically use multilinear interpolation as a supplement to the other regression approaches.
+A number of points can be inferred with another regression algorithm and then interpolated between with this approach.
+
     % Faster than some of its counterparts
     % builds smooth mappings of multi-dimensional spaces
 
