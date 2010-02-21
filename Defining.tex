@@ -3,8 +3,27 @@
 
 \label{Defining}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% Definition of a system-level property
 
+% Discuss how system-level properties are identified
+
+% Discuss how system-level properties are mathematically defined
+
+% Give an outline of the chapter
+
+
+\section{The Stability Assumption}
+
+% Before delving into the topic of defining system-level properties, I first discuss this assumption
+
+% A measurement of a system-level property should be stable.
+% Explain what stable means
+%  the sampling error is normally distributed 
+% For example, the percentage of trees burned down
+
+% Explain the need for stability - we are trying to develop a functional mapping to solve the forward-mapping problem. Without this assumption, we cannot use regression(see background).
+
+% In most situations, a nonstable measurement could be the result of two situations: there is an underlying threshold effect or biased readings before convergence.
 
 % This is an example explaining the need for stability
 For example, in the Wolf Sheep Predation domain, one simple system-level measurement could be the average number of wolves over a thousand time steps.
@@ -16,4 +35,91 @@ where $extinct$ is whether the wolves went extinct or not, $\mathrm{P}(extinct)$
 $\hat w$ is not very stable, because sometimes it is zero and sometimes it is $(\bar w | \neg extinct)$.
 Making a prediction based on the expected value of $\hat w$ will always have a specific amount of error associated with it.
 To remedy this problem
+
+\section{Common Classes of System-Level Properties}
+
+% Many system-level properties can fit into a certain category
+
+\subsection{Average of a Value}
+% average value over the life of a system
+
+\subsection{Variance of a Value}
+% variance of a value over the life of a system
+
+\subsection{Probability of an Event}
+% probability of an event occurring in the system
+
+
+\subsection{Measuring a Value That Changes Over Time}
+% There are a number of properties that change over time that may want to be measured
+% So far, all properties have had scalar values,
+% therefore, it may seem that it is impossible to measure behaviors over time, since these properties change.
+% With a change of perspective, this is possible.
+
+% to measure a system-level behavior that changes over time, the system-level properties used by \fw are scalars that represent this behavior in a parametric model.
+% The parameters are the system-level properties are learned in the forward mapping process and can be used to predict the parameters of the model.
+
+% For example, consider a NetLogo Traffic Simple simulation, in which cars move in a linear space; traffic jams appear in waves. We would like to develop a mapping for the red car.
+% from visual observations, it appears that the red car has a minimum speed and a maximum speed.
+% We know that the acceleration is linear from the programming of the model.
+% Also, can see that it follows a rhythmic behavior: the car reaches a certain speed, then stops.
+% With these, we have all that we need to create a wave-like parametric model that describes this behavior.
+% The following variables will be used in the parametric wave:
+%   Let $A$ be the amplitude of the wave (i.e., the maximum velocity minus the minimum velocity)
+%   Let $T$ be the period of the wave (i.e., the time between a max velocity and a min velocity)
+%   Let $h$ be the height of the wave (i.e., the minimum speed)
+% The behavior inside each period is linear, so it can be described as a simple linear model:
+%   \[\displaystyle \frac{A}{T} t + h\]
+% Since this behavior is periodic, the modulus can be taken of the time, (period):
+%   \[\displaystyle \frac{A}{T} (t mod T) + h \]
+
+
+\section{Sampling}
+% Two major steps:
+%  1. Retrieve raw data from the simulation
+%  2. Compute on that data to generate the properties of interest
+
+% \fw typically uses a evenly distributed random sampling technique.
+%  this is useful for changing the size of the dataset dynamically
+% More advanced sampling techniques could be used in the future.
+
+% Sometimes... Discuss the need for doing several runs on the same configuration
+
+% Discuss the selection of number of steps the ABM should run
+
+
+
+\section{NetLogo Implementation Details}
+% Steps:
+%  1. identify what properties are needed in the simulation and the ranges of values we want to configure --- that are needed to perform the system-level properties
+%  2. Sample the ABM to generate a raw data set
+%  3. Pass the raw data set through a script that converts the raw entries into the desired system-level properties to create a new data set
+
+% First step: the sampling program is written in java
+%  the sampling program is given the ranges that are to be sampled,
+%  and the data values that are needed
+
+% The second step: the sampling program performs the sampling
+%  the raw data is returned to standard out. The data is tab delimited to separate items within entries. Entries are delimited by newlines.
+%  The output file could be redirected to a file to be stored for future use, if necessary
+
+
+% The third step: use the ``map" script to parse the raw data, and output a data set that contains the system-level properties.
+%  the map script parses the data for each entry.
+%    the parse returned is a hash table object where the keys are the names of the raw data items and the values are the values inside, as strings.
+%  the map script is passed a user-created python module that is used to compute the values of the system-level properties, from the raw data.
+%  this user-created python module has a list of functions that each returns a value for a system-level property.
+%  map returns a new data set to standard out, containing the configuration parameters and the system-level properties.
+%  simple example
+%  list example
+%  More details on how to create this python module is covered in Appendix XX.
+
+
+ 
+
+
+
+
+
+
 
