@@ -4,37 +4,83 @@
 \label{Defining}
 
 % Definition of a system-level property
+System-level properties play a central role in this dissertation.
+A system-level property is a mathematical measurement of some non-explicit concept of interest in a agent-based model.
+These properties are typically non-explicit, meaning inferring their values from just the given agent-level configuration parameters is difficult.
 
 % Discuss how system-level properties are identified
-
 % Discuss how system-level properties are mathematically defined
+Identifying which system-level properties of an ABM to analyze is the first step of using the \framework.
+Deciding on which features to be measured is a job for the user of the framework and will be influenced in what that user finds interesting or what that user needs to know.
+Each system-level parameter must be defined as a mathematical measurement of the behavior in terms of observable features of the ABM.
+For example, the average number of sheep in the Wolf Sheep Predation model is a system-level property of the system that is calculated by averaging the number of sheep measured in each time step over the lifetime of the system.
+The framework utilizes the user provided mathematical definition to create the data set that is used in the forward mapping.
 
 % Give an outline of the chapter
+In this chapter, I discuss the problem of defining system-level properties for use in \fw.
+First, the important ``stability assumption" and the consequences of using assumption is explained.
+Next, comprehensive list of common classes of system-level properties are outlined.
+This list should be useful to users of \fw in defining their own system-level properties.
+Then, the process in which \fw uses to sample an ABM is explained.
+Finally, software implementation details are given for this particular step of \fw.
 
 
 \section{The Stability Assumption}
 
 % Before delving into the topic of defining system-level properties, I first discuss this assumption
+Before delving into the topic of defining system-level properties, I first discuss the ``stability assumption."
+Understanding this assumption and its consequences is important in defining system-level properties so that they will be measured accurately by \fw.
 
 % A measurement of a system-level property should be stable.
 % Explain what stable means
 %  the sampling error is normally distributed 
 % For example, the percentage of trees burned down
+\fw assumes that the naturally occurring error for sampled values of a system-level property must have the following feature: the expected mean and expected median of the behaviors should be identical.
+In other words, the errors should be expected to be evenly distributed around some value $\bar y$, in  both magnitude and quantity.
+Errors following a normal distribution will have this property.
+For example, the percentage of trees burned down in the Fires\footnote{More on the Fires model is discussed in Section \ref{sec:Fires}} model will vary from run to run, but for the most part will be centered around one value for a particular configuration.
 
 % Explain the need for stability - we are trying to develop a functional mapping to solve the forward-mapping problem. Without this assumption, we cannot use regression(see background).
-
-% In most situations, a nonstable measurement could be the result of two situations: there is an underlying threshold effect or biased readings before convergence.
+This assumption is important because if this assumption does not hold, regression algorithms will converge to predict with bias.
+As more points are sampled, the regression algorithms will converge on the value provided by the mean of measured values.
+However, the median may be a better predictor of the expected behavior if the errors are not normally distributed.
+This problem is best explained with an example.
 
 % This is an example explaining the need for stability
-For example, in the Wolf Sheep Predation domain, one simple system-level measurement could be the average number of wolves over a thousand time steps.
-This number can be misleading, because certain configurations will sometimes result in the wolves going extinct (i.e., zero wolves).
-Other times, the same configurations will have the wolves converge to a stable non-zero population.
-Therefore, the expected value for the average number of wolves $\hat w$ to be:
+For example, in the Wolf Sheep Predation domain, one simple system-level measurement could be the average number of wolves after a thousand time steps.
+This number can be misleading, because certain configurations will \textit{sometimes} result in the wolves going extinct (i.e., zero wolves).
+Other times, the same configurations will result in the wolves converging to a stable non-zero population.
+When the wolf population does stabilize, it converges upon generally the same population value, $\hat w$.
+The average of successive runs will result in a value between zero and this stable population size.
+Unfortunately, this average is not useful in any way, since it does not tell how often the wolves will go extinct or what their population will be, should it be the case that the population stabilizes.
+This fact is illustrated in Figure X.
+
+%% Have a figure here that shows a histogram of wolf populations given the same configuration.
+%% It will show a large number of wolf populations at zero and then a bell-curve like structure near the true value.
+%% Show the median and the mean
+
+To remedy this problem, the average can be decomposed into two components: the case of going extinct and the case of not.
+The average number of wolves $\bar w$ would be:
 \[\mathrm{E}(\bar w) = \mathrm{P}(extinct) * (\bar w | extinct) + (1 - \mathrm{P}(extinct)) * (\bar w | \neg extinct) \]
 where $extinct$ is whether the wolves went extinct or not, $\mathrm{P}(extinct)$ is the probability wolves go extinct, and $(\bar w | \neg extinct)$ is the average number of wolves, given they did not go extinct.
-$\hat w$ is not very stable, because sometimes it is zero and sometimes it is $(\bar w | \neg extinct)$.
-Making a prediction based on the expected value of $\hat w$ will always have a specific amount of error associated with it.
-To remedy this problem
+The value of $(\bar w | extinct)$ is zero, so the left hand side of the above equation is zero.
+Therefore, the equation can be simplified to:
+\[\mathrm{E}(\bar w) = (1 - \mathrm{P}(extinct)) * (\bar w | \neg extinct) \]
+
+As stated earlier, $\bar w$ is not very stable because sometimes it is zero and sometimes it is $(\bar w | \neg extinct)$.
+However, the values $\mathrm{P}(extinct)$ and $(\bar  w | \neg extinct)$ are useful in describing the system's behavior and are more stable (and accurate) than just using $\bar w$.
+In conclusion, the system-level properties that should be measured for the Wolf Sheep Predation model is not the average number of wolves, but the average number of wolves given that they did not go extinct, and the probability of the wolves going extinct.
+To calculate the value of $\mathrm{P}(extinct)$, divide the number of samples that exhibited zero wolves by the number of total samples for that configuration.
+To calculate the value of $(\bar w | \neg extinct)$, average the population size of the wolves, only in samples in which they did not go extinct.
+
+% In most situations, a nonstable measurement could be the result of two situations: there is an underlying threshold effect or biased readings before convergence.
+In most situations, non-stable system-level properties are the result of some sort of \textit{threshold effect}.
+Threshold effects are sudden changes in behavior, given a small change in the configuration.
+Threshold effects are also sometimes referred to as \textit{tipping points}.
+In ABMs that behave randomly, configurations that lay on a boundary of a threshold effect can exhibit erratic behavior, which was the case with the Wolf Sheep Predation example.
+Typically, this problem can be overcome by decomposing the property into several sub-properties that describe the threshold effect. 
+This approach is what was needed to provide useful and accurate information in the Wolf Sheep Predation example.
+
 
 \section{Common Classes of System-Level Properties}
 
@@ -89,7 +135,7 @@ To remedy this problem
 
 
 
-\section{NetLogo Implementation Details}
+\section{Implementation Details}
 % Steps:
 %  1. identify what properties are needed in the simulation and the ranges of values we want to configure --- that are needed to perform the system-level properties
 %  2. Sample the ABM to generate a raw data set
