@@ -46,6 +46,8 @@ As more points are sampled, the regression algorithm predictions will converge o
 However, the median may be a better predictor of the expected behavior if the errors are not normally distributed.
 This problem is best explained with an example.
 
+A good example of 
+
 % This is an example explaining the need for stability
 In the Wolf Sheep Predation domain, a simple system-level measurement is the average number of wolves after a thousand time steps.
 This number can be misleading, because certain configurations will \textit{sometimes} result in the wolves going extinct (i.e., zero wolves).
@@ -53,7 +55,6 @@ Other times, the same configurations will result in the wolves converging to a s
 When the wolf population does stabilize, it converges upon generally the same population value, $\bar w$.
 However, the average of successive runs will result in a biased value between zero and this stable population size.
 Unfortunately, this average is not useful in any way, since it does not tell how often the wolves will go extinct or what their population will be, should it be the case that the population stabilizes.
-This fact is illustrated in Figure X \textit{TODO: Figure that shows histogram of wolf populations. Point out the average of all the wolf populations, and the average of just the non-extinct populations}.
 
 %% Have a figure here that shows a histogram of wolf populations given the same configuration.
 %% It will show a large number of wolf populations at zero and then a bell-curve like structure near the true value.
@@ -73,6 +74,25 @@ The system-level properties that should be measured for the Wolf Sheep Predation
 
 To calculate the value of $\mathrm{P}(extinct)$, divide the number of samples that exhibited zero wolves by the number of total samples for that configuration.
 To calculate the value of $(\bar w | \neg extinct)$, average the population size of the wolves, only in samples in which they did not go extinct.
+
+The histogram in Figure \ref{fig:num_wolves} illustrates why $\bar w$ is a poor metric for this domain.
+I measured the average number of wolves post-convergence in 850 runs of the same configuration\footnote{grass-regrowth-time = 22, initial-number-sheep = 100, initial-number-wolves = 50, \\
+sheep-gain-from-food = 4.7, wolf-gain-from-food = 20, sheep-reproduce = 3\%, wolf-reproduce = 4\% } of the Wolf Sheep Predation model.
+In this experiment, 303 of the 850 samples resulted in wolves going extinct.
+The other 547 samples had their wolf populations stabilize.
+The average number of wolves over all samples $\bar w$ is 44.69.
+The value 44.69 has little meaning in this domain, as it does not tell us about the stable wolf population size, or how often the system will exhibit zero wolves.
+The estimated probability of extinction is $P(extinct) \approx 303 / 850 \approx .356$.
+The average number of wolves in a stable population is $(\bar w | \neg extinct) = \sum (w_i) / 547 \approx 69.45$.
+These two values explain the the behavior of this particular Wolf Sheep Predation model instance better than $\bar w$.
+
+\begin{figure}[ht]
+\centering
+\includegraphics{images/num_wolves.pdf}
+\caption{A histogram of the number of wolves after many successive runs shows that the average number of wolves is a poor number to use to describe the behavior.}
+\label{fig:num_wolves}
+\end{figure}
+
 
 % In most situations, a nonstable measurement could be the result of two situations: there is an underlying threshold effect or biased readings before convergence.
 In most situations, non-stable system-level properties are the result of some sort of \textit{threshold effect}.
@@ -160,8 +180,6 @@ For example, in the Wolf Sheep Predation ABM, a percentage could represent the p
 To measure this property, several experiments need to be executed for a single configuration. 
 The probability is estimated by calculating the proportion of iterations that had no wolves, to the total number of experiments.
 The value of this probability should converge as more experiments for a single configuration are executed.
-
-\textit{[TODO: Figure that shows two axis )two properties of the W/S domain). Uses color to show the probability of wolves going extinct. It will have a nice gradient, and the threshold will be clearly visible.]}
 
 
 
