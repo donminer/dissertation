@@ -3,6 +3,185 @@
 
 \label{ForwardMapping}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+% the forward mapping problem asks to develop a mapping from configuration space to system-level property space
+% This chapter details aspects of the forward mapping problem and the proposed solution used in \fw.
+% Also, evaluation criteria for solutions to the FMP is given.
+
+\section{Definition of the Problem}
+% develop an accurate mapping from //configuration space// to //system-level property space//.
+% This entire mapping describes what is called the //behavior space//.
+
+% configuration space consists of any number of ABM parameters that change the behavior
+% Configuration parameter values can be discrete values (i.e., integers) or real values
+% Thus, this space is n-dimensional, each dimension representing a single configuration parameter
+
+% The system-level property space consists of all properties wanting to be measured.
+% this space has one dimension per property to be measured.
+% Typically, these values are always real valued. 
+% Since it is a prediction, an impossible value (i.e., expected discrete value) still has meaning... for example the number of wolves expected could be 69.7, which is obviously impossible to have .7 wolves, but still shows that the value tends to be closer to 70 than 69, more often than not.
+
+% A solution must be able to handle highly dimensional spaces and must be able to handle continuous and discontinuous configuration spaces.
+% Also, several evaluation criteria that could be used to analyze the effectiveness and efficiency of solutions are provided later in this chapter.
+
+
+\section{The \fw Approach}
+
+% The default approach taken by \fw to solve the forward-mapping problem is to do regression
+% Regression fits this problem naturally, as regression takes indp variables and generates possible values for dep variables.
+% The configuration parameters are the independent variables and the system-level properties are the dependent variables.
+
+% The sampling phase provides a data set with several instances of configuration, outcome observation pairs.
+% These are provided to the regression algorithm to base its predictions off of.
+% Different regression approaches use this data in different ways.
+% Approaches like KNN do no pre-processing at all and uses the entire data set for each query.
+% Meanwhile, approaches like Nonlinear Regression train a compact parametric model to represent the data and does not require the data set after this point.
+% In general, more time spent pre-processing equates into less time querying, but is not proportionate. 
+
+% Other possible approaches fall into the field of machine learning.
+% Approaches such as kernel methods and neural networks could solve the similar prediction problem here, but regression was selected particularly to make solving the reverse mapping problem, which is discussed in the next chapter.
+
+\subsection{Scaling}
+% Scaling the data set is an important factor in learning the forward mapping.
+% The problem is that the different configurations have different ranges and different meanings.
+% Performing a simple euclidean distances on these is not sufficient, since the closeness of points will often be skewed on the values.
+% For example, consider a percentage value in the WS domain (sheep birth rate, which may be sampled 1-8% or .01 to .08) and sheep-gain-from-food from 2-10.
+% The euclidean metric treats all dimensions as equal, so closeness in the larger ranged dimension will give higher weight than closeness in the smaller ranged dimension
+
+% Typically, simply scaling each dimension such that the minimum value experienced is zero and the highest value is one, and then scaling all others accordingly works fine.
+% However, more advanced techniques such as X, Y, Z have their advantages.
+% A more in depth analysis on the effects of these approaches to the effectiveness of different approaches is left as future work (See \ref{sec:fw_scaling})
+
+% The choice of scaling technique and distance metric is determined in the scope of the regression algorithm used, particularly in the training step.
+% For example, KNN could preprocess the dataset into a scaled data set for future use.
+
+
+\subsection{Handling Non-Continuous Configuration Spaces}
+% In the original problem statement, I mentioned that the configuration space could contain discrete values.
+% These discrete valued configuration parameters typically represent numbers of agents.
+% The reason for the real-value assumption is just to simplify the process.
+
+% The limitations introduced by this assumption can easily be circumvented in a number of different ways.
+% First, the value can simply be rounded to the nearest integer value to produce integer values.
+% The challenge in this approach is not sampling, but how the regression approaches will handle non-continuous spaces, in the case that they are expecting continuous spaces.
+% For example KNN and to a lesser extent other nonparametric methods such as LOESS are agnostic to this problem.
+
+% In continuous domains, the distance metric must be chosen with care
+% since random configurations will be chunked into discrete groups.
+% points within the same discrete value group may naturally weight one another higher since they are equal in one dimension.
+% This could be bad for a technique such as k-nearest neighbor.
+% In KNN, the nearest neighbors may always be colinear values and completely ignore the non-discrete dimensions.
+% This problem is illustrated in Figure X.
+% [[ MAKE A FIGURE: show a 2d map of the distributions of a random sample. show that ''rows'' form. Show what the kNN would be for a particular point, and show that all of those points are in the same row.
+% The simplest way to solve this problem is to scale the discrete distances such that they are similar to the average distance between colinear points in a discrete parameter.
+% If the samples were taken randomly and the space is scaled to a square, which is the default behavior for \fw, this property is natural.
+
+\subsection{Handling Multi-Variate Forward Mappings}
+
+% In the definition of the problem, I mention the fact that a number of system-level properties can be measured at once.
+% To handle this, I split each system-level property into its individual single-property forward mapping problem.
+% give some math that splits the vector y into several individual ys
+
+% The alternative to this would be to use a multi-variate regression approach, such as X.
+% The main difference between these multi-variate approaches and my approach, is I have to assume that the dependent variables are statistically independent, i.e., they don't affect each other.
+% This assumption may not always be the case, but I have not personally found this to be a problem in any of the ABMs I have experimented with.
+% Also, the ability to use simple single-variate regression algorithms broadens the flexibility of the approach, makes it easier to implement and simplifies the solution to the reverse-mapping problem.
+% An investigation for the effectiveness of multi-variate regression approaches for this research is left as outside the scope of this dissertation.
+
+\subsection{Implementation Details}
+
+% The solution to the forward mapping problem in \fw is split into two distinct steps: training and predicting.
+% training builds the model and/or preprocesses the data as necessary.
+% The predicting program allows the user or other components of the framework to query the regression model
+% This process is assisted by a user-provided regression library that is used to build the models.
+% More on how to build the module property to interface with \fw, see Appendix ??.
+
+\subsubsection{Training}
+
+% The training portion of solving the forward mapping is where any necessary necessary preprocessing and/or model building is done
+% Also, scaling of the data can be done in this step.
+% This is implemented as a Python program called train.py. train.py takes in the data set generated by the sampling as well as a user-created regression module that was built to interface with train.py.
+% train.py then passes the data set to the regression module, which then may produce model files on the local filesystem.
+
+% KNN may simply just scale the data, or with more advanced implementations build a geo hash or kd-tree.
+% LOESS will perform the locally weighted smoothing step to build $y'$ values. (and output the smoothed data set)
+% NLR will learn optimal parameters for the parametric model given with optimization. (and output the parameters)
+% MLI will build a evenl spread data set with another regression algorithm
+% Each of these approaches require varying computational time
+
+
+
+\subsubsection{Predicting}
+
+% The prediction step is the step in which queries are passed and predictions are returned.
+% This is implemented as a python program predict.py that takes the regression module and any trained meta-data to generate predictions (answers to user-specified queries)
+% Any number of queries in the form of a configuration vector are passed in through standard in, with answered returned in standard out.
+
+% KNN will iterate through every point to find the kNN, then average the values
+% LOESS will interpolate between nearby smoothed data set points to determine the new value
+% NLR will simply plug in values for the configuration parameters and calculate the result
+% MLI will find which bin the point lies within and then interpolate from the corners.
+
+
+
+\section{Solution Evaluation Criteria}
+
+% An important step in generating a solution for the forward mapping problem is evaluating it.
+% I propose a single core approach, which I will be evaluating, with these criteria, in Chapter \ref{Results}.
+
+% Each of the following criteria have different weight, but are all important in their own way.
+
+\subsection{Time Required for Training}
+
+% The time required for training is listed as not very important in my original design goals.
+% However, intractable training problems should be avoided.
+
+% There are two matters of importance when measuring the time required for training a model.
+% First, how long does it take
+% Second, how does the length of time scale with larger data sets (quadratic? exponential? linear?)
+
+% Measuring how long it takes is easy: just measure the amount of time
+% The second is easy as well, just measure in comparison to the data set size.
+
+
+\subsection{Time Required for Querying}
+
+% Time required for querying is noted as important in the design goals.
+% In fact, time required for querying should ALWAYS be below the amount of time it takes to just sample the ABM.
+% If it is longer, there is no point and the user would just sample the ABM directly, instead of use \fw.
+
+% To measure this, a large number of random queries are passed to the regression algorithm, and statistics such as average response time and standard deviation of response times can be used to evaluate the speed of these approaches.
+% The speed of querying the system is used as a baseline to compare to in experiments.
+
+% In some cases/algorithms, the size of the data set may effect the time required for querying.
+% This relationship should also be evaluated to determine at which point direct domain sampling would be better.
+
+
+\subsection{Accuracy of the Forward Mapping}
+% The accuracy of the forward mapping is perhaps the most important of all evaluation criteria.
+% If the mapping is not accurate, it is not useful.
+% There is a certain amount of error that is tolerable for the increased speed of predicting values in \fw, 
+% however, the error cannot be too high.
+
+% To measure the accuracy of the predictions, two approaches are possible.
+% First, cross validation can be used to split the training set into a training set and a validation set.
+% Another, but slower approach, is the predict the value for a configuration and then actually run the simulation, and compare the values.
+
+% The errors calculated for an entire run are summed for a total accumulated error.
+% The higher the sum, the worse the predictor.
+% Other properties including the standard deviation of errors could be useful as well.
+% Visualizing the distribution of errors could also be useful in detecting a bias in prediction.
+% Visualizing the error localized to specific parts of the configuration space could show which areas of the space are less predictable or could require more sampling.
+
+
+\subsection{Data Set Size Requirement}
+
+% The size of the data set required to make accurate predictions is an important factor.
+% The data set takes a significant amount of time to sample, so smaller data set requirements are better.
+
+% Also, knowing what size data set is appropriate for a given domain and given algorithm is important for designing new experiments for use in \fw.
+
+% This is measured by calculating the ``Accuracy of the Forward Mapping" errors, but comparing the change of this error to the size of the data set.
+% Typically, error should decrease as the sample size increases.
+
 
 
