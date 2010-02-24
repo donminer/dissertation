@@ -122,6 +122,23 @@
 % MLI will find which bin the point lies within and then interpolate from the corners.
 
 
+\section{Using the Forward Mapping Models}
+
+% The forward mapping model has two main uses: prediction of behavior for a user and used by \fw for the reverse mapping.
+% A user can use the forward mapping to predict the behavior of a system without having to run it.
+% This could be useful for a number of reasons: it may be faster, it may be more convenient.
+% Thus, this approach is more useful than interacting with the ABM directly to varify hypotheses about behavior, answering 'what-if' questions and manually exploring the behavior space faster.
+
+% \fw uses the forward mapping to solve the reverse mapping.
+% A number of approaches are discussed in Chapter \ref{ReverseMapping}: The Reverse-Mapping Problem, but practically all use the forward mapping instead of direct sampling for the same reasons the user uses this over it.
+% The forward mapping describes behavior faster than direct sampling, and allows faster searching of the space to answer queries.
+
+% A secondary use for the forward mapping would be to plot the behavior space or visualize the behavior space in different ways.
+% Plotting programs do not calculate the value for every point (there are infinite!), what they typically do is sample a bunch of points then interpolate between them.
+% the forward mapping can be used for this purpose: to generate a bunch of points, then plot lines between them.
+% Also, parametric regression approaches (NLR) could be graphed directly and even compared to the training (or validation) set.
+
+
 
 \section{Solution Evaluation Criteria}
 
