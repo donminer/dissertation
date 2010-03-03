@@ -1,0 +1,16 @@
+%LABELS ones tens hundreds thousands out1 out2
+%VAR i i i i d d  # COMMENT
+%MIN 0 2 10 100 0 0     # COMMENT
+%MAX 1 10 100 1000 10 10
+
+#comment
+
+
+.37 3.7 37.0 370 3 3 #COMMENT
+#COMMENT
+
+
+0 2 10 100 0 0
+1 10 100 1000 10 10  # COMMENT
+.5 6 45 450 5 5
+.2 2.2 10.2 100.2 0 0
