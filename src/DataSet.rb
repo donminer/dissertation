@@ -8,8 +8,6 @@ class DataSet
          @data = []
 
          load
-
-
       end
 
       def to_s
@@ -140,4 +138,4 @@ end
 x= DataSet.new('fakedata.txt')
 
 
- x.each_d {|x| print x, "\n"}
+x.each_d {|x| print x, "\n"}
