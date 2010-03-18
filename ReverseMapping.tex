@@ -1,4 +1,4 @@
-\chapter{THE REVERSE MAPPING PROBLEM}
+\chapter{THE REVERSE-MAPPING PROBLEM}
 \thispagestyle{plain}
 
 \label{ReverseMapping}
@@ -7,6 +7,10 @@ The reverse-mapping problem is the problem of defining a function $f^{-1}$ that 
    \[ f^{-1}(\mathbf y) \rightarrow \hat{\mathbf S}. \]
 Every configuration $\hat {\mathbf x} \in \hat {\mathbf S}$ should satisfy the constraint $f(\hat{\mathbf x}) \approx \mathbf y$, where $f$ is the forward mapping.
 That is, $\hat{\mathbf S}$ contains all the points that would predict $\mathbf y$ in the forward mapping.
+
+The major difficulty in solving the reverse-mapping problem is that the mapping is one-to-many because the forward-mapping is built with regression (many-to-one).
+Therefore, querying a reverse mapping returns a solution space, not a singular solution.
+For this reason, \fw strives provide the \textit{space of configurations} that will exhibit a given system-level property in an ABM, not individual configurations.
 
 This method of developing a reverse mapping is compared to optimization.
 Finding a set of configuration parameters that satisfies a system-level property, by definition, is an optimization problem.
@@ -30,7 +34,6 @@ The arguments made with the aid of the Fires domain scale to larger dimensions.
 In abstract terms, the \fw reverse-mapping solver approach, named \textit{Simplical Complex Inversion} (SCI), builds an invertible approximation of the forward mapping, since often times the regression approach used is not easily invertible.
 I have found that inverting even the simplest approaches such as K-nearest neighbor and LOESS are either difficult to implement or computationally expensive.
 By approximating a representation of the forward mapping that is invertible, solving the reverse-mapping problem becomes computationally tractable.
-The process of inverting a method directly is covered in later in this chapter, in Subsection \ref{subsec:funcinvert}.
 These approaches are generally not preferred over other approaches since they are dependent on the forward mapping approach used.
 Meanwhile, SCI is applicable to any forward-mapping technique.
 
@@ -240,11 +243,22 @@ This is not a problem like being overspecified, since there are a number of poss
 
 
 \subsection{Granularity}
+\label{subsec:granularity}
 
 SCI can be configured by adjusting the granularity of the knots.
 SCI approximates an invertible continuous representation of the forward-mapping.
 Therefore, as the granularity of SCI increases, it models the forward mapping more accurately, \textit{not} the original target domain.
 Thus, the granularity should be as high as computationally acceptable.
+
+Granularity can be adjusted dynamically on a query-by-query basis.
+Individual simplexes may be separated into several subsimplexes.
+These new simplexes are composed of the original simplex's corners, in addition to new additional corners.
+The new corners have their system-level property value inferred from the forward mapping.
+Once these new simplexes have been formed, nothing special has to be performed to accommodate them in the general SCI algorithm.
+In addition, even if the granularity has been increases for a specific query, the finer grained simplexes can remain to increase the accuracy of future queries.
+
+Dynamic adjustment of granularity process can be performed automatically to increase the granularity of simplexes that contain significant amounts of variance between the system-level property values at the corners.
+Increasing the granularity will reduce the variance as when the points get closer together, since points closer to one another will have increasingly similar values.
 
 The effect of the granularity on accuracy is dependent on the nature of the forward-mapping regression method used.
 If the forward-mapping produces overfit or otherwise inaccurate predictions, the reverse-mapping produces will be inaccurate as well when it comes to suggesting behavior for the target domain.
@@ -252,7 +266,11 @@ This difficulty should be dealt with in the forward-mapping solving step, not th
 This is because the purpose of SCI is to model the forward-mapping, not the domain.
 
 An empirical analysis of the relationship between granularity and accuracy is provided in Chapter \ref{Results}.
-The accuracy is measured as the difference between the continuous forward-mapping function
+The accuracy is measured as the approximate total difference between the continuous forward-mapping function and the continuous simplical complex.
+In addition, suggestions made from SCI are validated against a actual system-run of the target ABM.
+The error between the desired system-level property values and the actual system-level property values are measured.
+This measurement is redundant, as I expect the error between the actual run and the reverse-mapping solution to be the sum of the forward mapping error and the reverse mapping error (in respect to the forward mapping).
+However, I am measuring this in the event that some unknown factor influences the error in either a positive or negative way.
 
 
 \subsection{Example: Fires ABM}
@@ -282,34 +300,97 @@ The intersection between this segment and the line is calculated, which in this 
 Therefore, setting $Density = 63.1$\% will be expected to yield 90\% of the trees burned down.
 In higher dimensional domains, the number of points that will satisfy the system-level property will be infinite instead of just one point, since they lie on a continuous hyperplane.
 
-\subsection{Alternative Approaches}
-
-   \subsubsection{Optimization}
-
-   \subsubsection{Functional Inversion}
-   \label{subsec:funcinvert}
-
-
 \subsection{Special Cases}
 
+In this section, I discuss two special cases that can simplify the SCI process significantly.
+Users of \fw can see significant if either cases can be identified as a property of a domain.
+
    \subsubsection{Classification}
+System-level properties that are binary (positive and negative) in nature (i.e., the forward-mapping is classification, not regression) can be treated differently than typical.
+
+SCI handles binary-valued system-level properties by labeling each simplex as either:
+\begin{itemize}
+\item positive -- corners are all positive instances,
+\item negative -- corners are all negative instances, or
+\item inconclusive -- corners are a mixture of both positive and negative instances.
+\end{itemize}
+Then, once a query is submitted with binary values as part of the requirement, SCI removes all simplexes that do not match that binary value.
+For example, if a query contains a positive binary value, all negative and inconclusive simplexes are removed from the search.
+This is possible because these simplexes will not be part of the solution, even if other system-level properties could be satisfied by configurations within these simplexes.
+This shortcut can drastically reduce computation time if a majority of the space is removed.
+
+Inconclusive simplexes are situated on the boundary of positive and negative instances in the space.
+Therefore, the granularity of the inconclusive can be increased by separating them (Subsection \ref{subsec:granularity}) in order to reduce the amount of space occupied by inconclusive simplexes.
+
 
    \subsubsection{One-to-One Mapping}
+With some properties, the forward-mapping may define a one-to-one.
+If this is the case, then regression can be used for the reverse mapping by training on system-level property to infer values for the configuration parameters.
+The regression will return the one configuration that satisfies the system-level property, since it is one-to-one.
+Therefore, if a user is working with a one-to-one mapping, this should be the only property being analyzed.
+Only one point is being returned, so adding additional constraints will overspecify the system of equations and not return anything.
+Even if another property's hyperplane intersects with the point, the same point will still return the same point.
+
+The percentage of trees burned down in the Fires ABM is an example of a one-to-one relationship since the percentage of trees burned down monotonically increases with the density of the trees.
+
+
+\section{Alternative Approach: Optimization}
+In previous work, researchers typically treat the problem of finding a configuration that will satisfy some system-level constraint as an optimization problem.
+In this type of approach, an optimization meta-heuristic such as simulated annealing or genetic algorithms can be used to incrementally adjust the system configuration until the system-level properties match the final goal.
+These approaches use a concept of fitness that measures the actual outcome with the expected outcome.
+ABMs that exhibit closer outcomes are weighted higher so that the algorithm gradually converges on a solution.
+
+The main reason this is a poor choice for the reverse-mapping problem is that sampling the ABM every iteration can be very slow.
+To calculate the fitness of a particular configuration, the ABM must be executed and measured.
+Running the Wolf Sheep Predation model takes at least a seconds per run.
+For example, every generation of a genetic algorithm could have to execute an ABM several hundred times.
+In which case, each generation could take several minutes to compute.
+
+A hybrid approach is possible that drastically reduces online running time.
+Instead of directly sampling the ABM, the optimization technique can use the forward mapping to infer the outcome of a configuration instead of executing it.
+This also has the benefit of the regression smoothing the predictions, which in many cases will give more consistent results than querying an ABM directly.
+This approach is effectively searching through the regression space created by the forward mapping, which is an approximation of the true behavior space.
+
+Optimization is used as a baseline in which to compare \fw.
+Both the straightforward optimization and hybrid regression/optimization approaches are compared to SCI in offline running time, online running time and accuracy.
+I claim that SCI is faster than straightforward optimization and provides more useful results as it returns a space instead of a singular point.
+The hybrid approach has running time correlated to the running time of a forward-mapping query.
+Therefore, both the accuracy and the running time of the hybrid approach is very dependent on the forward mapping.
+In some cases this approach may be faster, and in others it will be slower than SCI [TODO: VERIFY THIS STATEMENT WITH RESULTS].
 
 \section{Using Reverse Mappings}
 
+The main purpose of generating a reverse mapping is to gain understanding of the space of configurations that generate a particular system-level behavior.
+Relationships between configuration parameters can be inferred by analyzing these spaces.
+For example, when one configuration parameter value is reduced and the other is increased a specific amount, the resulting system-level behavior is the same.
+The equations returned by SCI provide this mathematical representation in a piecewise way.
+This deeper understanding of how a system-level property can be produced is more faster and more valuable than having a researcher manually study a domain to gain understanding of how the configurations affect system-level behavior.
 
-\section{Evaluation Criteria}
+The reverse mapping can be used to suggest a configuration when a user wishes to see a particular behavior exhibited in the ABM.
+For example, the of \fw wants to see what an execution of a Fire ABM that burns down 80\% of the trees looks like.
+SCI can suggest what density of trees should be used.
+Typically, the user would have to go through an iterative process of guessing a possible configuration, then executing the ABM to determine if the configuration generated the behavior or not.
+This is effectively manual hill climbing, and can be unintuitive, difficult and tedious.
 
-\subsection{Time Required for Preprocessing}
+To suggest a configuration with \fw, the user queries the reverse mapping with the desired system-level property values.
+SCI returns the space of configurations that would satisfy this query.
+Any point in this space will be satisfactory, however the user must select one.
+Whether this point is selected arbitrarily or not is up to the user.
+To select an arbitrary point, a random simplex is chosen.
+Then, a set of values that will satisfy the system of equations associated with that simplex are derived.
+Free variables have their values randomly selected, within the range of the simplex.
+The fixed variables are fixed, so their values are already given.
+Together, these points provide the user with a suitable point in the solution space to configure the target ABM.
 
-\subsection{Time Required for Querying}
-
-\subsection{Accuracy of the Reverse Mapping}
+Certain points in the solution space can be considered better than others, even if they should produce similar output.
+Typically, areas of the space that have minimal variance are safer choices for configuration suggestions, as the expected error is less.
+As an aside, the action of removing high variance areas of the space is possible by adding a binary valued system-level property that separates the space into ``high variance" and ``low variance" spaces, given a specified threshold.
+This has the benefit that the selecting configurations with low variance is performed inside the framework, instead of by the user.
 
 
 \section{Summary}
-
-
-
-
+The reverse-mapping problem is the problem of finding a one-to-many mapping that maps system-level property values to the set of ABM configurations that would exhibit that behavior.
+\fw uses an algorithm I devised, named SCI, that builds an \textit{invertible} approximation of the forward mapping.
+This approximated mapping can be inverted and thus return the inverse of the forward mapping.
+An alternative to this approach is optimization, which is used as a baseline for SCI's performance.
+Results detailing the computational time required offline, the computational time required per query and the accuracy of the reverse mappings developed by \fw are discussed in Chapter \ref{Results}.
