@@ -3,25 +3,24 @@
 
 \label{ReverseMapping}
 
-The reverse-mapping problem is the problem of defining a function $f^{-1}$ that maps a system-level configuration $\mathbf y$ onto a solution space $\hat{\mathbf S}$ that represents all possible configurations that would have the system exhibit $\mathbf y$:
+The reverse-mapping problem is the problem of defining a function $f^{-1}$ that maps a system-level configuration $\mathbf y$ onto a solution space $\hat{\mathbf S}$ that represents all possible configurations that would cause the system to exhibit $\mathbf y$:
    \[ f^{-1}(\mathbf y) \rightarrow \hat{\mathbf S}. \]
 Every configuration $\hat {\mathbf x} \in \hat {\mathbf S}$ should satisfy the constraint $f(\hat{\mathbf x}) \approx \mathbf y$, where $f$ is the forward mapping.
-That is, $\hat{\mathbf S}$ contains all the points that would predict $\mathbf y$ in the forward mapping.
+That is, $\hat{\mathbf S}$ is the set of all the points that would predict $\mathbf y$ in the forward mapping.
 
 The major difficulty in solving the reverse-mapping problem is that the mapping is one-to-many because the forward-mapping is built with regression (many-to-one).
 Therefore, querying a reverse mapping returns a solution space, not a singular solution.
-For this reason, \fw strives provide the \textit{space of configurations} that will exhibit a given system-level property in an ABM, not individual configurations.
+For this reason, \fw strives to return the \textit{space of configurations} that will exhibit a given system-level property in an ABM, not individual configurations.
 
-This method of developing a reverse mapping is compared to optimization.
+This general method of developing a reverse mapping is compared to optimization.
 Finding a set of configuration parameters that satisfies a system-level property, by definition, is an optimization problem.
-However, instead of just a single point being returned, a reverse mapping returns the space of all points that would satisfy the configuration.
+However, instead of a single point being returned, a reverse mapping returns the space of all points that would satisfy the configuration.
 This has a number of benefits, such as being able to visualize and inspect the entire solution space.
 Analysis of how the solution space changes in respect to the configuration parameters can be performed.
-Different solutions that produce similar results can be selected from a number of good solutions based on some exterior preference on points.
+Different solutions that produce similar results can be selected from a number of good solutions based on some exterior preference on configurations.
 That is, although all points in a solution space should be satisfactory, some points may be more desirable for a number of reasons, such as points which have less expected variance.
 
 In this chapter, I give details of how \fw approaches the solution to this problem, in general, then delves deeper into actual implementation of the solution.
-Then, I discuss evaluation criteria for implementations of reverse-mapping problem solutions.
 Throughout this chapter, I use the NetLogo Fires ABM\footnote{More on the Fires model is discussed in Section \ref{sec:Fires}} as an example.
 The Fires domain is simple and has solution spaces that are easy to visualize.
 Other domains, such as Wolf Sheep Predation, have too many dimensions to make graphing feasible.
@@ -30,14 +29,14 @@ The arguments made with the aid of the Fires domain scale to larger dimensions.
 
 
 \section{The \fw Approach: Simplical Complex Inversion}
-
-In abstract terms, the \fw reverse-mapping solver approach, named \textit{Simplical Complex Inversion} (SCI), builds an invertible approximation of the forward mapping, since often times the regression approach used is not easily invertible.
+The \fw reverse-mapping solver approach is named \textit{Simplical Complex Inversion} (SCI).
+In abstract terms, SCI builds an invertible approximation of the forward mapping in the form of a simplical complex. This is done because regression is not easily invertible.
 I have found that inverting even the simplest approaches such as K-nearest neighbor and LOESS are either difficult to implement or computationally expensive.
 By approximating a representation of the forward mapping that is invertible, solving the reverse-mapping problem becomes computationally tractable.
 These approaches are generally not preferred over other approaches since they are dependent on the forward mapping approach used.
 Meanwhile, SCI is applicable to any forward-mapping technique.
 
-Much like the forward-mapping solution, $\mathbf y$ is split into subspaces to simplify the problem:
+Much like the forward-mapping solution, the system-level property $\mathbf y$ is split into subspaces to simplify the problem:
 \[ \mathbf y = \{y_0, y_1, \ldots, y_{|\mathbf y|}\}. \]
 The solution space is split up in a similar manner:
 \[ \hat{\mathbf S} = \{\hat S_0, \hat S_1, \ldots, \hat S_{|\mathbf S|}\}. \]
@@ -54,8 +53,8 @@ First, regression is used to infer the system-level property values for several 
 The location of these knots are used to segregate the configuration space into a number of simplexes (multi-dimensional triangles).
 This segregated configuration space is referred to as a \textit{simplical complex}.
 Next, the intersection between each of these simplexes and a plane representing the target system-level property is found.
-That is, SCI finds the equation of the hyperplane through each simplex that satisfies the target system-level property
-A curve representing the configurations that would satisfy the target system-level property is pieced together from all the intersections found.
+That is, SCI derives the equation of the hyperplane through each simplex that satisfies the target system-level property.
+A curve representing the configurations that would satisfy the target system-level property is pieced together from all the intersections.
 This subsection discusses these steps in detail along with Figure \ref{fig:ISFlow}, which illustrates the SCI process.
 
 \begin{figure}[ht]
@@ -66,8 +65,8 @@ This subsection discusses these steps in detail along with Figure \ref{fig:ISFlo
 \end{figure}
 
 I claim that SCI is a general approach to the reverse-mapping problem that is applicable in all domains in which the forward-mapping problem is solved accurately.
-Also, SCI provides the most useful information than optimization, since SCI returns a piecewise and continuous set of hyperplanes.
-These hyperplanes give a more continuous and complete view of the nature of a specific system-level property value.
+Also, SCI provides the useful information than optimization, since SCI returns the set of all configurations.
+These hyperplanes give a more continuous and complete view of the nature of a specific system-level property value than individual points.
 
 
 
@@ -134,7 +133,7 @@ Delaunay triangulation is used to segregate the space.
 If the configuration points were randomly scattered, a standard algorithm for computing the Delaunay triangulation could be used.
 However, since SCI controls how configuration points are distributed, it can organize the points in such a way where a solution to the Delaunay triangulation can be computed implicitly.
 In general, SCI will evenly space the sample points as a grid and split each hypercube into two simplexes.
-The Delaunay triangulation is easy to compute with points organized in this way.
+The Delaunay triangulation is trivial to compute with points organized in this way.
 For example, in Figure \ref{fig:ISFlow}, the space is segregated into a number of adjacent triangles that satisfy the requirements for being a Delaunay triangulation.
 
 The equations of the simplexes can be defined in terms of the hyperplane in which they reside.
@@ -143,8 +142,8 @@ If a point is within all the facets and lies on the hyperplane, the point is on 
 For example, in the Fires ABM, the two points defining a line segment reside on a more general line.
 Meanwhile, the facets are defined by the points individually.
 If a behavior space point lies on th line and resides between the two facet points, the point is a realistic point.
-This explanation expands to two-dimensional configuration spaces, which has triangles as simplexes and line segments are facets.
-If a point lies on the plane defined by the 3 points, and is within the boundaries of the line segment facets, the point is realistic.
+This explanation expands to two-dimensional configuration spaces, which has triangles as simplexes and line as facets.
+If a point lies on the plane defined by the the points, and is within the boundaries of the line segment facets, the point is realistic.
 
 
 \begin{figure}[ht]
@@ -157,16 +156,15 @@ If a point lies on the plane defined by the 3 points, and is within the boundari
 \subsection{Simplex Intersection}
 Recall that the final goal of this process is to find the equation of the intersection between all the simplexes and a system-level property hyperplane.
 Therefore, no complicated technique needs to be performed to calculate the actual equation of the simplex or the facets.
-Instead, the intersection at the edges is found by finding the intersections with the edges.
-These edge intersections are then used to construct the intersection through the simplex.
+Edge intersections are used to approximate the intersection through the simplex.
 The process to find the intersection between the system-level property hyperplane and a simplex is as follows:
 \begin{enumerate}
    \item Pair off each corner with every other corner, in every possible combination. These point pairs define the edges of the simplex.
    \item Determine which edges intersect with the hyperplane. An edge intersects with the hyperplane if the target system-level property value  is between the $y$-values for the two points that define the edge. From the intermediate-value theorem, the plane must intersect with this line segment at some point, at least once.
    \item Use linear interpolation to determine at which point on the edge line segment the intersection occurs. For example, consider the corners have $y$-values of 2 and 4 and the target system-level property value is 3---the location of the intersection is halfway between these points.
-   \item The set of all edge intersection points lie on the hyperplane that intersects the simplex.
+   \item The set of all edge intersection points lie on the hyperplane that intersects the simplex. Use these points to define the intersecting hyperplane.
 \end{enumerate}
-This approach totally circumvents the need for modeling the actual simplexes as equations, which can be challenging to implement.
+This approach circumvents the need for modeling the actual simplexes as equations, which can be challenging to implement.
 Two illustrative examples of this intersection method being used are shown in Figure \ref{fig:simint}.
 In the example on the right-hand side in Figure \ref{fig:simint}, the two-dimensional plane intersects the tetrahedron in four places.
 However, only three of these points are needed to define the plane because the fourth point is coplanar and thus redundant.
@@ -182,9 +180,9 @@ Thus, a point that intersects with only the corner or an edge will not be consid
 
 \subsection{Recombination of Solution Spaces}
 
-Once solution spaces have been found for each of the desired system-level properties, they must be recombined into one solution space.
+Once solution spaces have been found for each of the desired system-level properties, they are recombined into one solution space.
 This final solution space will consist of points that exhibit the specified system-level property values, or perhaps none at all.
-The spaces generated by SCI are in the form of hyperplane.
+The spaces generated by SCI are in the form of a hyperplane.
 Therefore, the recombination is the intersection of all these hyperplanes.
 
 
@@ -200,9 +198,9 @@ First, SCI verifies if the hyperplanes intersect within the simplex.
 Two hyperplanes intersect if the points on one hyperplane are separated by the other hyperplane.
 If the points are separated, then there must be an intersection.
 An illustration of points being separated by a hyperplane, and not, is shown in Figure \ref{fig:intcheck}.
-The points used for the hyperplanes are the edge intersections, therefore, the two planes must intersect within the simplex.
-This check is performed by plugging in values for the edge intersections of one hyperplane into the other hyperplane.
-Then, the nature of the inequality (greater-than or less-than) specifies which side the edge intersection is on.
+This intersection check is performed by plugging in values for the edge intersections of one hyperplane into the equation of other hyperplane.
+Then, the nature of the inequality (greater-than or less-than) for each point specifies which side the edge intersection is on.
+If one point is on the other side of another point, the planes intersect.
 This calculation is easy to perform since SCI has the edge intersection points and the equation of the hyperplanes already computed.
 Also, this process can be repeated for any number of hyperplanes by performing this test for each possible pair of hyperplanes.
 However, it may be the case that the hyperplanes do not intersect in the same places, although all hyperplanes intersect, pairwise.
@@ -252,20 +250,20 @@ Thus, the granularity should be as high as computationally acceptable.
 
 Granularity can be adjusted dynamically on a query-by-query basis.
 Individual simplexes may be separated into several subsimplexes.
-These new simplexes are composed of the original simplex's corners, in addition to new additional corners.
+These new simplexes are composed of the original simplex's corners, in addition to new corners.
 The new corners have their system-level property value inferred from the forward mapping.
 Once these new simplexes have been formed, nothing special has to be performed to accommodate them in the general SCI algorithm.
-In addition, even if the granularity has been increases for a specific query, the finer grained simplexes can remain to increase the accuracy of future queries.
+In addition, even if the granularity has been increased for a specific query, the finer grained simplexes can remain to increase the accuracy of future queries.
 
-Dynamic adjustment of granularity process can be performed automatically to increase the granularity of simplexes that contain significant amounts of variance between the system-level property values at the corners.
+Dynamic adjustment of granularity process can be performed automatically to increase the accuracy of simplexes that contain significant amounts of variance between the system-level property values at the corners.
 Increasing the granularity will reduce the variance as when the points get closer together, since points closer to one another will have increasingly similar values.
 
 The effect of the granularity on accuracy is dependent on the nature of the forward-mapping regression method used.
-If the forward-mapping produces overfit or otherwise inaccurate predictions, the reverse-mapping produces will be inaccurate as well when it comes to suggesting behavior for the target domain.
+If the forward-mapping produces overfit or otherwise inaccurate predictions, the reverse-mapping produces will be inaccurate as well.
 This difficulty should be dealt with in the forward-mapping solving step, not the reverse-mapping solving step.
 This is because the purpose of SCI is to model the forward-mapping, not the domain.
 
-An empirical analysis of the relationship between granularity and accuracy is provided in Chapter \ref{Results}.
+An empirical analysis of the relationship between granularity and accuracy is provided in Chapter \ref{Results}: Results.
 The accuracy is measured as the approximate total difference between the continuous forward-mapping function and the continuous simplical complex.
 In addition, suggestions made from SCI are validated against a actual system-run of the target ABM.
 The error between the desired system-level property values and the actual system-level property values are measured.
@@ -303,11 +301,10 @@ In higher dimensional domains, the number of points that will satisfy the system
 \subsection{Special Cases}
 
 In this section, I discuss two special cases that can simplify the SCI process significantly.
-Users of \fw can see significant if either cases can be identified as a property of a domain.
+Users of \fw can see significant improvements in computation time if either cases can be identified as a property of a domain.
 
    \subsubsection{Classification}
-System-level properties that are binary (positive and negative) in nature (i.e., the forward-mapping is classification, not regression) can be treated differently than typical.
-
+System-level properties that are binary (positive and negative) in nature (i.e., the forward-mapping is classification, not regression) can be treated differently..
 SCI handles binary-valued system-level properties by labeling each simplex as either:
 \begin{itemize}
 \item positive -- corners are all positive instances,
@@ -320,11 +317,11 @@ This is possible because these simplexes will not be part of the solution, even 
 This shortcut can drastically reduce computation time if a majority of the space is removed.
 
 Inconclusive simplexes are situated on the boundary of positive and negative instances in the space.
-Therefore, the granularity of the inconclusive can be increased by separating them (Subsection \ref{subsec:granularity}) in order to reduce the amount of space occupied by inconclusive simplexes.
+Therefore, the granularity of the inconclusive simplexes can be increased by separating them (Subsection \ref{subsec:granularity}) in order to reduce the amount of space occupied by inconclusive simplexes.
 
 
    \subsubsection{One-to-One Mapping}
-With some properties, the forward-mapping may define a one-to-one.
+With some properties, the forward-mapping may define a one-to-one mapping.
 If this is the case, then regression can be used for the reverse mapping by training on system-level property to infer values for the configuration parameters.
 The regression will return the one configuration that satisfies the system-level property, since it is one-to-one.
 Therefore, if a user is working with a one-to-one mapping, this should be the only property being analyzed.
@@ -346,7 +343,7 @@ Running the Wolf Sheep Predation model takes at least a seconds per run.
 For example, every generation of a genetic algorithm could have to execute an ABM several hundred times.
 In which case, each generation could take several minutes to compute.
 
-A hybrid approach is possible that drastically reduces online running time.
+A hybrid approach is possible that drastically reduces online running time of optimization.
 Instead of directly sampling the ABM, the optimization technique can use the forward mapping to infer the outcome of a configuration instead of executing it.
 This also has the benefit of the regression smoothing the predictions, which in many cases will give more consistent results than querying an ABM directly.
 This approach is effectively searching through the regression space created by the forward mapping, which is an approximation of the true behavior space.
@@ -367,7 +364,7 @@ The equations returned by SCI provide this mathematical representation in a piec
 This deeper understanding of how a system-level property can be produced is more faster and more valuable than having a researcher manually study a domain to gain understanding of how the configurations affect system-level behavior.
 
 The reverse mapping can be used to suggest a configuration when a user wishes to see a particular behavior exhibited in the ABM.
-For example, the of \fw wants to see what an execution of a Fire ABM that burns down 80\% of the trees looks like.
+For example, the user of \fw wants to determine what an execution of a Fire ABM that burns down 80\% of the trees looks like.
 SCI can suggest what density of trees should be used.
 Typically, the user would have to go through an iterative process of guessing a possible configuration, then executing the ABM to determine if the configuration generated the behavior or not.
 This is effectively manual hill climbing, and can be unintuitive, difficult and tedious.
