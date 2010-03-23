@@ -3,9 +3,81 @@
 
 \label{Results}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+\section{Evaluation}
+
+ \subsection{Forward Mapping}
+
+  \subsubsection{Accuracy}
+
+  \subsubsection{Offline Computation Time}
+
+  \subsubsection{Online Computation Time}
+
+ \subsection{Reverse Mapping}
+
+  \subsubsection{Accuracy vs. Forward Mapping}
+
+  \subsubsection{Accuracy vs. Agent-Based Model Run}
+
+  \subsubsection{Offline Computation Time}
+
+  \subsubsection{Online Computation Time}
 
 
-\section{Domains}
+\section{Target Domains}
 
-\subsection{NetLogo Fires Domain}\label{sec:Fires}
+ \subsection{NetLogo Fires Domain}\label{sec:Fires}
+
+config: density
+
+slp: \% burned
+
+ \subsection{NetLogo Wolf Sheep Predation}
+
+config: sheep-gain-from-food, wolf-gain-from-food, grass-regrowth-time, sheep-reproduce, wolf-reproduce
+
+slp: sheep extinct?, wolf extinct?, average wolf population, average sheep population, variance of sheep population, variance of wolf population
+
+ \subsection{NetLogo Traffic Basic}
+
+config: number-of-cars, acceleration, deceleration
+
+slp: average max speed, average min speed, frequency of traffic jam
+
+ \subsection{Reynolds Boids}
+
+config: num-boids, avoidance, center
+
+slp: density, speed
+
+
+\section{Forward Mapping Algorithms}
+
+\begin{itemize}
+ \item k-Nearest Neighbor (KNN)
+ \item Robust Locally Weighted Regression and Smoothing Scatterplots (LOESS)
+ \item ?
+\end{itemize}
+
+
+
+\section{Experiments}
+
+ \subsection{Forward Mapping}
+
+  \subsubsection{Accuracy}
+
+  \subsubsection{Offline Computation Time}
+
+  \subsubsection{Online Computation Time}
+
+ \subsection{Reverse Mapping}
+
+  \subsubsection{Accuracy vs. Forward Mapping}
+
+  \subsubsection{Accuracy vs. System Run}
+
+  \subsubsection{Offline Computation Time}
+
+  \subsubsection{Online Computation Time}
