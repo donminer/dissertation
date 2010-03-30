@@ -267,8 +267,26 @@ Even more diverse behaviors can be observed by adjusting several parameters at o
 Several system-level properties have been developed for this domain.
 To sample many of these properties and to provide more consistent results, each random configuration is sampled a number of times and averaged.
 \begin{itemize}
-\item \textit{sheep-extinct?} -- the probability that the sheep population will reach zero.
-Every training instance has a value of one or zero for this property.
+\item \textit{sheep-extinct?} and \textit{wolves-extinct?} -- the probability that the sheep and wolf populations will reach zero, respectively.
+
+The probability of sheep and wolf extinction is measured by sampling the same configuration numerous times and calculating the percentage of instances they went extinct.
+Most often with a specific configuration, the sheep or wolves always go extinct or always do not go extinct.
+However, there are borderline configurations in which the sheep or wolves will go extinct while the system is stabilizing into a rhythm.
+This metric is useful in distinguishing between these three situations.
+Wolves will always go extinct if there are no sheep, but sheep can exist without wolves.
+Therefore, the value of \textit{wolves-extinct} is always higher than \textit{sheep-extinct?}.
+
+\item \textit{sheep-average} and \textit{wolf-average} -- the average sheep and wolves given they did not go extinct, respectively.
+
+The average sheep and wolf populations are calculated by averaging the populations at every time step in instances in which they did not go extinct.
+Not including extinct populations in the average is important because these instances will introduce significant amounts of bias.
+This metric describes how large the population can expected to be.
+Along with \textit{sheep-variance} and \textit{wolf-variance}, the averages describes the nature of the population and how it changes.
+
+\item \textit{sheep-variance} and \textit{wolf-variance} -- the variance of the sheep and wolf population over the course of a run.
+
+The variance is calculated with the same data as the average.
+This metric describes how much the population changes from time step to time step, since the population is typically rhythmically changing.
 
 \end{itemize}
 
