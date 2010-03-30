@@ -141,23 +141,136 @@ A fire is started in the left column, in which all trees in this column burn.
 Each burning tree then burns its adjacent trees (up, down, left, and right).
 This process continues until no more trees are adjacent to burning trees.
 
-The configuration space is one dimensional and the system-level property space is one dimensional.
+The configuration space is one-dimensional and the system-level property space is one dimensional.
 The configuration parameter for this domain is the density $\rho$ of the forest, which in our experiments I range from 45 \% to 75\%.
 What this parameter does is change the probability that a grid point contains a tree.
 During the initialization step, each grid point has a tree placed with probability $\rho$.
 The system-level property is the percentage of trees burned down, which is measured by diving the number of trees that were burned by the total number of trees in the system.
 
 
-This domain is particularly interesting because it exhibits an interesting threshold effect.
+The Fires ABM is particularly interesting because it exhibits a threshold effect.
+There is a sharp transition from small amounts of the forest burning down and the entire forest burning down when the forest density increases past 58\%.
+The behavior space is not linear and exhibits high variance around 58\%, making this ABM moderately challenging, regardless of it only having one configuration parameter.
 
+The Fires ABM is used as an example in this chapter on how to apply every aspect of \fw to a single domain later on in this chapter.
 
-config: density
-
-slp: \% burned
 
  \subsection{NetLogo Wolf Sheep Predation}
+The NetLogo Wolf Sheep Predation ABM has been the running example throughout this dissertation.
+In this ABM, there are three major entities: wolves, sheep and grass.
+Wolves eat sheep, sheep eat wolves and sheep eat grass.
+The grass naturally regrows, meanwhile wolves and sheep occasionally reproduce.
+Every time step sheep and wolves lose some energy and die naturally if their energy reaches zero.
+A screen capture of the Wolf Sheep Predation ABM in NetLogo is shown in Figure \ref{fig:wolfsheepss}.
+The configuration controls are in the top left, the monitors are in the bottom left and the visualization of the domain is on the right.
 
-config: sheep-gain-from-food, wolf-gain-from-food, grass-regrowth-time, sheep-reproduce, wolf-reproduce
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.4]{images/wolfsheep_ss.png}
+\caption{Screen capture of the Wolf Sheep Predation ABM.}
+\label{fig:wolfsheepss}
+\end{figure}
+
+The populations of a running Wolf Sheep Predation system are constantly changing.
+Therefore, measuring properties is not as straightforward as in the Fires ABM.
+Changes in populations can range from small oscillations to high magnitude oscillations in numbers, depending on the configuration parameters.
+Quantitatively capturing these properties is challenging, but is possible with \fw.
+A plot of a relatively normal (not too stable and not too high-magnitude) population is shown in Figure \ref{fig:wsp_norm}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.666667]{images/wolfsheep/wolfsheep_normal.png}
+\caption{Plot of a stable populations in a Wolf Sheep Predation system.}
+\label{fig:wsp_norm}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.666667]{images/wolfsheep/sheepfood_low.png}
+\includegraphics[scale=.666667]{images/wolfsheep/sheepfood_high.png}
+\caption{Plot of a Wolf Sheep Predation run with low (left) and high (right) \textit{sheep-gain-form-food}.}
+\label{fig:wsp_sheepfood}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.666667]{images/wolfsheep/wolffood_low.png}
+\includegraphics[scale=.666667]{images/wolfsheep/wolffood_high.png}
+\caption{Plot of a Wolf Sheep Predation run with low (left) and high (right) \textit{wolf-gain-form-food}.}
+\label{fig:wsp_wolffood}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.666667]{images/wolfsheep/sheepsex_low.png}
+\includegraphics[scale=.666667]{images/wolfsheep/sheepsex_high.png}
+\caption{Plot of a Wolf Sheep Predation run with low (left) and high (right) \textit{sheep-reproduce}.}
+\label{fig:wsp_sheepsex}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.666667]{images/wolfsheep/wolfsex_low.png}
+\includegraphics[scale=.666667]{images/wolfsheep/wolfsex_high.png}
+\caption{Plot of a Wolf Sheep Predation run with low (left) and high (right) \textit{wolf-reproduce}.}
+\label{fig:wsp_wolfsex}
+\end{figure}
+
+
+The configuration space is five-dimensional, making this domain nontrivial to analyze.
+The configuration parameters, along with some general observations, are as follows:
+\begin{itemize}
+   \item \textit{sheep-gain-from-food} -- the amount of energy sheep gain from eating grass.
+This parameter has interesting effects on the system.
+The effect of changing this parameter from the stable norm is shown in Figure \ref{fig:wsp_sheepfood}.
+
+At lower values, the population of the sheep has difficulty not going extinct.
+This almost always results in the wolf population going extinct.
+
+At higher values, sheep live longer and quickly become overpopulated, which causes the grass to become a scarce resource.
+With little grass left, the sheep begin to die off.
+Once enough sheep have died off, the grass begins to regrow and the sheep begin to reproduce.
+This results in sharp increases and decreases in sheep population as the sheep population oscillates between overpopulated and underpopulated.
+When the oscillations are of high enough magnitude, the wolves have a high chance of becoming extinct while the sheep population is very low.
+
+
+   \item \textit{wolf-gain-from-food} -- the amount of energy wolves gain from eating a sheep.
+This parameter affects the system in a similar way as \textit{sheep-gain-from-food}.
+Lower values cause the wolves to go extinct, while higher values cause more drastic oscillations in wolf and sheep populations.
+The effect of changing this parameter from the stable norm is  shown in Figure \ref{fig:wsp_wolffood}.
+
+   \item \textit{sheep-reproduce} -- the percent chance that a sheep will reproduce, per time step.
+This parameter has the interesting property that when it is increased, the wolf population increases, but the sheep population remains relatively constant.
+When \textit{sheep-reproduce} is too low, the sheep population has difficulties sustaining its numbers, which causes the wolf population to be very low.
+The effect of changing this parameter from the stable norm is  shown in Figure \ref{fig:wsp_sheepsex}.
+
+   \item \textit{wolf-reproduce} -- the percent chance that a wolf will reproduce, per time step.
+This parameter has relatively little effect on the system, in comparison to the other parameters.
+The populations oscillate more when the reproduction rate is higher and more stable with it lower.
+The effect of changing this parameter from the stable norm is  shown in Figure \ref{fig:wsp_wolfsex}.
+
+   \item \textit{grass-regrowth-time} -- the amount of time steps a patch of grass takes to regrow.
+This is perhaps the strangest behaving configuration parameter.
+At higher values, not enough grass grows to sustain a large sheep population, which causes the wolves to go extinct.
+At lower values, sheep rarely every die, until they become overpopulated and eat all the grass.
+At this point, there is a mass extinction, which causes the wolves to typically go extinct.
+In behavior, this parameter is similar to that of \textit{sheep-gain-from-food}.
+
+\end{itemize}
+Each of these parameters individually affect the system state.
+Even more diverse behaviors can be observed by adjusting several parameters at once.
+
+Several system-level properties have been developed for this domain.
+To sample many of these properties and to provide more consistent results, each random configuration is sampled a number of times and averaged.
+\begin{itemize}
+\item \textit{sheep-extinct?} -- the probability that the sheep population will reach zero.
+Every training instance has a value of one or zero for this property.
+
+\end{itemize}
 
 slp: sheep extinct?, wolf extinct?, average wolf population, average sheep population, variance of sheep population, variance of wolf population
 
