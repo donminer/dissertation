@@ -96,20 +96,84 @@ The behaviors are not linear and the configuration space is three-dimensional, m
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{NetLogo AIDS}
+
+The AIDS ABM is a model of how AIDS spreads in humans.
+There are a number of agents in a two-dimensional world that move around randomly.
+Agents that collide have a chance to couple, and have a chance to spread AIDS if one partner has AIDS (\textit{HIV+} and one does not (\textit{HIV-}).
+Individuals that know they have the disease will not spread it to people without it.
+Only individuals that have AIDS but do not know (\textit{HIV?}) can spread the disease.
+Eventually, once there are no more people unknowingly spreading AIDS, the population is segregated into people who have AIDS and know it, and people that do not have it.
+A screen capture of the domain running in NetLogo is shown in Figure \ref{fig:aidsss}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.5]{images/aids_ss.png}
+\caption{Screen capture of the NetLogo AIDS ABM.}
+\label{fig:aidsss}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.666667]{images/condom_low.png}
+\includegraphics[scale=.666667]{images/condom_high.png}
+\caption{Plot of a AIDS ABM run with low (left) and high (right) \textit{average-condom-use} (notice the difference in the scale of weeks).}
+\label{fig:aids_condom}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.666667]{images/test_low.png}
+\includegraphics[scale=.666667]{images/test_high.png}
+\caption{Plot of a AIDS ABM run with low (left) and high (right) \textit{average-test-frequency} (notice the difference in the scale of weeks).}
+\label{fig:aids_test}
+\end{figure}
 
 
- \section{NetLogo Traffic Basic}
+There are five configuration parameters available in the NetLogo implementation of this ABM.
+However only two are used for the intents of this dissertation:
+\begin{itemize}
+  \item \textit{average-condom-use} -- The probability that one of the two individuals will insist on using a condom.
 
-config: number-of-cars, acceleration, deceleration
+The usage of a condom prevents the spread of the disease.
+Therefore, when this value is lower, the disease will spread to more people.
+When this value is higher, the opposite happens.
+The difference between a high value and a low value is illustrated in Figure \ref{fig:aids_condom}.
 
-slp: average max speed, average min speed, frequency of traffic jam
+  \item \textit{average-test-frequency} -- The frequency that an individual will get tested for AIDS, per year.
+
+Getting tested decreases the population of the individuals that have AIDS but do not know it, directly reducing the number of agents capable of spreading the disease.
+This parameter has as similar effect as \textit{average-condom-use}, as seen in Figure \ref{fig:aids_test}.
+\end{itemize}
+The other parameters, \textit{initial-people}, \textit{average-coupling-tendency} (chance a couple will form), and \textit{average-commitment} (how long a couple stays together) are not used.
+I chose not to incorporate these in my experiments because they change the system-level behavior in a similar way to the two parameters that I do use.
+In addition, condom usage and test frequency may be more easily affected by public policy than coupling tendency and how long a couple are committed for.
+
+For this domain, I will use \fw to model the plots of the populations, such as the ones in Figures \ref{fig:aids_condom} and \ref{fig:aids_test}.
+This is done by using a parametric model to perform curve fitting (i.e., nonlinear regression) on training instances and extracting the model parameters as the system-level properties.
+Thus, the forward mapping maps the two configuration parameters to predicted values of the parameters of the model.
+A prediction of what the plots will look like can then be predicted with the forward mapping.
+A base parametric model is needed that can fit the data well.
+
+For this domain, the curves appear to be sigmoid functions, so I will use a generalized logistic function:
+\[P(t) = c_1 + \displaystyle\frac{c_2 - c_1}{1 + e^{-c_3 (t - c_4)}}.\]
+The parameters indicate the following:
+\begin{itemize}
+ \item $c_1$ -- the lesser asymptote,
+ \item $c_2$ -- the greater asymptote,
+ \item $c_3$ -- the growth rate, and
+ \item $c_4$ -- the location of the inflection point.
+\end{itemize}
+
+The step of performing the nonlinear regression to model the curve is done after the raw data sampling and before solving the forward mapping.
+Each instance of scatter plot data has nonlinear regression applied to it to determine the four parameters of the logistic function.
+The parameters are used as the new data set, instead of the original scatter plot data.
+
+In conclusion, the AIDS domain is used to specifically demonstrate the usage of parametric models to describe system-level behaviors over time.
 
 
 
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%5
+%%%%%%%%%%%%%%%%%%%%%%%
  \section{NetLogo Wolf Sheep Predation}
 The NetLogo Wolf Sheep Predation ABM has been the running example throughout this dissertation.
 In this ABM, there are three major entities: wolves, sheep and grass.
