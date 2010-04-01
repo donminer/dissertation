@@ -1,0 +1,3 @@
+data/ contains data sets used in evaluating thesis
+src/ contains all the source code that deals with this dissertation research
+thesis/ contains the actual document
