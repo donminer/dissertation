@@ -1,3 +1,15 @@
-data/ contains data sets used in evaluating thesis
+Author: Don Miner
+University: University of Maryland, Baltimore County
+Advisor: Marie desJardins
+
+Title: A Framework for Predicting and Controlling System-Level Properties of Agent-Based Models
+Defense Date: April 23rd, 2010
+
+This is a repository containing the "final products" of my dissertation.
+
+
+=== CONTENTS OF THIS REPOSITORY ===
+
+data/ contains data sets I have made for use in this work
 src/ contains all the source code that deals with this dissertation research
-thesis/ contains the actual document
+thesis/ contains the actual document; thesis.pdf is the dissertation document in its most recent form.

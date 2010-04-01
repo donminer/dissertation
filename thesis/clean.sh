@@ -7,4 +7,3 @@ rm -v *.bbl
 rm -v *.lof
 rm -v *.lot
 rm -v text.autosave
-rm -v src/*~
