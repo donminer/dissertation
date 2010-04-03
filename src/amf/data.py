@@ -10,24 +10,31 @@ def make_vartype(vartype_str):
    """
    Takes a string that labels columns in a data set.
    vartype_string should either have 'i' or 'd' in it, e.g., "iidid"
+
+   i - independent variable
+   d - dependent variable
    """
    # replace characters i and d with IND and DEP symbols.
-   return tuple(IND if c == 'i' else DEP for c in vartype_str.strip())
+   return tuple( (IND if c == 'i' else DEP) for c in vartype_str.strip() if not c.isspace())
 
-def load(file_name, vartype):
+def load(file_name):
    """
    Loads a data set from a file.
-   This function also takes in "vartype", a list of ind/dep symbols made from make_vartype.
+
+   The data set should be space delimited to distinguish columns, and newline
+   delimited to distinguish rows.
+
+   The first line should contain something that is to be passed into make_vartype.
+
    """
 
-   # maybe they passed in a vartype string, let's just set that up for them.
-   if type(vartype) is str:
-      vartype = make_vartype(vartype)
+   file_h = open(file_name)
+
+   vartype = make_vartype(file_h.readline().strip())
 
    dataset = []
-
    # go through each line and parse it
-   for line in open(file_name).xreadlines():
+   for line in file_h.xreadlines():
       line = line.strip()
 
       # ignore empty lines

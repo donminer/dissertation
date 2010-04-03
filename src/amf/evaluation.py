@@ -3,7 +3,7 @@
 import fm
 import numpy
 import misc
-
+import sys
 class ErrorStats(object):
    def __init__(self, entries = None):
       self.error_rows = []
@@ -30,6 +30,7 @@ class ErrorStats(object):
       """
       return tuple( d.deviation for d in self.error_rows )
 
+
 class _ErrorStatsRow(object):
    def __init__(self, config, test_val, predict_val):
       self.config = config
@@ -43,6 +44,9 @@ def eval_fm(initialized_fm, training_set, test_set):
    """
    takes a training set, a test set and an initialized (but not trained) forward
    mapping object.
+
+   Returns a evaluation.ErrorStats object and the amount of time it took
+   per query.
    """
 
    # rename it
@@ -53,6 +57,18 @@ def eval_fm(initialized_fm, training_set, test_set):
 
    test = ErrorStats()
 
+
+
+   sys.stderr.write("Starting Experiment\n")
+   sys.stderr.write("%d training instances, %d testing instances\n" \
+      % (len(training_set), len(test_set)) )
+   sys.stderr.write("|" + " "*40 + "|\n")
+   progress_bar_tic = len(test_set)/40
+   sys.stderr.write(" ")
+   count = 0
+
+   st = misc.StopWatch()
+
    # for each item in the training set, predict with that configuration and test
    # it against the actually sampled value
    for test_config, test_val in test_set:
@@ -60,6 +76,12 @@ def eval_fm(initialized_fm, training_set, test_set):
 
       test.add( test_config, test_val, predict_val )
 
-   return test
+      if count % progress_bar_tic == 0:
+         sys.stderr.write("*")
+      count += 1
+
+   sys.stderr.write("\n")
+
+   return test, (st.read() / len(test_set))
 
 
