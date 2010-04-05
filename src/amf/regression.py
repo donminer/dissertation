@@ -7,6 +7,8 @@ import misc
 
 # This is the basic Interface that other regression objects should inherit from
 class Regression(object):
+   name = None
+
    def train(self, data):
       raise NotImplementedError, "'train' method not implemented."
 
@@ -15,6 +17,8 @@ class Regression(object):
 
 
 class kNN(Regression):
+   name = "kNN"
+
    def __init__(self, k):
       self.k = k
       self.__data__ = None

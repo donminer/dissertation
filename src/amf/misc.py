@@ -88,3 +88,14 @@ class StopWatch(object):
       """ Returns the seconds that have elapsed since the stopwatch
       has been reset last"""
       return time.time() - self.start_time
+
+def stripspaces(s):
+   new_s = ""
+   for c in s:
+      if not c.isspace():
+         new_s += c
+
+   return new_s
+
+
+
