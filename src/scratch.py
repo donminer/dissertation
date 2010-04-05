@@ -3,73 +3,71 @@ import sys
 import amf
 import amf.misc as misc
 import os.path
+import math
 
 # Comment this out to have debug messages shown.
-sys.stderr = open('/dev/null', 'w')
+#sys.stderr = open('/dev/null', 'w')
 
+def test_fires_fm_random():
+   amf.evaluation.test_fm("FIRESknn", amf.regression.Random, [0.0, 1.0], '../data/fires.txt', 100, 500)
 
-def test_fm(reg_method, parameters, dataset_path, training_size, evaluation_size):
-   print >> sys.stderr, "Testing a [%s] forward mapping on the [%s] data set." % (reg_method.name, dataset_path)
-   print >> sys.stderr, "Training data set size:", training_size
-   print >> sys.stderr, "Evaluation data set size:", evaluation_size
-
-   # initialize the data set
-   all_data = amf.data.load(dataset_path)
-   training, validation = amf.data.random_subsets(all_data, [training_size, evaluation_size])
-
-   # initialize the forward mapping with kNN
-   knn = amf.ForwardMapping(reg_method, parameters)
-
-   # Run the tests
-   error_list, time_per = amf.evaluation.eval_fm(knn, training, validation)
-   print >> sys.stderr, "Each query took about", time_per, "seconds."
-
-   # calculate some stats on the errors
-
-   errors = error_list.errors()
-   devias = error_list.deviations()
-   column = misc.to_columns(devias)
-
-   avg = misc.col_average(errors)
-   print >> sys.stderr, "The everage error was", avg
-
-   bias = misc.col_average(devias)
-   print >> sys.stderr, "The average deviation (bias) was", bias
-
-   print >> sys.stderr, "The worst error was", misc.col_max(errors)
-   print >> sys.stderr, "The lowest error was", misc.col_min(errors)
-
-   boxplots = []
-   for col in column:
-      boxplot = misc.boxplot(col)
-      boxplots.append(boxplot)
-      print >> sys.stderr, "A box-whisker plot of the deviations:", boxplot
-
-
-   for col in range(len(column)):
-      # print out a data row that can be redirected to a data set sort of thing
-      mi, lq, me, uq, ma = boxplots[col]
-      nums_to_print = (avg[col], bias[col], mi, lq, me, uq, ma)
-      print "%s:slp%d" % (os.path.basename(dataset_path), col),
-      print "%s:%s" % (reg_method.name, misc.stripspaces(repr(parameters)) ), 
-      print "%d:%d" % (training_size, evaluation_size),
-      print " ".join(["%.10f"] * len(nums_to_print)) % nums_to_print
-
-   ##### This is the way a data row looks:
-  #  <data set name>:<property number>
-  #    <regression>:<parameters>
-  #    <training size>:<evaluation size>
-  #    <average error> <bias> <min> <lower quartile> <median> <upper quartile> <max>
 
 
 def test_fires_fm_knn():
-   test_fm(amf.regression.kNN, [5], '../data/fires.txt', 100, 500)
+   amf.evaluation.test_fm("FIRESknn", amf.regression.kNN, [5], '../data/fires.txt', 100, 500)
+
+def sigmoid(p, x1):
+   return p[0] + (p[1] - p[0]) / (1 + math.e ** (-p[2] * (x1 - p[3])))
+
+def test_fires_fm_nlr():
+   init_guess = [0.0, 1.0, .65, 58.3]
+
+   amf.evaluation.test_fm("FIRESnlr", amf.regression.NLR, [sigmoid, init_guess], '../data/fires.txt', 100, 500)
+
+def test_fires_fm_loess():
+
+   for sm in [0, 1, 2, 3, 4, 5]:
+      for win in [1.5, 2.0, 3.0]:
+         amf.evaluation.test_fm("FIRESloess", amf.regression.LOESS, [win, sm], '../data/fires.txt', 100, 500)
 
 
-def test_fm_multi(regressions, dataset, training_sizes, evaluation_size):
-   pass
+def plotpoints_loess_fm_fires():
+   fm = amf.ForwardMapping(amf.regression.LOESS, [1.0, 1], 1)
+   data = amf.data.load('../data/fires.txt')
+   subset = amf.data.random_subsets(data, [400])[0]
+
+   fm.train(subset)
+
+   for x in misc.xfrange(45.0, 75.0, .1):
+      print x, fm.predict((x,))[0]
+
+def plotpoints_knn_fm_fires():
+   fm = amf.ForwardMapping(amf.regression.kNN, [55], 3)
+   data = amf.data.load('../data/fires.txt')
+   subset = amf.data.random_subsets(data, [400])[0]
+
+   fm.train(subset)
+
+   for x in misc.xfrange(45.0, 75.0, .1):
+      print x, fm.predict((x,))[0]
 
 
+def test_fm_multi(regressions, dataset_path, training_sizes, evaluation_size, num_trials = 1):
+   """
+   regressions is a list of tuples with (<regression>, <parameters>)
+   """
+
+   loaded_data = amf.data.load(dataset_path)
+   name = os.path.basename(dataset_path).split('.', 1)[0].upper()
+
+   for regression, parameters in regressions:
+      for training_size in training_sizes:
+         for i in xrange(num_trials):
+            amf.evaluation.test_fm(name, regression, parameters, loaded_data, training_size, evaluation_size)
+            
+
+def test_fm_multi_fires():
+   test_fm_multi([(amf.regression.kNN, [6])], '../data/fires.txt', range(20,200, 2), 2000, 1)
 
 
 def main():

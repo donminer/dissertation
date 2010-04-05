@@ -80,3 +80,26 @@ def random_subsets(data_set, n_list):
 
    return subsets
 
+
+
+def split_dep(data_set):
+   """
+   Split the data set into one-data-set-per-dependent variable.
+   """
+
+   num_dep = len(data_set[0][1])
+
+   sets = [ [] for idx in range(num_dep) ]
+
+   for ind, dep in data_set:
+      # for each dependent variable here...
+      for d_idx in range(num_dep):
+         sets[d_idx].append((ind, dep[d_idx]))
+
+   return sets
+
+
+
+
+
+

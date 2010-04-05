@@ -4,6 +4,7 @@
 
 import time
 import math
+import numpy
 
 def distance(v1, v2):
    if len(v1) != len(v2):
@@ -24,7 +25,10 @@ def list_multscalar(v1, s):
    return tuple( x1 * s for x1 in v1 )
 
 def col_average(lists):
-   return col_reduce(lambda x, y: (x + y) / float(len(lists)), lists)
+   return [ col / len(lists) for col in col_sum(lists) ]
+
+def stddev(lists):
+   return tuple(numpy.std(l) for l in lists)
 
 def col_sum(lists):
    return col_reduce(lambda x, y: x + y, lists)
@@ -34,6 +38,13 @@ def col_max(lists):
 
 def col_min(lists):
    return col_reduce(min, lists)
+
+
+def get_col(lists, col):
+   """ Retrieve a single column from a data set as a list. """
+
+   return tuple( row[col] for row in lists )
+
 
 def col_reduce(function, matrix):
    """ performs a 'reduce' operation on each column of a matrix """
@@ -96,6 +107,30 @@ def stripspaces(s):
          new_s += c
 
    return new_s
+
+
+def xzip(l1, l2):
+   """ the same thing as zip, but as an iterator"""
+
+   minlen = min(len(l1), len(l2))
+
+   for idx in xrange(minlen):
+      yield (l1[idx], l2[idx])
+
+
+def xfrange(start, stop, step):
+   if start > stop and step > 0.0 or start < stop and step < 0.0 or step == 0.0:
+      sys.stderr.write("Bad start/stop/step!\n")
+
+   else:
+      cur = start
+      while cur < stop:
+         yield cur
+         cur += step
+
+
+
+
 
 
 
