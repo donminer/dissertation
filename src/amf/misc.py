@@ -121,10 +121,10 @@ def xfrange(start, stop, step):
       sys.stderr.write("Bad start/stop/step! %f %f %f \n" % (start, stop, step))
 
    else:
-      cur = start
-      while cur < stop:
-         yield cur
-         cur += step
+      cur = 0.0
+      while start + cur * step < stop:
+         yield start + cur * step
+         cur += 1.0
 
 def binary(n):
    """ Generate all binary numbers of length n """

@@ -76,7 +76,10 @@ def test_rm():
 
    rm = amf.ReverseMapping(fm, [(45.0, 75.0)], 100.0)
 
-   print rm.knots
+
+   print rm.intersections(0, .5)
+   print rm.intersections(0, .94)
+
 
 def main():
    # Please don't inject malicious code here. Thanks!
