@@ -28,6 +28,10 @@ def list_multscalar(v1, s):
 def col_average(lists):
    return [ col / len(lists) for col in col_sum(lists) ]
 
+def average(l):
+   return sum(l) / float(len(l))
+
+
 def stddev(lists):
    return tuple(numpy.std(l) for l in lists)
 

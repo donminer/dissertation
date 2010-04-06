@@ -8,6 +8,7 @@ import sys
 import scipy.optimize
 import random
 import data
+import math
 
 # This is the basic Interface that other regression objects should inherit from
 class Regression(object):
@@ -23,7 +24,8 @@ class Regression(object):
 class kNN(Regression):
    name = "kNN"
 
-   possible_ks = [2, 3, 4, 5, 6, 7, 10, 13, 17, 23, 29, 36, 44]
+   #possible_ks = [2, 3, 4, 5, 6, 7, 10, 13, 17, 23, 29, 36, 44]
+   possible_ks = [2, 3, 5, 7, 13]
 
    def __init__(self):
       self.k = None
@@ -52,13 +54,12 @@ class kNN(Regression):
             mses.append(mse)
 
          total = sum(mses)
-         print '..', k, total
 
          results.append((total, k))
 
       # this is the best
       total, k = min(results)
-      sys.stderr.write("kNN has decided that %d is the best value for k\n" % k)
+      #sys.stderr.write("kNN has decided that %d is the best value for k\n" % k)
 
       self.k = k
       self.__data__ = temp_data
@@ -124,8 +125,12 @@ class LOESS(Regression):
             weighted_sum += weight * other_y
 
          if sum_weights == 0.0:
-            sys.stderr.write("WARNING: No other instances found to have weights for point %s\n" % repr(configuration))
-            return 0.0
+            #sys.stderr.write("WARNING: No other instances found to have weights for point %s\n" % repr(configuration))
+            # temporarily make window a bit bigger...
+            self.window *= 2.0
+            p = self.predict(configuration, smoothing)
+            self.window /= 2.0
+            return p
 
          return weighted_sum / sum_weights
 
@@ -165,13 +170,14 @@ class NLR(Regression):
 
       v, success = scipy.optimize.leastsq( self.error, self.initial, args=tuple(x_arrays + [y_array]) )
 
-      print 'success?', success
-      print 'v=', v
+      #print 'success?', success
+      #print 'v=', v
 
       self.opt = v
 
    def predict(self, configuration):
-      return self.model(self.opt, configuration)
+      # doing [0] because it returns an array for some reason
+      return self.model(self.opt, configuration)[0]  
 
 
 # This class is intended to test the evaulation -- RANDOM should do very poorly!
