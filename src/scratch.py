@@ -12,7 +12,7 @@ def test_fires_fm_random():
    amf.evaluation.test_fm("FIRESknn", amf.regression.Random, [0.0, 1.0], '../data/fires.txt', 100, 500)
 
 def test_fires_fm_knn():
-   amf.evaluation.test_fm("FIRESknn", amf.regression.kNN, [5], '../data/fires.txt', 100, 500)
+   amf.evaluation.test_fm("FIRESknn", amf.regression.kNN, [], '../data/fires.txt', 1000, 1000)
 
 def sigmoid(p, x1):
    return p[0] + (p[1] - p[0]) / (1 + math.e ** (-p[2] * (x1 - p[3])))

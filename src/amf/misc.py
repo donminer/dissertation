@@ -138,3 +138,11 @@ def _binary_helper(n, l, output):
    else:
       _binary_helper(n-1, l + (0,), output), _binary_helper(n-1, l + (1,), output)
 
+def MSE(data):
+   """calculate the mean squared error between two sets of data of the form:
+   [(a,b), (c,d), (e,f)  ==>  ((b-a)^2 + (d-c)^2 + (f-e)^2) / 3"""
+
+   return sum((b - a) ** 2 for a, b in data) / float(len(data))
+
+
+

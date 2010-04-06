@@ -7,6 +7,7 @@ import misc
 import sys 
 import scipy.optimize
 import random
+import data
 
 # This is the basic Interface that other regression objects should inherit from
 class Regression(object):
@@ -22,17 +23,46 @@ class Regression(object):
 class kNN(Regression):
    name = "kNN"
 
-   def __init__(self, k):
-      self.k = k
+   possible_ks = [2, 3, 4, 5, 6, 7, 10, 13, 17, 23, 29, 36, 44]
+
+   def __init__(self):
+      self.k = None
       self.__data__ = None
       self.ind = None
-      self.dep = None
 
-   def train(self, data):
+   def train(self, tdata):
       # kNN just stores the data...
-      self.__data__ = copy.deepcopy(data)
+      temp_data = copy.deepcopy(tdata)
 
-      self.ind = len(self.__data__[0][0])
+      self.ind = len(temp_data[0][0])
+
+      # determine the best k with 10fold validation
+
+
+      results = []
+      for k in kNN.possible_ks:
+         self.k = k
+         mses = []
+         for training, validation in data.kfold_sets(temp_data, 10):
+            self.__data__ = training
+
+            test = tuple( (self.predict(config), slp) for config, slp in validation )
+ 
+            mse = misc.MSE(test)
+            mses.append(mse)
+
+         total = sum(mses)
+         print '..', k, total
+
+         results.append((total, k))
+
+      # this is the best
+      total, k = min(results)
+      sys.stderr.write("kNN has decided that %d is the best value for k\n" % k)
+
+      self.k = k
+      self.__data__ = temp_data
+
 
    def predict(self, configuration):
       nn = self.__find_knn__(configuration)      
@@ -106,9 +136,6 @@ class LOESS(Regression):
          new_yhats.append(self.predict(xs, True))
 
       self.yhats = new_yhats
-
-
-
 
 class NLR(Regression):
    name = "NLR"

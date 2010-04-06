@@ -2,6 +2,7 @@
 #  data and manipulating data sets.
 
 import random
+import copy
 
 IND = 5
 DEP = 6
@@ -80,7 +81,19 @@ def random_subsets(data_set, n_list):
 
    return subsets
 
+def kfold_sets(data_set, k):
+   """ Generates k sets of training/data sets for use in k-fold validation.
+     Pairs come back as (training, validation)
+   """
 
+   validation_size = int(len(data_set) / k)
+
+   shards = random_subsets(data_set, [validation_size] * k)
+
+   for t in range(k):
+      validation = shards[t]
+      training = reduce(lambda x,y : x+y, shards[:t] + shards[t+1:])
+      yield training, validation
 
 def split_dep(data_set):
    """
