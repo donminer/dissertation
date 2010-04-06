@@ -11,8 +11,6 @@ import math
 def test_fires_fm_random():
    amf.evaluation.test_fm("FIRESknn", amf.regression.Random, [0.0, 1.0], '../data/fires.txt', 100, 500)
 
-
-
 def test_fires_fm_knn():
    amf.evaluation.test_fm("FIRESknn", amf.regression.kNN, [5], '../data/fires.txt', 100, 500)
 
@@ -25,11 +23,9 @@ def test_fires_fm_nlr():
    amf.evaluation.test_fm("FIRESnlr", amf.regression.NLR, [sigmoid, init_guess], '../data/fires.txt', 100, 500)
 
 def test_fires_fm_loess():
-
    for sm in [0, 1, 2, 3, 4, 5]:
       for win in [1.5, 2.0, 3.0]:
          amf.evaluation.test_fm("FIRESloess", amf.regression.LOESS, [win, sm], '../data/fires.txt', 100, 500)
-
 
 def plotpoints_loess_fm_fires():
    fm = amf.ForwardMapping(amf.regression.LOESS, [1.0, 1], 1)
@@ -51,7 +47,6 @@ def plotpoints_knn_fm_fires():
    for x in misc.xfrange(45.0, 75.0, .1):
       print x, fm.predict((x,))[0]
 
-
 def test_fm_multi(regressions, dataset_path, training_sizes, evaluation_size, num_trials = 1):
    """
    regressions is a list of tuples with (<regression>, <parameters>)
@@ -65,10 +60,23 @@ def test_fm_multi(regressions, dataset_path, training_sizes, evaluation_size, nu
          for i in xrange(num_trials):
             amf.evaluation.test_fm(name, regression, parameters, loaded_data, training_size, evaluation_size)
             
-
 def test_fm_multi_fires():
    test_fm_multi([(amf.regression.kNN, [6])], '../data/fires.txt', range(20,200, 2), 2000, 1)
 
+def test_rm():
+   fm = amf.ForwardMapping(amf.regression.LOESS, [1.0, 1], 1)
+   data = amf.data.load('../data/fires.txt')
+   subset = amf.data.random_subsets(data, [400])[0]
+
+   print "Training now..."
+
+   fm.train(subset)
+
+   print "Done training"
+
+   rm = amf.ReverseMapping(fm, [(45.0, 75.0)], 100.0)
+
+   print rm.knots
 
 def main():
    # Please don't inject malicious code here. Thanks!

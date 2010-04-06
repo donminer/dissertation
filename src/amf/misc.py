@@ -5,6 +5,7 @@
 import time
 import math
 import numpy
+import sys
 
 def distance(v1, v2):
    if len(v1) != len(v2):
@@ -87,7 +88,6 @@ def boxplot(stat_list):
           sorted_list[round_float(length*.75)], \
           sorted_list[-1]
 
-
 class StopWatch(object):
    def __init__(self):
       self.reset()
@@ -108,7 +108,6 @@ def stripspaces(s):
 
    return new_s
 
-
 def xzip(l1, l2):
    """ the same thing as zip, but as an iterator"""
 
@@ -117,10 +116,9 @@ def xzip(l1, l2):
    for idx in xrange(minlen):
       yield (l1[idx], l2[idx])
 
-
 def xfrange(start, stop, step):
    if start > stop and step > 0.0 or start < stop and step < 0.0 or step == 0.0:
-      sys.stderr.write("Bad start/stop/step!\n")
+      sys.stderr.write("Bad start/stop/step! %f %f %f \n" % (start, stop, step))
 
    else:
       cur = start
@@ -128,9 +126,15 @@ def xfrange(start, stop, step):
          yield cur
          cur += step
 
+def binary(n):
+   """ Generate all binary numbers of length n """
+   out = []
+   _binary_helper(n, (), out)
+   return tuple(out)
 
-
-
-
-
+def _binary_helper(n, l, output):
+   if n == 0:
+      output.append(l)
+   else:
+      _binary_helper(n-1, l + (0,), output), _binary_helper(n-1, l + (1,), output)
 

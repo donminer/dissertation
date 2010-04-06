@@ -144,13 +144,20 @@ def test_fm(experiment_name, reg_method, parameters, dataset, training_size, eva
 
    sys.stderr.write("\n")
 
+   output = []
+
    for col in range(len(column_err)):
       # print out a data row that can be redirected to a data set sort of thing
-      print "%s:%d" % (experiment_name, col),
-      print "%s:%s" % (reg_method.name, misc.stripspaces(repr(parameters)) ), 
-      print "%d:%d" % (training_size, evaluation_size),
-      print "%.10f" % time_per,
-      print "%.10f:%.10f" % (avg[col], std[col])
+      #print "%s:%d" % (experiment_name, col),
+      #print "%s:%s" % (reg_method.name, misc.stripspaces(repr(parameters)) ), 
+      #print "%d:%d" % (training_size, evaluation_size),
+      #print "%.10f" % time_per,
+      #print "%.10f:%.10f" % (avg[col], std[col])
+
+      output.append((avg[col], std[col]))
 
    sys.stderr.write("\n\n")
+
+   return output
+
 

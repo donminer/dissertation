@@ -23,4 +23,4 @@ class ForwardMapping(object):
          mapper.train(tset)
 
    def predict(self, configuration):
-      return [ mapper.predict(configuration) for mapper in self.mappers ]
+      return tuple( mapper.predict(configuration) for mapper in self.mappers )
