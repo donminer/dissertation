@@ -167,3 +167,15 @@ def errorbars(data, confidence = 1.96):
 
    return avg, avg - confidence * se, avg + confidence * se
 
+def doublesided(data, encompass = .75):
+   sdata = sorted(data)
+
+   median = sdata[len(sdata)/2]
+
+   upper = sdata[ int(numpy.floor(encompass * len(sdata))) ]
+   lower = sdata[ int(numpy.ceil((1-encompass) * len(sdata))) ]
+
+   return median, lower, upper
+   
+
+

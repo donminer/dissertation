@@ -37,6 +37,11 @@ RMACCURACYABM = 6
 #   7. RM Query Time
 RMQUERYTIME = 7
 
+
+# the amount to scale the y scale by
+MAGIC_YSCALE_FM_ACCURACY = .175
+
+
 class Experiment(object):
    def __init__(self, config_file_path):
       fh = open(sys.argv[1]).read()
@@ -206,6 +211,7 @@ class Experiment(object):
 
    def make_plots(self):
       self.results.make_plot_FMTRAININGTIME()
+      self.results.make_plot_FMACCURACY()
 
 def labelize(reg, parameters):
    return misc.stripspaces(reg.name + repr(parameters))
@@ -287,6 +293,72 @@ set key top left
 
       print >> gnuplot_script, '\n',
       gnuplot_script.close()
+
+
+
+   def make_plot_FMACCURACY(self):
+      # This graph shows the time spent training vs. the data set size
+
+      # THIS ONLY DOES ONE SLP RIGHT NOW!!! (for fires!)  TODO FIXME
+
+      exp_no = FMACCURACY
+
+      plot_dir = OUTPUT_DIR + "fm_accuracy/"
+      os.mkdir(plot_dir)
+
+      # gotta find the max deviation seen, ever, so that I can make all the
+      # graphs have the same y-scale
+
+      maerr = 0.0
+      for reg, params in self._exp.regressions:
+         label = labelize(reg, params)
+
+         for training_size in self._exp.training_sizes:
+            key = (label, training_size)
+
+            maxerror = max([ abs(x[0]) for x in self._fm_results[key][exp_no]]) # FIXME
+
+            maerr = max(maerr, maxerror)
+
+      for reg, params in self._exp.regressions:
+         label = labelize(reg, params)
+
+         gnuplot_script = open(plot_dir + 'plot-%s.gp' % reg.name, 'w')
+         print >> gnuplot_script, """
+set xlabel "Data Set Size"
+set ylabel "Median Error"
+set key top right
+"""
+
+         mi = int(numpy.floor(2 * self._exp.training_sizes[0] - self._exp.training_sizes[1]))
+         ma = int(numpy.ceil(2 * self._exp.training_sizes[-1] - self._exp.training_sizes[-2]))
+         print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
+         print >> gnuplot_script, "set yrange [0:%.4f]" % (maerr * 1.1 * MAGIC_YSCALE_FM_ACCURACY)
+
+         print >> gnuplot_script, 'plot ',
+
+         out_file = open(plot_dir + "%s" % reg.name, 'w')
+         print >> gnuplot_script, '"%s" with errorbars' % reg.name,
+
+         for training_size in self._exp.training_sizes:
+            key = (label, training_size)
+
+            # this is the list of deviations
+            errors = [ abs(x[0]) for x in self._fm_results[key][exp_no]] # FIXME
+
+            # average them
+            median, lower, upper = misc.doublesided(errors)
+            
+            print >> out_file, "%d %f %f %f" % (training_size, median, lower, upper)
+
+         out_file.close()
+         print >> gnuplot_script, '\n',
+         gnuplot_script.close()
+
+
+
+
+
 
 exp = Experiment(sys.argv[1])
 
