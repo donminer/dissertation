@@ -148,5 +148,22 @@ def MSE(data):
 
    return sum((b - a) ** 2 for a, b in data) / float(len(data))
 
+standard_deviation = numpy.std
 
+def standard_error(data_set):
+
+
+   return standard_deviation(data_set) /  numpy.sqrt(len(data_set))
+
+
+def errorbars(data, confidence = 1.96):
+   """ Returns the average, the lower error bar, then the upper error bar """
+
+   #1.96 is a 95% confidence
+
+   avg = average(data)
+
+   se = standard_error(data)
+
+   return avg, avg - confidence * se, avg + confidence * se
 

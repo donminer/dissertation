@@ -3,6 +3,7 @@ import amf
 import amf.misc as misc
 import time
 import os
+import numpy
 
 FM_TRAINING_ITERATIONS = 1
 FM_QUERY_ITERATIONS = 1
@@ -46,11 +47,11 @@ class Experiment(object):
       exec(fh, execd)
 
       self.datafile = execd['DATA_FILE']
-      self.training_sizes = execd['TRAINING_SIZES']
+      self.training_sizes = sorted(execd['TRAINING_SIZES'])
       self.validation_size = execd['VALIDATION_SIZE']
       self.regressions = execd['REGRESSIONS']
       self.num_dep = execd['NUM_DEPENDENT']
-      self.rm_granularities = execd['RM_GRANULARITIES']
+      self.rm_granularities = sorted(execd['RM_GRANULARITIES'])
 
       self.results = Results(self)
 
@@ -252,8 +253,12 @@ set xlabel "Data Set Size"
 set ylabel "Training Time (Seconds)"
 set key top left
 """
-      print >> gnuplot_script, 'plot ',
 
+      mi = int(numpy.floor(2 * self._exp.training_sizes[0] - self._exp.training_sizes[1]))
+      ma = int(numpy.ceil(2 * self._exp.training_sizes[-1] - self._exp.training_sizes[-2]))
+      print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
+
+      print >> gnuplot_script, 'plot ',
 
       first = True
       for reg, params in self._exp.regressions:
@@ -264,9 +269,8 @@ set key top left
          else:
             print >> gnuplot_script, ", ",
 
-
          out_file = open(plot_dir + "%s" % reg.name, 'w')
-         print >> gnuplot_script, '"%s" with lines' % reg.name,
+         print >> gnuplot_script, '"%s" with errorbars' % reg.name,
 
          for training_size in self._exp.training_sizes:
             key = (label, training_size)
@@ -275,9 +279,9 @@ set key top left
             times = self._fm_results[key][exp_no]
 
             # average them
-            avg = misc.average(times)
+            avg, lower, upper = misc.errorbars(times)
             
-            print >> out_file, "%d %.3f" % (training_size, avg)
+            print >> out_file, "%d %f %f %f" % (training_size, avg, lower, upper)
 
          out_file.close()
 

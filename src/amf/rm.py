@@ -63,8 +63,6 @@ class RMSimplex(object):
       if not self.contains(slp_num, value[0]):
          return []
 
-
-
       inters = []
 
       for scorner, bcorner in self.edges:
