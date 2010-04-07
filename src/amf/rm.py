@@ -2,6 +2,7 @@
 
 import misc
 import numpy
+import sys
 
 # hack to avoid rounding error
 def _round(n):
@@ -52,13 +53,17 @@ class RMSimplex(object):
    def contains(self, slp_num, value):
       """Determines if the value for slp_num idx lives inside this simplex."""
 
+      #print self._min[slp_num], '<', value, '<', self._max[slp_num]
+
       return value > self._min[slp_num] and value < self._max[slp_num]
 
    def intersections(self, slp_num, value):
       """Returns the approximate places that the value plane intersects with this simplex"""
 
-      if not self.contains(slp_num, value):
+      if not self.contains(slp_num, value[0]):
          return []
+
+
 
       inters = []
 
@@ -71,7 +76,7 @@ class RMSimplex(object):
          distance = bcorner[1][slp_num] - scorner[1][slp_num]
 
          # this is the distance from 'value' from the smaller corner
-         ratio = (value - scorner[1][slp_num]) / distance
+         ratio = (value[slp_num] - scorner[1][slp_num]) / distance
          # if value is close to smaller, this ratio will be close to zero
          # if value is closer to bigger, this ratio will be close to one
 
@@ -143,6 +148,15 @@ class ReverseMapping(object):
             sims = self.simplexes_from_cube(key)
             self.simplexes.extend(sims)
 
+   def wiggle(self, root):
+      """ Returns the closest point to this root that is an actual root. """
+      distance, knot = min( (misc.distance(root, knot), knot)  for knot in self.knots )
+
+      #print >> sys.stderr, "Wiggling point %s to knot %s" % (repr(root), repr(knot))
+
+      return knot
+
+
    def cube_at_root(self, root):
       """ Returns the members of this cube with this point as its root. """
 
@@ -154,7 +168,10 @@ class ReverseMapping(object):
             corner.append(_round(perm[idx] * self.steps[idx] + root[idx]))
          corner = tuple(corner)
 
-         val = self.knots[corner]
+         try:
+            val = self.knots[corner]
+         except KeyError:
+            val = self.knots[self.wiggle(corner)]
 
          corners.append((corner, val))
 
@@ -182,8 +199,30 @@ class ReverseMapping(object):
 
       return tuple(out)
 
+   def all_intersections(self, value):
+      """ Finds intersections with each provided SLP """
 
+      return tuple( self.intersections(d, value) for d in range(self.slp_dim) )
+         
+   def distance_to(self, param_num, config, value):
+      # i'm going to cheat for now and just pick the closest intersecting corner
+      ints = self.intersections(param_num, value)
 
+      #print 'simplexes', self.simplexes
+      #print 'ints', ints
+      #raw_input()
 
+      dists = []
+      for simplex in ints:
+         for i in simplex:
+            dists.append( (misc.distance(i, config)) )
+   
+      if len(dists) == 0:
+         #print >> sys.stderr, "BADNESS: no intersections found for %s" % repr(value)
+         dist = None
+      else:
+         dist = min(dists)
+
+      return dist
 
 

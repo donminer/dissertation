@@ -9,5 +9,6 @@ DATA_FILE = '../data/fires.txt'
 TRAINING_SIZES = range(25, 125, 25)
 VALIDATION_SIZE = 500
 REGRESSIONS = ((r.kNN, []), (r.LOESS, [1.0, 1]), (r.NLR, [sigmoid, (0.0, 1.0, .65, 58.0)]))
+RM_GRANULARITIES = range(20, 180, 20)
 
 NUM_DEPENDENT = 1

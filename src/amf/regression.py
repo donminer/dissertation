@@ -119,7 +119,6 @@ class LOESS(Regression):
             ydist = 1.0 + (abs(other_y - other_yhat) if smoothing else 0.0)
             weight = __tricubic__(configuration, other_xs, self.window) / ydist
 
-
             sum_weights += weight
 
             weighted_sum += weight * other_y
