@@ -9,15 +9,7 @@ FM_TRAINING_ITERATIONS = 1
 FM_QUERY_ITERATIONS = 1
 RM_TRAINING_ITERATIONS = 0
 
-OUTPUT_DIR = '../data/test_domain_results/' + repr(int(time.time())) + "/"
-os.mkdir(OUTPUT_DIR)
-info = open(OUTPUT_DIR + 'info.txt', 'w')
 
-print >> info, """
-FM_TRAINING_ITERATIONS = %d
-FM_QUERY_ITERATIONS = %d
-RM_TRAINING_ITERATIONS = %d
-""" % ( FM_TRAINING_ITERATIONS, FM_QUERY_ITERATIONS, RM_TRAINING_ITERATIONS )
 
 # EXPERIMENTS:
 #  For each regression X data set size:
@@ -41,12 +33,13 @@ RMQUERYTIME = 7
 # the amount to scale the y scale by
 MAGIC_YSCALE_FM_ACCURACY = .175
 
+OUTPUT_DIR = None
 
 class Experiment(object):
    def __init__(self, config_file_path):
       fh = open(sys.argv[1]).read()
 
-      print >> info, '\n\nContents of %s :\n%s\n\n' % (config_file_path, fh.replace('\n', '\n> '))
+
 
       execd = {}
       exec(fh, execd)
@@ -57,6 +50,20 @@ class Experiment(object):
       self.regressions = execd['REGRESSIONS']
       self.num_dep = execd['NUM_DEPENDENT']
       self.rm_granularities = sorted(execd['RM_GRANULARITIES'])
+      self.name = execd['EXPERIMENT_NAME']
+
+      global OUTPUT_DIR
+      OUTPUT_DIR = '../data/test_domain_results/' + self.name + repr(int(time.time())) + "/"
+      os.mkdir(OUTPUT_DIR)
+      info = open(OUTPUT_DIR + 'info.txt', 'w')
+
+      print >> info, """
+FM_TRAINING_ITERATIONS = %d
+FM_QUERY_ITERATIONS = %d
+RM_TRAINING_ITERATIONS = %d
+""" % ( FM_TRAINING_ITERATIONS, FM_QUERY_ITERATIONS, RM_TRAINING_ITERATIONS )
+
+      print >> info, '\n\nContents of %s :\n%s\n\n' % (config_file_path, fh.replace('\n', '\n> '))
 
       self.results = Results(self)
 
@@ -212,6 +219,7 @@ class Experiment(object):
    def make_plots(self):
       self.results.make_plot_FMTRAININGTIME()
       self.results.make_plot_FMACCURACY()
+      self.results.make_plot_FMQUERYTIME()
 
 def labelize(reg, parameters):
    return misc.stripspaces(reg.name + repr(parameters))
@@ -255,10 +263,13 @@ class Results(object):
 
       gnuplot_script = open(plot_dir + 'plot.gp', 'w')
       print >> gnuplot_script, """
+set terminal png nocrop enhanced size 400, 400
+set output "plot.png"
 set xlabel "Data Set Size"
 set ylabel "Training Time (Seconds)"
 set key top left
-"""
+set title "Forward Mapping Training Time (%s)"
+""" % self._exp.name
 
       mi = int(numpy.floor(2 * self._exp.training_sizes[0] - self._exp.training_sizes[1]))
       ma = int(numpy.ceil(2 * self._exp.training_sizes[-1] - self._exp.training_sizes[-2]))
@@ -294,6 +305,10 @@ set key top left
       print >> gnuplot_script, '\n',
       gnuplot_script.close()
 
+      curdir = os.path.abspath('.')
+      os.chdir(plot_dir)
+      os.system('gnuplot ' + 'plot.gp')
+      os.chdir(curdir)
 
 
    def make_plot_FMACCURACY(self):
@@ -325,10 +340,13 @@ set key top left
 
          gnuplot_script = open(plot_dir + 'plot-%s.gp' % reg.name, 'w')
          print >> gnuplot_script, """
+set terminal png nocrop enhanced size 400, 400
+set output "plot-%s.png"
 set xlabel "Data Set Size"
 set ylabel "Median Error"
 set key top right
-"""
+set title "Forward Mapping Accuracy (%s)"
+""" % (reg.name, self._exp.name)
 
          mi = int(numpy.floor(2 * self._exp.training_sizes[0] - self._exp.training_sizes[1]))
          ma = int(numpy.ceil(2 * self._exp.training_sizes[-1] - self._exp.training_sizes[-2]))
@@ -354,9 +372,70 @@ set key top right
          out_file.close()
          print >> gnuplot_script, '\n',
          gnuplot_script.close()
+         
+         curdir = os.path.abspath('.')
+         os.chdir(plot_dir)
+         os.system('gnuplot ' + 'plot-%s.gp' % reg.name)
+         os.chdir(curdir)
 
 
 
+   def make_plot_FMQUERYTIME(self):
+      # This graph shows the time spent training vs. the data set size
+
+      exp_no = FMQUERYTIME
+
+      plot_dir = OUTPUT_DIR + "fm_query_time/"
+      os.mkdir(plot_dir)
+
+      gnuplot_script = open(plot_dir + 'plot.gp', 'w')
+      print >> gnuplot_script, """
+set terminal png nocrop enhanced size 400, 400
+set output "plot.png"
+set xlabel "Data Set Size"
+set ylabel "Average Query Time (Seconds)"
+set key top left
+set title "Forward Mapping Query Time (%s)"
+""" % self._exp.name
+
+      mi = int(numpy.floor(2 * self._exp.training_sizes[0] - self._exp.training_sizes[1]))
+      ma = int(numpy.ceil(2 * self._exp.training_sizes[-1] - self._exp.training_sizes[-2]))
+      print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
+
+      print >> gnuplot_script, 'plot ',
+
+      first = True
+      for reg, params in self._exp.regressions:
+         label = labelize(reg, params)
+
+         if first:
+            first = False
+         else:
+            print >> gnuplot_script, ", ",
+
+         out_file = open(plot_dir + "%s" % reg.name, 'w')
+         print >> gnuplot_script, '"%s" with errorbars' % reg.name,
+
+         for training_size in self._exp.training_sizes:
+            key = (label, training_size)
+
+            # this is the list of times
+            times = self._fm_results[key][exp_no]
+
+            # average them
+            avg, lower, upper = misc.errorbars(times)
+            
+            print >> out_file, "%d %f %f %f" % (training_size, avg, lower, upper)
+
+         out_file.close()
+
+      print >> gnuplot_script, '\n',
+      gnuplot_script.close()
+
+      curdir = os.path.abspath('.')
+      os.chdir(plot_dir)
+      os.system('gnuplot ' +'plot.gp')
+      os.chdir(curdir)
 
 
 
