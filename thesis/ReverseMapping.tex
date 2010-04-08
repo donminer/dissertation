@@ -363,9 +363,9 @@ This has the benefit that no approximation, such as SCI, has to be performed, ho
 I will provide functional inversions of kNN and NLR, as examples.
 kNN is conceptually and computationally difficult to invert.
 The ``forward mapping" of kNN is:
-\quote{What is the average of the values for the $k$ nearest point to configuration vector $\mathbf c$?}
+What is the average of the values for the $k$ nearest point to configuration vector $\mathbf c$?
 The inverse of this statement is:
-\quote{What space covered by $k$ neighboring points would produce the average $p$?}
+What space covered by $k$ neighboring points would produce the average $p$?
 One way to compute this, would be to generate a structure similar to a Voronoi diagram that segregates the space into sections.
 Every point within a section has the same k-nearest neighbors, which is iterated over to find averages that are close enough.
 This search can be computationally intensive as the number of sections can be large with large high values for $k$.
