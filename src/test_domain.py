@@ -5,9 +5,9 @@ import time
 import os
 import numpy
 
-FM_TRAINING_ITERATIONS = 1
-FM_QUERY_ITERATIONS = 1
-RM_TRAINING_ITERATIONS = 0
+FM_TRAINING_ITERATIONS = 5
+FM_QUERY_ITERATIONS = 15
+RM_TRAINING_ITERATIONS = 15
 
 
 
@@ -188,7 +188,7 @@ RM_TRAINING_ITERATIONS = %d
 
             # Error vs. ABM
             for config, slp in validation:
-               # this only dones one SLP right now!
+               # this only does one SLP right now! FIXME
                dist = rm.distance_to(0, config, slp)
 
                if dist != None:
@@ -220,6 +220,10 @@ RM_TRAINING_ITERATIONS = %d
       self.results.make_plot_FMTRAININGTIME()
       self.results.make_plot_FMACCURACY()
       self.results.make_plot_FMQUERYTIME()
+      self.results.make_plot_RMTRAININGTIME()
+      self.results.make_plot_RMACCURACYFM()
+      self.results.make_plot_RMQUERYTIME()
+      self.results.make_plot_RMACCURACYABM()
 
 def labelize(reg, parameters):
    return misc.stripspaces(reg.name + repr(parameters))
@@ -428,6 +432,185 @@ set title "Forward Mapping Query Time (%s)"
             print >> out_file, "%d %f %f %f" % (training_size, avg, lower, upper)
 
          out_file.close()
+
+      print >> gnuplot_script, '\n',
+      gnuplot_script.close()
+
+      curdir = os.path.abspath('.')
+      os.chdir(plot_dir)
+      os.system('gnuplot ' +'plot.gp')
+      os.chdir(curdir)
+
+   def make_plot_RMTRAININGTIME(self):
+      # This graph shows the time spent training vs. the data set size
+
+      exp_no = RMTRAININGTIME
+
+      plot_dir = OUTPUT_DIR + "rm_training_time/"
+      os.mkdir(plot_dir)
+
+      gnuplot_script = open(plot_dir + 'plot.gp', 'w')
+      print >> gnuplot_script, """
+set terminal png nocrop enhanced size 400, 400
+set output "plot.png"
+set xlabel "Granularity"
+set ylabel "Average Training Time (Seconds)"
+set nokey
+set title "Reverse Mapping Training Time (%s)"
+""" % self._exp.name
+
+      mi = int(numpy.floor(2 * self._exp.rm_granularities[0] - self._exp.rm_granularities[1]))
+      ma = int(numpy.ceil(2 * self._exp.rm_granularities[-1] - self._exp.rm_granularities[-2]))
+      print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
+
+      print >> gnuplot_script, 'plot "rm_times" with errorbars, "rm_times" with lines',
+
+      out_file = open(plot_dir + "rm_times", 'w')
+
+      for gran in self._exp.rm_granularities:
+         times = self._rm_results[gran][exp_no]
+
+         avg, lower, upper = misc.errorbars(times)
+
+         print >> out_file, "%d %f %f %f" % (gran, avg, lower, upper)
+
+
+      out_file.close()
+
+      print >> gnuplot_script, '\n',
+      gnuplot_script.close()
+
+      curdir = os.path.abspath('.')
+      os.chdir(plot_dir)
+      os.system('gnuplot ' +'plot.gp')
+      os.chdir(curdir)
+
+
+   def make_plot_RMACCURACYFM(self):
+      # This graph shows the time spent training vs. the data set size
+
+      exp_no = RMACCURACYFM
+
+      plot_dir = OUTPUT_DIR + "rm_accuracyfm/"
+      os.mkdir(plot_dir)
+
+      gnuplot_script = open(plot_dir + 'plot.gp', 'w')
+      print >> gnuplot_script, """
+set terminal png nocrop enhanced size 400, 400
+set output "plot.png"
+set xlabel "Granularity"
+set ylabel "Median Error"
+set nokey
+set title "Reverse Mapping Accuracy vs. FM (%s)"
+""" % self._exp.name
+
+      mi = int(numpy.floor(2 * self._exp.rm_granularities[0] - self._exp.rm_granularities[1]))
+      ma = int(numpy.ceil(2 * self._exp.rm_granularities[-1] - self._exp.rm_granularities[-2]))
+      print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
+
+      print >> gnuplot_script, 'plot "rm_times" with errorbars, "rm_times" with lines',
+
+      out_file = open(plot_dir + "rm_times", 'w')
+
+      for gran in self._exp.rm_granularities:
+         times = self._rm_results[gran][exp_no]
+
+         avg, lower, upper = misc.doublesided( abs(x[0]) for x in times )  # FIXME : only works for 1 parameter!
+
+         print >> out_file, "%d %f %f %f" % (gran, avg, lower, upper)
+
+
+      out_file.close()
+
+      print >> gnuplot_script, '\n',
+      gnuplot_script.close()
+
+      curdir = os.path.abspath('.')
+      os.chdir(plot_dir)
+      os.system('gnuplot ' +'plot.gp')
+      os.chdir(curdir)
+
+
+   def make_plot_RMQUERYTIME(self):
+      # This graph shows the time spent training vs. the data set size
+
+      exp_no = RMQUERYTIME
+
+      plot_dir = OUTPUT_DIR + "rm_query_time/"
+      os.mkdir(plot_dir)
+
+      gnuplot_script = open(plot_dir + 'plot.gp', 'w')
+      print >> gnuplot_script, """
+set terminal png nocrop enhanced size 400, 400
+set output "plot.png"
+set xlabel "Granularity"
+set ylabel "Average Query Time (Seconds)"
+set nokey
+set title "Reverse Mapping Query Time (%s)"
+""" % self._exp.name
+
+      mi = int(numpy.floor(2 * self._exp.rm_granularities[0] - self._exp.rm_granularities[1]))
+      ma = int(numpy.ceil(2 * self._exp.rm_granularities[-1] - self._exp.rm_granularities[-2]))
+      print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
+
+      print >> gnuplot_script, 'plot "rm_times" with errorbars, "rm_times" with lines',
+
+      out_file = open(plot_dir + "rm_times", 'w')
+
+      for gran in self._exp.rm_granularities:
+         times = self._rm_results[gran][exp_no]
+
+         avg, lower, upper = misc.errorbars(times)
+
+         print >> out_file, "%d %f %f %f" % (gran, avg, lower, upper)
+
+
+      out_file.close()
+
+      print >> gnuplot_script, '\n',
+      gnuplot_script.close()
+
+      curdir = os.path.abspath('.')
+      os.chdir(plot_dir)
+      os.system('gnuplot ' +'plot.gp')
+      os.chdir(curdir)
+
+
+   def make_plot_RMACCURACYABM(self):
+      # This graph shows the time spent training vs. the data set size
+
+      exp_no = RMACCURACYABM
+
+      plot_dir = OUTPUT_DIR + "rm_accuracyabm/"
+      os.mkdir(plot_dir)
+
+      gnuplot_script = open(plot_dir + 'plot.gp', 'w')
+      print >> gnuplot_script, """
+set terminal png nocrop enhanced size 400, 400
+set output "plot.png"
+set xlabel "Granularity"
+set ylabel "Median Error"
+set nokey
+set title "Reverse Mapping Accuracy vs. ABM (%s)"
+""" % self._exp.name
+
+      mi = int(numpy.floor(2 * self._exp.rm_granularities[0] - self._exp.rm_granularities[1]))
+      ma = int(numpy.ceil(2 * self._exp.rm_granularities[-1] - self._exp.rm_granularities[-2]))
+      print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
+
+      print >> gnuplot_script, 'plot "rm_errors" with errorbars, "rm_errors" with lines',
+
+      out_file = open(plot_dir + "rm_errors", 'w')
+
+      for gran in self._exp.rm_granularities:
+         times = self._rm_results[gran][exp_no]
+
+         avg, lower, upper = misc.doublesided( abs(x) for x in times )  # FIXME : only works for 1 parameter!
+
+         print >> out_file, "%d %f %f %f" % (gran, avg, lower, upper)
+
+
+      out_file.close()
 
       print >> gnuplot_script, '\n',
       gnuplot_script.close()
