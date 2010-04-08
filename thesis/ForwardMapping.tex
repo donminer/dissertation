@@ -6,48 +6,52 @@
 % the forward mapping problem asks to develop a mapping from configuration space to system-level property space
 The \textit{forward-mapping problem} is the problem of developing a mapping from an ABM's configuration space to the user-defined system-level property space.
 The forward-mapping problem is the first half of building a complete meta-model of an agent-based model (the other half being the reverse-mapping problem).
-Learning a meta-model is made simpler by splitting the problem into two sub-problems, in comparison to directly building a bidirectional mapping from data.
+Learning a meta-model is made simpler by splitting the problem into two sub-problems (as opposed to directly building a bidirectional mapping from the data).
+
+% A user can use the forward mapping to predict the behavior of a system without having to run it.
+The forward mapping can be used to predict the behavior of a system without having to actually run it.
+% This could be useful for a number of reasons: it may be faster, it may be more convenient.
+This is useful because running an ABM may require too much time for hypothetical experiments.
+Also, in ABMs that have noisy behavior, several iterations of sampling may have to be performed to get an accurate average value.
+This makes sampling the original ABM even more computationally intensive.
+% Thus, this approach is more useful than interacting with the ABM directly to varify hypotheses about behavior, answering 'what-if' questions and manually exploring the behavior space faster.
+Interacting with the forward mapping is more convenient than interacting with the ABM to verify hypotheses about system-level behavior.
+Also, exploration of the behavior space is more efficient when interacting with a model instead of running an ABM numerous times.
+
 
 % This chapter details aspects of the forward mapping problem and the proposed solution used in \fw.
-This chapter details aspects of the forward-mapping problem and my proposed solution that is used in \fw.
+This chapter details aspects of the forward-mapping problem and the solution that is used in \fw.
 % Also, evaluation criteria for solutions to the FMP is given.
-In addition, I suggest a comprehensive list of evaluation criteria for all solutions to the forward-mapping problem.
 
 \section{Definition of the Problem}
 % develop an accurate mapping from //configuration space// to //system-level property space//.
-The forward-mapping is a functional mapping that maps \textit{configuration space} to \textit{system-level property space}.
+The forward mapping is a functional mapping that maps \textit{configuration space} to \textit{system-level property space}.
+The configuration space is made up of the dimensions representing all the input configuration parameters of the agent-based model that could affect the system-level behavior.
+This space is $n$-dimensional, where $n$ is the number of configuration parameters.
+For NetLogo ABMs, user interface elements such as sliders, text boxes, and switches provide user access to the configuration dimensions in the configuration space.
+
+The system-level property space is made up of the dimensions representing all of the user-defined system-level properties that are being measured.
+Typically, these propertyies are real-valued.
+Since many system-level property metrics are statistical in nature, real values are used even when a discrete value is expected.
+For example, a expected wolf population of 70.6 still has statistical meaning, even though it is impossible to have .6 of a wolf.
+%The system-level property space is more open-ended that configuration space.
+%Dimensions could be used to represent monitors or features of graphical plots, but, in general, system-level properties are user-defined statistical metrics.
+
+The space defined by the combination of the configuration and the system-level property spaces is the \textit{behavior space}.
+
+An outline of the configuration and system-level property space for the Wolf Sheep Predation ABM is shown in Table \ref{table:ws_parameters}.
+In this domain, five configuration parameters and five system-level properties are considered, so therefore the behavior space is ten-dimensional.
+
+
 Let $\mathbf{y}$ be a point in system-level property space and $\mathbf x$ be a configuration.
-The forward mapping $f$is defined as the mapping that satisfies the following:
+The forward mapping $f$ is defined as the mapping that satisfies the following:
 \[ f(\mathbf x) \rightarrow \mathbf{y} \]
 % This entire mapping describes what is called the //behavior space//.
-This mapping is used to answer the query ``given $\mathbf x$, approximate the the system-level properties  $\hat{\mathbf y}$.
+This mapping is used to answer the query ``given $\mathbf x$, approximate the the system-level properties  $\hat{\mathbf y}$."
 \[ f(\mathbf x) \approx \hat{\mathbf y} \]
 
-The space that is the combination of the configuration and the system-level property spaces is the \textit{behavior space}.
-
-% configuration space consists of any number of ABM parameters that change the behavior
-% Configuration parameter values can be discrete values (i.e., integers) or real values
-% Thus, this space is n-dimensional, each dimension representing a single configuration parameter
-Configuration space is comprised of dimensions representing all configuration parameters of the agent-based model that could affect system-level behavior.
-Configuration parameter values can be discrete values (i.e., integers) or real values.
-This space is $n$-dimensional, where $n$ is the number of configuration parameters.
-For NetLogo ABMs, user interface elements such as sliders, text boxes and switches represent the configuration dimensions in the configuration space.
 
 
-% The system-level property space consists of all properties wanting to be measured.
-% this space has one dimension per property to be measured.
-% Typically, these values are always real valued. 
-% Since it is a prediction, an impossible value (i.e., expected discrete value) still has meaning... for example the number of wolves expected could be 69.7, which is obviously impossible to have .7 wolves, but still shows that the value tends to be closer to 70 than 69, more often than not.
-System-level property space is comprised of dimensions representing all user-defined system-level properties that are being measured.
-Typically, these values are always real valued.
-Since many system-level property metrics are statistical in nature, real values are used even when a discrete value is expected.
-For example, a expected wolf population of 70.6 still has statistical meaning, even if having .6 of a wolf is impossible.
-%The system-level property space is more open-ended that configuration space.
-Dimensions could be used to represent monitors or features of graphical plots, but, in general, system-level properties are user-defined statistical metrics.
-
-An outline of the configuration and system-level property space for the Wolf Sheep Predation ABM are shown in Table \ref{table:ws_parameters}.
-In the Wolf Sheep Predation ABM, five configuration parameters and five system-level properties are considered.
-Both of these spaces are five-dimensional and thus the behavior space is ten-dimensional.
 
 \begin{table}[ht]
   \caption{Outline of Wolf Sheep Predation Behavior Space}
@@ -56,7 +60,7 @@ Both of these spaces are five-dimensional and thus the behavior space is ten-dim
     \hline \hline
     \textbf{Configuration Space} \\
     \hline
-    grass-regrowth-time & Number of time steps it takes for grass regrow \\
+    grass-regrowth-time & Number of time steps it takes for grass to regrow \\
     sheep-gain-from-food & Energy gained by a sheep when it eats grass \\ 
     wolf-gain-from-food & Energy gained by a wolf when it eats a sheep \\
     sheep-reproduce & Probability that a sheep reproduces every time step \\
@@ -64,7 +68,7 @@ Both of these spaces are five-dimensional and thus the behavior space is ten-dim
     \hline \hline
     \textbf{System-Level Property Space} \\
     \hline
-    wolf-extinction & Probability the wolves will go extinct \\
+    wolf-extinction & Probability that the wolves will go extinct \\
     wolf-population & Average wolf population, should it stabilize \\
     sheep-population & Average number of sheep \\
     wolf-variance & Variance of the wolf population \\
@@ -82,8 +86,7 @@ Both of these spaces are five-dimensional and thus the behavior space is ten-dim
 A solution to the forward-mapping problem must be able to handle configuration spaces with many dimensions.
 Also, the methods must be able to perform accurately in both continuous and discontinuous behavior spaces.
 % Also, several evaluation criteria that could be used to analyze the effectiveness and efficiency of solutions are provided later in this chapter.
-Several evaluation criteria that are used to analyze the effectiveness and efficiency of forward-mapping problem solutions are provided later in this chapter in Section \ref{sec:soln_eval}.
-
+The most important aspect for any approach to solving the forward-mapping problem is that querying for a prediction must be faster than sampling the system directly and predictions should be as accurate as possible.
 
 \section{The \fw Approach}
 
@@ -94,18 +97,18 @@ Regression is the default approach taken by \fw to solve the forward-mapping pro
 it fits this problem naturally: the configuration parameters are the independent variables and the system-level properties are the dependent variables.
 % The sampling phase provides a data set with several instances of configuration, outcome observation pairs.
 The sampling phase of \fw provides a data set with measurements from numerous and diverse configurations.
-Each entry in the data set is a \textit{(configuration, system-level measurements)} pair.
+Each entry in the data set is a \textit{<configuration, system-level measurements>} pair.
 % These are provided to the regression algorithm to base its predictions off of.
-These individual observations are passed to the regression algorithm to base its predictions off of.
+These individual observations are passed to the regression algorithm as training data.
 
 % Different regression approaches use this data in different ways.
 Different regression approaches use this data in different ways.
 % Approaches like KNN do no pre-processing at all and uses the entire data set for each query.
-Approaches like k-nearest neighbor (kNN) do no pre-processing and uses the entire data set for each query.
+Approaches like k-nearest neighbor (kNN) do not need to perform any pre-processing and instead uses the entire data set for each query.
 % Meanwhile, approaches like Nonlinear Regression train a compact parametric model to represent the data and does not require the data set after this point.
-Meanwhile, parametric approaches like nonlinear regression (NLR) train a compact model and uses a limited number of parameters to represent the entire data set.
+Meanwhile, parametric approaches like nonlinear regression (NLR) train a compact model, using a limited number of parameters to represent the entire data set.
 % In general, more time spent pre-processing equates into less time querying, but is not proportionate. 
-In general, more time spent pre-processing equates to less time spent querying.
+In general, the more time that is spent pre-processing the data, less time is spent querying.
 Amortized over a large number of queries, offline computation to speed up online queries is a worthwhile trade-off.
 
 % Other possible approaches fall into the field of machine learning.
@@ -117,8 +120,7 @@ Amortized over a large number of queries, offline computation to speed up online
 \subsection{Scaling}
 
 Calculating the distance between two observations is an important part of many nonparametric regression techniques.
-Distance is used in kNN to determine which points will  be factored in to determine the output value.
-Distance is also used in LOESS to weight closer points higher (hence, the ``locally-weighted" part of the name).
+Distance is used in kNN to determine which points will  be factored in to determine the output value, and in LOESS to weight closer points higher (hence, the ``locally-weighted" part of the name).
 % Scaling the data set is an important factor in learning the forward mapping.
 %Scaling of the data set to make is an important factor in learning the forward mapping.
 % The problem is that the different configurations have different ranges and different meanings.
@@ -131,7 +133,7 @@ For example, consider \textit{sheep-reproduce}, a percentage value in the Wolf S
 Another parameter, \textit{grass-regrowth}, is sampled from 5 to 30.
 % The euclidean metric treats all dimensions as equal, so closeness in the larger ranged dimension will give higher weight than closeness in the smaller ranged dimension
 The Euclidean distance metric treats all dimensions as equal, so closeness in the larger-ranged dimensions will be given lower weight than closeness in the smaller ranged dimension.
-For example, values of .01 and .03 could be proportionally similar to 6 and 7, yet the Euclidean distances are very different: .02 and 1.
+%For example, values of .01 and .03 could be proportionally similar to 6 and 7, yet the Euclidean distances are very different: .02 and 1.
 This skew in weight can make dimensions less important, regardless of their actual importance.
 Properly scaling the data set rectifies this problem.
 
@@ -145,52 +147,51 @@ The analysis of the effect of more advanced sampling techniques is left as futur
 
 % The choice of scaling technique and distance metric is determined in the scope of the regression algorithm used, particularly in the training step.
 % For example, KNN could preprocess the dataset into a scaled data set for future use.
-Scaling is an optional step in \fw that is inserted between the sampling phase and the forward-mapping phase.
-Parameters for the minimum and maximum values are passed to the scale program, which  scales data points linearly, accordingly.
-When \fw is queried, points are rescaled their original values.
+Linear scaling is an optional step in \fw that can inserted between the sampling phase and the forward-mapping phase.
+%Parameters for the minimum and maximum values are passed to the scale program, which  scales data points linearly, accordingly.
+When \fw is queried, the points are rescaled to their original values.
 
 
 
 \subsection{Handling Non-Continuous Configuration Spaces}
 
-Discrete value configuration parameters are handled as a special case in \fw.
-In designing \fw, I did not feel the need to handle discretely valued parameters as a typical use case since they are rather rare.
+Ordinal (discrete) configuration parameters are handled as a special case in \fw.
+%In designing \fw, I did not feel the need to handle discretely valued parameters as a typical use case since they are rather rare.
 % The reason for the real-value assumption is just to simplify the process.
-Therefore, to streamline and simplify the processing of real-valued parameters, discrete valued parameters are handled differently in sampling and learning the forward mapping.
+%Therefore, to streamline and simplify the processing of real-valued parameters, discrete valued parameters are handled differently in sampling and learning the forward mapping.
+The sampling program is told whether or not each parameter is ordinal or real-valued.
+The random selection of data points will abide by this restraint by randomly selecting integers for ordinal parameters, instead of real values
 
-The sampling program is told whether or not each parameter is a discrete integer or a real value.
-The random selection of data points will abide by this restraint by randomly selecting integers for discrete valued parameters, instead of real values
-
-The best way to handle a discretely valued parameter in learning the forward mapping depends on the nature of the variable.
-In the case where the parameter is sampled such that thousands of possible values are possible or the number has little effect on the system, it may suffice to treat the parameter as a real value.
+The best way to handle an ordinal parameter in learning the forward mapping depends on the nature of the variable.
+If the parameter has a wide rage, so that thousands of different values are possible, or if the number has little effect on the system, it may suffice to treat the parameter as a real value.
 In many cases, the error incurred by making this assumption is negligible.
-This has the advantage of not having to treat the discrete values as special.
+This method has the advantage of providing a common representation across all parameters.
 Another approach would be to split the configuration space into separate configuration subspaces, with each subspace having a uniform value for the discrete value.
-This provides more accurate results at the cost of higher computation requirements.
-When there are numerous different discrete parameters, the number of subspaces grows quickly, making this approach intractable.
+This method provides more accurate results at the cost of higher computation requirements.
+When there are numerous different discrete parameters, however, the number of subspaces grows quickly, making this approach intractable.
 
 
-Another problem caused by discrete values is the reverse mapping returns a real values for each of the parameters.
-The approaches used in \fw for the reverse mapping are not compatible with discrete values.
-The mappings will return impossible configurations as possible solutions to the reverse mapping problem.
-\fw leaves circumventing this problem to the configuration selection phase to select discretely valued configurations.
-This way, the reverse-mapping problem can be solved the same way for both real and discretely valued parameters.
+%Another problem caused by discrete values is the reverse mapping returns a real values for each of the parameters.
+%The approaches used in \fw for the reverse mapping are not compatible with discrete values.
+%The mappings will return impossible configurations as possible solutions to the reverse mapping problem.
+%\fw leaves circumventing this problem to the configuration selection phase to select discretely valued configurations.
+%This way, the reverse-mapping problem can be solved the same way for both real and discretely valued parameters.
 
 \subsection{Handling Multi-Variate Forward Mappings}
 
 % In the definition of the problem, I mention the fact that a number of system-level properties can be measured at once.
-In the problem definition, I mention that a number of system-level properties can be measured at once.
+Although multiple system-level properties can be measured at once,
 % To handle this, I split each system-level property into its individual single-property forward mapping problem.
-\fw splits each system-level property into individual single-property forward-mapping problems.
+\fw represents each system-level property as an independent single-property forward-mapping problem.
 % give some math that splits the vector y into several individual ys
-The reformulation the original definition of the forward mapping is as follows:
+The reformulation of the original definition of the forward mapping is as follows:
 \[ f_i(\mathbf x) \rightarrow y_i \]
-where $i = \{0, 1, \ldots, |\mathbf y|\}$.
-To answer the  query for $\hat{\mathbf y}$, given $\mathbf x$, the sub-mappings are individually queried and collected:
-\[ \{f_0(\mathbf x), f_1(\mathbf x), \ldots, f_{|\mathbf y|}(\mathbf x)\} \approx \hat{\mathbf y} \]
-This approach assumes that the system-level properties are not correlated (i.e., independent).
-By assuming independence, the predictions may not be as accurate as they could be.
-This problem is outside the scope of the implementation of \fw, as it has not been a problem for any of the test domains that have been used with \fw.
+where $i = \{0, 1, \ldots, m\}$, where $m = |\mathbf y|$.
+To answer a  query for $\hat{\mathbf y}$, given $\mathbf x$, the sub-mappings are individually queried and collected:
+\[ \{f_0(\mathbf x), f_1(\mathbf x), \ldots, f_{m}(\mathbf x)\} \rightarrow \hat{\mathbf y} \]
+This approach assumes that the system-level properties are independent of one another.
+If this assumption does not hold, the predictions may not be accurate.
+This problem is outside the scope of the implementation of \fw; the test domains that have been used with \fw, the assumption appears to hold.
 
 
 
@@ -211,198 +212,67 @@ The predicting component allows the user and other framework components (e.g., t
 % This process is assisted by a user-provided regression library that is used to build the models.
 This process is driven by a user-provided regression library that is plugged into the framework.
 % More on how to build the module property to interface with \fw, see Appendix ??.
-More on how to build this library in order to properly interface with \fw is provided in Appendix ??.
+More information on how to build this library in order to properly interface with \fw is provided in Appendix \ref{RegressionInterface}.
 
 \subsubsection{Training}
 
 % The training portion of solving the forward mapping is where any necessary necessary preprocessing and/or model building is done
-The training portion of solving the forward mapping problem is where any necessary pre-processing and/or model construction is performed.
+During training phase of solving the forward-mapping problem, any necessary pre-processing and/or model construction is performed.
 % Also, scaling of the data can be done in this step.
 % This is implemented as a Python program called train.py. train.py takes in the data set generated by the sampling as well as a user-created regression module that was built to interface with train.py.
-This process is implemented as a Python program called \textit{train}.
-\textit{train} takes the training data set as input and uses this data
-to prepare and set up the specific regression approach passed in by the user.
+This process is implemented as a Python function called \textit{train}.
+%\textit{train} takes the training data set as input and uses this data
+%to prepare and set up the specific regression approach passed in by the user.
 % train.py then passes the data set to the regression module, which then may produce model files on the local filesystem.
-Most regression algorithms will write models or meta-data to the local file system for later use.
+Most regression algorithms will store models or meta-data in memory for later use.
 % KNN may simply just scale the data, or with more advanced implementations build a geo hash or kd-tree.
 Basic kNN does nothing since the queries use the entire data set.
 % LOESS will perform the locally weighted smoothing step to build $y'$ values. (and output the smoothed data set)
 LOESS performs the iterative locally weighted smoothing step to build $y'$ values, which are
 written to a file.
 % NLR will learn optimal parameters for the parametric model given with optimization. (and output the parameters)
-Nonlinear regression learns optimal parameters for the parametric model given by using optimization.
-The parameters to the model are written to a file.
+Nonlinear regression learns the optimal parameters for the specified parametric model by using optimization; the parameters for this model are stored.
 % MLI will build a evenl spread data set with another regression algorithm
-Multi-linear interpolation approaches use this phase to develop an evenly spaced data set with another regression approach.
+%Multi-linear interpolation approaches use this phase to develop an evenly spaced data set with another regression approach.
 % Each of these approaches require varying computational time
-Each of these approaches require varying amounts of computational time.
-This step only needs to be executed only once for a given data set.
+Each of these approaches requires varying amounts of computational time, but needs to be executed only once for a given data set.
 
 
 \subsubsection{Predicting}
 
 % The prediction step is the step in which queries are passed and predictions are returned.
-The prediction portion of solving the forward mapping problem is the action performed when a query is submitted.
+The prediction phase of solving the forward mapping problem  is invoked whenever a query is submitted.
 % This is implemented as a python program predict.py that takes the regression module and any trained meta-data to generate predictions (answers to user-specified queries)
 This process is implemented as a Python program called \textit{predict}, but is mostly driven by the user-provided regression module.
-\textit{predict} uses the models generated by \textit{train} to predict the value for individual system-level properties.
+The \textit{predict} function in \fw uses the models generated by \textit{train} to predict values for individual system-level properties.
 % Any number of queries in the form of a configuration vector are passed in through standard in, with answered returned in standard out.
 
-Like the training phase, the predicting phase changes from algorithm to algorithm.
+As in the training phase, the predicting phase is algorithm-dependent, however, the API users interact with is the same.
 % KNN will iterate through every point to find the kNN, then average the values
-kNN will iterate through every point to find the nearest neighbors, then average the values.
+kNN will iterate over each input point to find the nearest neighbors, then average the values.
 % LOESS will interpolate between nearby smoothed data set points to determine the new value
-LOESS will interpolate between nearby smoothed data set points.
+LOESS will interpolate between nearby smoothed training data points.
 % NLR will simply plug in values for the configuration parameters and calculate the result
-NLR simply plugs in the configuration values into the parametric model.
+NLR applies the parametric model using the input configuration values.
 % MLI will find which bin the point lies within and then interpolate from the corners.
-MLI finds which bin the configuration lies within and then interpolates the values from the corners.
-Each of these approaches require varying amounts of computational time, like the training step.
-However, this process is executed once per individual query, making efficiency and important factor.
+Each of these approaches requires varying amounts of computational time, as with the training step.
+Since, this process is executed once per  query, efficiency is an important factor.
 
 
-\section{Using Forward Mappings}
+\section{Using Forward Mapping to Solve the Reverse-Mapping Problem}
 
 % The forward mapping model has two main uses: prediction of behavior for a user and used by \fw for the reverse mapping.
-The forward mapping has two main uses: it is used to predict the behavior of a system, given the configuration, and it is used by \fw to solve the reverse mapping problem.
-
-% A user can use the forward mapping to predict the behavior of a system without having to run it.
-The forward mapping can be used to predict the behavior of a system without having to actually run it.
-% This could be useful for a number of reasons: it may be faster, it may be more convenient.
-This is useful because running an ABM may require too much time for hypothetical experiments.
-Also, in ABMs that have noisy behavior, several iterations of sampling may have to be performed to get an accurate average value.
-This makes sampling the original ABM even more computationally intensive.
-% Thus, this approach is more useful than interacting with the ABM directly to varify hypotheses about behavior, answering 'what-if' questions and manually exploring the behavior space faster.
-Interacting with the forward mapping is more convenient than interacting with the ABM to verify hypotheses about system-level behavior.
-Also, exploration of the behavior space is more efficient when interacting with a model instead of running an ABM numerous times.
-
+The forward mapping has two main uses: it is used to predict the behavior of a system, given the configuration; and it is used by \fw to solve the reverse mapping problem.
 % \fw uses the forward mapping to solve the reverse mapping.
-\fw uses the forward mapping to solve the reverse mapping.
+%\fw uses the forward mapping to solve the reverse mapping.
 % A number of approaches are discussed in Chapter \ref{ReverseMapping}: The Reverse-Mapping Problem, but practically all use the forward mapping instead of direct sampling for the same reasons the user uses this over it.
-A number of approaches are discussed in the next chapter, Chapter \ref{ReverseMapping}: The Reverse-Mapping problem.
-Most of these approaches use the forward mapping instead of directly sampling from the ABM for two reasons.
-First, querying meta-models is faster than interacting with the ABM.
-Second, the regression models smooth the error over the entire space, effectively eliminating natural sampling noise.
-This can produce more accurate and consistent results.
+\fw uses the forward mapping to solve the reverse-mapping problem, using one of many of the approaches discussed in Chapter \ref{ReverseMapping}.
+All of these approaches use the forward mapping instead of directly sampling from the ABM for two reasons.
+First, querying models of the behavior space is faster than interacting with the ABM directly.
+Second, the regression models smooth the error over the entire space, effectively eliminating natural sampling noise, which can produce more accurate and consistent results.
 % The forward mapping describes behavior faster than direct sampling, and allows faster searching of the space to answer queries.
 
-% A secondary use for the forward mapping would be to plot the behavior space or visualize the behavior space in different ways.
-A secondary use for the forward mapping is for visualizing the behavior space.
-% Plotting programs do not calculate the value for every point (there are infinite!), what they typically do is sample a bunch of points then interpolate between them.
-Plotting programs could be passed a number of inferred points to show the general shape of the mapping.
-% the forward mapping can be used for this purpose: to generate a bunch of points, then plot lines between them.
-The forward mapping can be used to generate a number of points, which are then plotted to show the space.
-% Also, parametric regression approaches (NLR) could be graphed directly and even compared to the training (or validation) set.
-Also, parametric regression approaches such as NLR could be graphed directly and compared to the training data set.
 
-
-
-\section{Solution Evaluation Criteria}
-\label{sec:soln_eval}
-% An important step in generating a solution for the forward mapping problem is evaluating it.
-A number of algorithms and approaches can be used to solve the forward-mapping problem.
-Some approaches work better in different domains.
-Therefore, evaluation of the forward mapping is important in determining which approach would work best.
-
-There are a number of evaluation criteria proposed in this section.
-Not one algorithm I have tested with \fw has dominated the others in performance.
-Some are more accurate but require more query time.
-Some are fast for querying but slow for training.
-There are a number of these trade-offs that can affect the choice of which algorithm is ``best" for a situation.
-% I propose a single core approach, which I will be evaluating, with these criteria, in Chapter \ref{Results}.
-
-A number of algorithms plugged into the general \fw forward-mapping problem solver are evaluated with the criteria outlined in this chapter.
-The results are given in Chapter \ref{Results}: Results.
-
-% Each of the following criteria have different weight, but are all important in their own way.
-
-\subsection{Time Required for Training}
-
-% The time required for training is listed as not very important in my original design goals.
-The time required for training is listed as not very important in the \fw design goals.
-% However, intractable training problems should be avoided.
-However, intractable training problems should be avoided.
-
-% There are two matters of importance when measuring the time required for training a model.
-There are two matters of importance when measuring the time required for training a model.
-% First, how long does it take
-First, how long does it take?
-% Second, how does the length of time scale with larger data sets (quadratic? exponential? linear?)
-Second, how does the length of time training takes correlate to the size of the data set?
-
-% Measuring how long it takes is easy: just measure the amount of time
-% The second is easy as well, just measure in comparison to the data set size.
-This is measured by training a number of different mappings with different sized data sets.
-The training time for each of these is measured and compared.
-
-
-\subsection{Time Required for Querying}
-
-% Time required for querying is noted as important in the design goals.
-The time required for querying is noted as important in the design goals because
-a quick average query time is important for user interaction.
-Also, querying is important for solving the reverse-mapping problem, as numerous queries are performed.
-If the query time is slow, the performance of the reverse mapping solver will significantly suffer.
-% In fact, time required for querying should ALWAYS be below the amount of time it takes to just sample the ABM.
-The time required for querying the forward mapping should always be less than the amount of time it takes to sample the ABM directly.
-% If it is longer, there is no point and the user would just sample the ABM directly, instead of use \fw.
-If querying the forward mapping takes longer, there is no point in this process as the user could just sample the ABM for faster and perhaps more accurate results.
-
-% To measure this, a large number of random queries are passed to the regression algorithm, and statistics such as average response time and standard deviation of response times can be used to evaluate the speed of these approaches.
-Evaluation is performed by by submitting a large number of random queries to the regression algorithm.
-The average response time and standard deviation of response times are measured.
-% The speed of querying the system is used as a baseline to compare to in experiments.
-The amount of time it takes to query the ABM directly is used as a baseline to show the improvement provided by \fw.
-
-
-% In some cases/algorithms, the size of the data set may effect the time required for querying.
-With some regression algorithms, the size of the data set may affect the average query time.
-% This relationship should also be evaluated to determine at which point direct domain sampling would be better.
-The relationship between data set size and query time is also evaluated to determine at which point direct domain sampling would be preferred.
-For example, kNN will query slower when the data set is larger because it needs to iterate through more points per query.
-At a certain point, traversing the entire data set will take more time than simply sampling the ABM directly.
-Identifying this point for relevant algorithms is important for determining an appropriate data set size or determining whether or not an algorithm is appropriate for a particular ABM.
-
-\subsection{Accuracy of the Forward Mapping}
-% The accuracy of the forward mapping is perhaps the most important of all evaluation criteria.
-The accuracy of a forward mapping is perhaps the most important of all evaluation criteria.
-% If the mapping is not accurate, it is not useful.
-If the mapping is not very accurate, sampling the ABM directly would be more useful, even if it takes more time.
-% There is a certain amount of error that is tolerable for the increased speed of predicting values in \fw, 
-% however, the error cannot be too high.
-
-% To measure the accuracy of the predictions, two approaches are possible.
-To measure the accuracy of predictions, I use cross validation.
-To do this, I randomly split the original training set into two sets, a smaller training set and a validation set.
-The training set is used by the regression algorithm.
-Then, for every entry in the validation set, the true value originally sampled is compared to the predicted value, to measure error.
-This process is repeated a number of times by selecting different subsets of the data set for the training set and the validation set.
-% The errors calculated for an entire run are summed for a total accumulated error.
-All errors collected can then be used for a number of statistics that describe the accuracy of the approach.
-The average error and standard deviation of errors provide information on the expected range of performance.
-These errors are compared to the natural standard deviation observed from repeated samples of the true ABM. 
-% The higher the sum, the worse the predictor.
-
-% Other properties including the standard deviation of errors could be useful as well.
-% Visualizing the distribution of errors could also be useful in detecting a bias in prediction.
-% Visualizing the error localized to specific parts of the configuration space could show which areas of the space are less predictable or could require more sampling.
-Visualizing the distribution of errors over the entire behavior space is a useful tool in determining which portions of the space are more tumultuous.
-These areas can be considered more chaotic than other portions of the space.
-
-The relationship between accuracy and data set size is also an interesting metric.
-This metric can provide a guideline for the size of a data set, given that a particular approach will be used.
-Also, different approaches can be compared by how efficiently they use the data: better algorithms will be more accurate with less data.
-
-
-%\subsection{Data Set Size Requirement}
-
-% The size of the data set required to make accurate predictions is an important factor.
-% The data set takes a significant amount of time to sample, so smaller data set requirements are better.
-
-% Also, knowing what size data set is appropriate for a given domain and given algorithm is important for designing new experiments for use in \fw.
-
-% This is measured by calculating the ``Accuracy of the Forward Mapping" errors, but comparing the change of this error to the size of the data set.
-% Typically, error should decrease as the sample size increases.
 
 \section{Summary}
 
@@ -412,10 +282,9 @@ The solution to this problem has a central role in the framework, as it provides
 My solution to the forward-mapping problem is to use regression to learn the correlations between the configuration parameters (independent variables) and the system-level properties (dependent variables), individually.
 Different regression algorithms, in the form of a Python module library, can be plugged into \fw seamlessly.
 This allows for a great amount of flexibility in approaches that can be used to sample ABMs.
-\fw scales with new technology as new regression techniques are developed since they can simply be plugged in by the user.
+\fw adapts with new technology as new regression techniques are developed since they can simply be plugged in by the user.
 
-I have proposed a number of different metrics for evaluating the current forward-mapping approaches, as well as future approaches that users may use.
-The most important goals for any approach to solving the forward-mapping problem is: querying for a prediction must be faster than sampling the system directly and predictions should be as accurate as possible.
+
 
 
 
