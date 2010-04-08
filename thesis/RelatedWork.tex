@@ -33,5 +33,57 @@ All of these are optimization techniques. They do not return an actual mapping. 
 
 
 
+\subsection{Multilinear Interpolation}
+
+  % Multilinear Interpolation
+    % Concept - given corner points of a hypercube (knots), interpolate some point inside of it with linear interpolation; interpolate dimension my dimension until the point is reached.
+Multilinear interpolation is a dynamic approach that uses multi-dimensional interpolation between ``knots" to generate a smooth surface across a space of any dimension \cite{davies1997multidimensional}.
+Knots are sampled data points, scattered across the behavior space in a regular fashion such that the knots, when connected, form hypercubes.
+When a point $\mathbf x$ is queried, multidimensional interpolation is performed using the corners of the hypercube to infer the value of $\hat y$.
+
+    % Downside - sampling needs to be systematic: remedy- use another regression algorithm to build the knots. This has the benefit of being faster than other approaches (the interpolation is fast, the regression may be slow, and the knots can be built ahead of time)
+The major downside to multilinear interpolation is that the sampling needs to be systematic and evenly spaced.
+To remedy this situation, another regression algorithm is used to compile a set of evenly spaced points.
+These evenly spaced inferred points are then passed to a traditional multilinear interpolation approach.
+
+In this dissertation, I typically use multilinear interpolation as a supplement to  other regression approaches.
+Any irregularly sampled data set can be converted to an evenly spaced one by inferring knot locations with another regression technique.
+Once this intermediary inferred data set is in place, standard multilinear interpolation can be used.
+
+    % Faster than some of its counterparts
+    % builds smooth mappings of multi-dimensional spaces
+
+%\section{Inverting Regression}
+% How does inverting regression fit into \fw? We invert the forward mapping to solve the reverse-mapping problem.
+% Our two major approaches to this are optimization and plane intersection.
+% More approaches are possible and are discussed in Chapter X: The Reverse-Mapping problem, but require limited amount of background information.
+
+
+
+
+%\section{Surface Intersection}
+    % Plane Intersection
+       % What does plane intersection do? it takes two hyperplanes and returns the intersection.
+%The surface-to-surface intersection (SSI) problem is the problem of finding the intersection between two surfaces.
+%This is a difficult problem due to the variety of shapes and configurations of high-dimensional spaces.
+%Surface-to-surface intersection algorithms for solving these problems can take a number of forms:
+%lattice evolution methods, marching methods, subdivision methods, and analytic methods \cite{patrikalakis1993surface}.
+
+% [Give specific examples of SSI algorithms; a more comprehensive literature survey of SSI is needed] \cite{huber}
+
+
+   % How we use plane intersection: The solution to the reverse-mapping problem is the intersection of the forward mapping and the plane representing the desired behavior.
+   % Give example
+   % Figure example
+%SSI serves an important purpose in solving the reverse-mapping problem.
+%First, SSI is used to find the space of configurations that would satisfy a desired system parameter.
+%To apply SSI approaches, we frame the problem of solving for $f^{-1}(y_k) = \hat{\mathbf x}_k$ (i.e., find $\hat{\mathbf x}_k$, given $y_k$) as an SSI problem.
+%This is done by finding the intersection $\vec{w} : \vec{u} \bigcap \vec{v}$ between the surfaces $\vec{u}: y = y_k$ and $\vec{v}: y = f(\mathbf x)$.
+%In this case, $f$ is the forward mapping space.
+%The surface $\vec{w}$ can be used to extract valid configurations that will produce the behavior $\hat y$.
+%This approach can be expanded to satisfy a number of system-level properties at once.
+%For example, in the Wolf Sheep Predation model, a user might want to find configurations of a system that typically averages 100 sheep and 80 wolves.
+%Intricacies and extensions to this approach are discussed in Chapter \ref{ReverseMapping}: The Reverse-Mapping Problem.
+
 
 
