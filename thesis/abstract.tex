@@ -18,17 +18,19 @@ Department of Computer Science and \\ Electrical Engineering}
 
 \begin{singlespace}
 
+An ABM is a computational model that simulates a complex system of many autonomous agents.
+For example, ABMs have been used to model food chains, the spread of disease, traffic situations and flocking animals.
+All of the behaviors in an ABM, from agent-level local interactions to system-level behaviors, emerge from these local interactions, which are governed by the individual agent programs.
 The behavior of each individual agent in an agent-based model (ABM) is typically well understood because the agents' program has adjustable control parameters that directly modify its behaviors.
-What is typically not understood by users of ABMs is explicitly how the values of agent-level control parameters affect the observed
-system-level behavior of the ABM.
-In effect, modifying the emergent behavior of an ABM is typically reduced to a repetitive and time-consuming process of guess-and-check: select new agent-level parameter values and then observe and evaluate the result.
-That is, the controller of the system is forced to use the agent-level parameters which only indirectly affect the system-level behavior.
-This process is unintuitive.
+However, users of ABMs do not typically have an explicit model of how the values of agent-level control parameters affect the observed system-level behavior of the ABM.
+Because of this lack of a model, the emergent behavior of an ABM is generally reduced to a repetitive process of guess-and-check: select new agent-level parameter values and then observe and evaluate the result.
+That is, the controller of the system is forced to use the agent-level parameters, which only indirectly affect the system-level behavior.
+This process is repetative.
 
-This dissertation documents a domain-independent approach for modeling how changes in agent-level control parameters affect the system as a whole, and using this model to enable a user to predict and control the behavior of the system \textit{at the system level}.
+This dissertation presents a domain-independent approach for modeling how changes in agent-level control parameters affect the system as a whole, and for using this model to enable a user to predict and control the behavior of the system \textit{at the system level}.
 The approach is implemented as a learning-based framework, named the \framework,  for defining correlations between agent-level parameter values and quantitative system-level behavior.
 Regression methods such as k-nearest neighbor, locally weighted scatterplot smoothing, and nonlinear least squares are used to predict system-level property values, given the system configuration.
-The mappings from agent-configuration space to system-level behavior space are then inverted with a novel approach to produce inverted predictions that suggest system configurations, given a desired system-level property values.
+The mappings from agent-configuration space to system-level behavior space are then inverted with a novel approach to produce inverted predictions that suggest system configurations, given desired system-level property values.
 The effectiveness and flexibility of the \framework are demonstrated with experiments from four diverse ABMs implemented in NetLogo, a popular multi-agent programmable modeling environment.
 
 \end{singlespace}
