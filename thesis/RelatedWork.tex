@@ -6,30 +6,156 @@
 
 \section{Experimentation in ABMs}
 \label{sec:abmexp}
-Experimental platform for messing around with ABMs: (Bourjot -- ``A platform for the analysis of artificial self-organized systems'' 2004) (relevant?)
+Experimental platform for messing around with ABMs: (Bourjot -- ``A platform for the analysis of artificial self-organized systems'' 2004) (relevant?).
+Outline 3 tasks for experimentation -- under which conditions expected behavior occurs; validating the system (it works like we planned).
+designed a platform
+allows the user to experiment with a system with several inputs (analogous to our sampling).
+they plot and find the mean behavior of different experiments
+they propose that you can use the raw data to compute abstract conclusions about the system.
+Suggest using optimization instead of a user.
 
-ABMs have been used to study behaviors in biological systems... Domain specific work interested in system-level behavior: ant lane formation \cite{couzin2003sol}, marching locusts \cite{buhl2006dom}, fish schools \cite{parrish2002sof}. Most of these studies are qualitative in nature.
+\fw provides a framework for general experimentation of ABMs.
+provides quantitative analysis, instead of qualitative. researchers' qualitative conclusions can be made with the assistance of the quantitative data produced by \fw.
 
-particle swarm optimization: emperical study \cite{shi1998parameter}; more general approach: \cite{van2006study}
+\subsection{Experimentation in Realistic Biological Models}
+ABMs have been used to study behaviors in biological systems... Domain specific work interested in system-level behavior: ant lane formation , , fish schools . Most of these studies are qualitative in nature.
+
+marching locusts \cite{buhl2006dom} -- find at which density locusts start swarming, instead of acting as individuals; they note a few SLPs that describe the swarming behavior and show plots that show the relationship between these properties with the density of locusts.
+This is an example of manual experimentation, and is something that \fw automates
+
+\cite{couzin2003sol}
+models how army ants form lanes.
+ants moving to and from the nest.
+at low densities, agents come and go randomly.
+at higher densities, lanes form that optimize traffic flow.
+agent-level property of avoidance turning rate and perception angle of area ahead of the ant.
+the authors make a plot that show how ant flow changes with the change of these two parameters.
+Also do another experiment where difference in turning rate between incoming and outgoing, shows that higher difference means higher flow.
+They make plots and analyze them -- no computer-assistedness.
+Other parameters were tweaked to have the system match behavior from videos of real ants.
+This was probably done manually.
+
+\cite{parrish2002sof}
+Generalized model of fish schooling that aggregate concepts from several previous schooling models.
+Fish from a population form into several groups
+Measure a number of group-level and population aggregated statistics, such as group size, number of groups, stragglers, collisions, polarization.
+Make a number of qualitative conclusions on the effects of agent-level parameters on the system-level properties.
+They found that drag and randomness had little effect on fish schooling behavior in comparison to the social forces.
+They tested lots of different types of repulsion/attraction curves with different shapes and magnitudes.
+With a convex attraction-repulsion curve, stayed closed together and had more collisions. Polarization unaffected.
+Changing neighbor scaling to have social forces be weighted based on distance made fish schools smaller and move faster. collisions decreased.
+
+\subsection{Experimentation in Particle Swarm Optimization}
+
+Particle swarm optimization (PSO) is a swarm intelligence technique for finding a solution to optimization problems in a multi-dimensional, continuous search space \cite{kennedy1995pso}.
+PSO uses a multitude of agents that ``swarm" around good solutions, hoping to find better solutions.
+Agents in PSO are in predetermined neighborhoods in which all members of the same neighborhood share the neighborhood's highest fitness found.
+Each agent keeps track of its personal highest fitness found, its neighborhood's highest fitness found and the global highest fitness found.
+Then, an agent moves towards each of these maxima with a force of predetermined strength, specified by a parameter provided by the user.
+Additional parameters specify the number of agents and how much momentum agents have.
+Momentum is defined as how much of the agent's velocity vector in the previous time step is carried into the next time step.
+
+There originally were no guidelines for determining appropriate parameter settings for the following: the number of neighborhoods, the size of the neighborhoods, the constants in the force equation (personal best factor, neighborhood best factor, global best factor, momentum), the maximum speed of the agents, the initial spread of the agents, and the initial velocity.
+First, there was an empirical study particle swarm optimization: empirical study \cite{shi1998parameter};
+They performed experiments to show how inertia weight (the momentum of a particle) and the maximum speed affect the performance of PSO.
+The intuition behind this experiment is that particles that are too fast (i.e., high inertia and high maximum speed) will overshoot optimums, missing them entirely, while particles that are too slow (i.e., low inertia and low maximum speed) will take a long time to reach optimal solutions.
+A number of different configurations were used and the results are presented as a table.
+There is no way to determine if these parameter values will transfer to other domains other than the experimental one.
+
+more general approach: \cite{van2006study}
+provides a more theoretical perspective to particle swarm optimization.
+They determine which parameters will cause particles to converge.
+They also are able to predict the nature of particle trajectories over time.
+However, although this paper provides theoretical results on PSO, the authors explicitly state that the paper is not an approach to determining optimal parameters and points readers to empirical studies like \cite{shi1998parameter}.
+\fw can analyze systems such as PSO to find configurations that perform as expected.
+This takes the empirical studies one step further than just sampling data points by aggregating information from them.
 
 \section{Prediction of System-Level Behavior}
 
-physics-based control policy \cite{spears2004dpb} -- similar to our approach, but the models are tightly coupled to the domain. the system was designed with system-level models in mind. Algebraic inversion for inverse mapping is nice. Inspires the nonlinear regression approach in \fw.
+physics-based control policy \cite{spears2004dpb} -- similar to our approach, but the models are tightly coupled to the domain. the system was designed with system-level models in mind.
+Called physicomimetics.
+Framework of rules inspired by common physics equations (such as $F=MA$) that can control self-organizing agents.
+Agents can form hexagonal lattices, square formations,
+Algebraic inversion for inverse mapping is nice. Inspires the nonlinear regression approach in \fw.
+For example, in work by Spears et al. \cite{spears2004dpb}, the authors develop a physics-based control policy for
+a swarm of mobile robot agents. With this, the swarm-level behavior of the system can be described as a mathematical equation.
+System designers of this framework can avoid costly trial-and-error of the controllers by deriving theoretical laws from the controlling functions.
+This mathematical analysis of the system is useful and precise, but will
+not always extend to other domains. Also, some level of human intuition was required to develop these equations.
+Rule abstraction may not develop models that are as accurate as the theoretical behaviors developed by Spears et al., but it will do so
+autonomously with methods that can be extended to other domains.
 
 Macroscopic models of swarm robot systems \cite{lerman2002mmf}\cite{lerman2005rpm} -- similar in motivation, but models the system in a more specific way (FSAs). Specific to systems in which agents can be modeled as FSAs. Our approach is more general, since it just looks at parameters.
+Describe robots as a stochastic markov process (ie, future state depends only on its present state)
+Develop a function $N_x(t)$ -- the average number of robots in state x at time t.
+Developed this function as a parametric function, with manual mathematicaly analysis.
+Worked on two domains -- collaborative stick pulling and collective object collection.
+The $N$ function can be used to describe how the behavior of the robots change over time.
+They can also aggregate information about total time spent robots are spending in a sertain state.
+The authors plot total time spent in each state in relation to the number of agents.
+The plots show that with more agents, the robots spend more time avoiding and less time collecting.
+From this, they determine the efficiency of how each robot is affected by group size.
+This work develops a model of how long the collection task takes, given the number of robots.
+They developed functions that describe the space, which is what we are doing.
+this is domain-dependent, as the mathematical analysis will change for different systems.
+Also, this is not applicable to many ABMs that would be difficult to model the individual agents as sMDPs.
+\fw differs from this in two major ways. First, the authors do not discuss how inverted analysis could be applied:
+that is, given a value for the macroscopic behavior, generate parameters for a swarm with that property. However,
+this was probably not an explicit goal of their work.
+Second, the way the authors model agents is more restrictive than the model used in rule abstraction. Some swarm systems,
+such as boid flocks, behave based on a sum of forces, not as FSAs. Therefore, Lerman et al.'s work may not be able to intuitively
+model such a system. Meanwhile, rule abstraction's view of an agent can represent an FSA:
+the parameters in a rule abstraction would include properties of each state of the FSA as well as transition probabilities.
+Therefore, I believe that rule abstraction is more general than the work by Lerman et al. and will be applicable in more domains.
+
+
+Use evolutionary search to look for nonconvergence in the NetLogo Flocking and V-Formation Flocking domains \cite{stonedahl}
+Use genetic algorithms to search the configration space for system-level properties of interest.
+Find a system that converges as fast as possible.
+Make a quantitative measure of the property (like we do with SLPs).
+Main difference: optimization vs. a goal, while I am just fitting a specific desire.
+Plots the results as a set of boxplots that show the ranges of configurations that generate converging behaviors.
+The correlations between the configuration parameters are mostly ignored in these plots, but they do show the ranges of behaviors that produce desired behavior.
+They showed that genetic algorithms outperform hill climbers and random search with the same number of model runs.
+This approach is similar in many ways: it is using optimization to make a sort of reverse mapping.
+It is domain independent, given that the user defines the quantifiable behavior.
+However, it uses optimization, which requires online time, to find results.
+I develop a prelearned mapping which is fast to query and saveable for later use.
 
 %not entirely relevant -- Idea of system-level control.... robot swarms \cite{mclurkin2004srt} -- tightly coupled with domain, describes the behaviors as actions (not properties), splits behaviors into hierarchies.
 
 
-\section{Inversion of Neural Networks}
-Inversion of neural networks: 
+\section{Inversion of Forward Mappings}
+Approaching the reverse-mapping problem has been tackled before by inverting the forward mapping.
+The idea is not new, but the idea of returning a functional approximation of the reverse space is new.
+All of these approaches return a single solution, instead of a space.
+Also, many of these approaches are iterative and online.
+
+One of the first approaches is to simply directly learn the reverse mapping as a supervised learning problem\cite{widrow1985adaptive}.
+This doesn't work because if the forward mapping is many-to-one, this is trying to learn a one-to-many relationships, which is bad.
+The reason this is bad is called the ``convexity problem", where if set of all possible solutions is not convex, the average of some values from it may not be within the solution space, yielding bad results. \cite{jordan-forward}.
+
+Work has been done in inverting multilayer neural networks.
+All of these are optimization techniques.
+They do not return an actual mapping.
+Also, the techniques are restricted to neural networks (and are thus not algorithm-independent).
+
 \begin{itemize}
-\item (A Linden and J Kindermann ``Inversion of multilayer nets'' 1989 -- optimization problem solved by gradient descent) 
-\item (Bao-Liang Lu ``Inverting Feedforward Neural Networks using Linear and Nonlinear programming'' 1990 -- formulate the inverse problem as a nonlinear programming problem, a separable programming problem or a linear programming problem)
-\item (S. Lee and R.M. Kill ``Inverse Mapping of continuous functions using local and global information'' 1989 -- iterative update towards a good solution)
+\item (A Linden and J Kindermann ``Inversion of multilayer nets'' 1989 -- optimization problem solved by gradient descent) Minimize $\sum (Y_i - f(X_i))^2$ \cite{linden1989inversion}
+\item (Bao-Liang Lu ``Inverting Feedforward Neural Networks using Linear and Nonlinear programming'' 1990 --  Authors mention the problem of the inverse problem being ill-posed because the mapping is one-to-many .formulate the inverse problem as a nonlinear programming problem (constrained optimization problem), a separable programming problem or a linear programming problem). Uses a modified simplex method for solving linear programming problems.
+Ability to specify exterior constraints.
+Various points can be derivd by setting different constraint functions. \cite{lu1999inverting}
 \item (Michael I. Jordan work with robot arm ``Forward Models: supervised learning with a distal teacher'' -- asks the question, what configuration of the robot arm will yield this behavior?)
+returns an individual solution.
+no way to tell which of the infinite solutions will be returned.
 \end{itemize}
-All of these are optimization techniques. They do not return an actual mapping. Also, some of the techniques are restricted to neural networks (and are thus not algorithm-independent).
+
+(S. Lee and R.M. Kill ``Inverse Mapping of continuous functions using local and global information'' 1989 -- iterative update towards a good solution)
+Iterative approach to approximating any continuous function.
+It incrementally approaches a good solution, and leaves local minima to continue searching for more solutions.
+One requirement, however, is the Jacobian must be calculated (or approximated), which makes this approach difficult to apply to some functions, such as piecewise or discontinuous ones.
+The authors suggest their approach would work well with neural networks, as the jacobian for them is easy to compute.
+Also, it just returns one solution.
 
 
 
@@ -42,49 +168,23 @@ Multilinear interpolation is a dynamic approach that uses multi-dimensional inte
 Knots are sampled data points, scattered across the behavior space in a regular fashion such that the knots, when connected, form hypercubes.
 When a point $\mathbf x$ is queried, multidimensional interpolation is performed using the corners of the hypercube to infer the value of $\hat y$.
 
-    % Downside - sampling needs to be systematic: remedy- use another regression algorithm to build the knots. This has the benefit of being faster than other approaches (the interpolation is fast, the regression may be slow, and the knots can be built ahead of time)
-The major downside to multilinear interpolation is that the sampling needs to be systematic and evenly spaced.
-To remedy this situation, another regression algorithm is used to compile a set of evenly spaced points.
-These evenly spaced inferred points are then passed to a traditional multilinear interpolation approach.
+Multilinear interpolation serves as an inspiration for my simplical complex inversion approach.
+They are practically identical, except that SCI segregates the space into simplexs, instead of hypercubes.
+This modification was necessary because intersections can be found at the edges of simplexes and connected with line segments.
+Slices through a gradient in a hypercube that represent a particular value are not linear.
+Therefore, the representation is more complicated and makes working with them more difficult.
+Working with: finding intersections (combining reverse mappings), defining a piecewise curve that represents a SLP can be done with just points, instead of curves.
+SCI is therefore less smooth because of the linearity of the pieces, but easier to work with.
 
-In this dissertation, I typically use multilinear interpolation as a supplement to  other regression approaches.
-Any irregularly sampled data set can be converted to an evenly spaced one by inferring knot locations with another regression technique.
-Once this intermediary inferred data set is in place, standard multilinear interpolation can be used.
+    % Downside - sampling needs to be systematic: remedy- use another regression algorithm to build the knots. This has the benefit of being faster than other approaches (the interpolation is fast, the regression may be slow, and the knots can be built ahead of time)
+A major downside to standard multilinear interpolation is that the sampling needs to be systematic and evenly spaced.
+To remedy this situation, another regression algorithm can be used to compile a set of evenlyspaced points.
+SCI uses this approach so that it can use randomly sampled data.
+These evenly spaced inferred points are then passed to a traditional multilinear interpolation approach.
 
     % Faster than some of its counterparts
     % builds smooth mappings of multi-dimensional spaces
 
-%\section{Inverting Regression}
-% How does inverting regression fit into \fw? We invert the forward mapping to solve the reverse-mapping problem.
-% Our two major approaches to this are optimization and plane intersection.
-% More approaches are possible and are discussed in Chapter X: The Reverse-Mapping problem, but require limited amount of background information.
-
-
-
-
-%\section{Surface Intersection}
-    % Plane Intersection
-       % What does plane intersection do? it takes two hyperplanes and returns the intersection.
-%The surface-to-surface intersection (SSI) problem is the problem of finding the intersection between two surfaces.
-%This is a difficult problem due to the variety of shapes and configurations of high-dimensional spaces.
-%Surface-to-surface intersection algorithms for solving these problems can take a number of forms:
-%lattice evolution methods, marching methods, subdivision methods, and analytic methods \cite{patrikalakis1993surface}.
-
-% [Give specific examples of SSI algorithms; a more comprehensive literature survey of SSI is needed] \cite{huber}
-
-
-   % How we use plane intersection: The solution to the reverse-mapping problem is the intersection of the forward mapping and the plane representing the desired behavior.
-   % Give example
-   % Figure example
-%SSI serves an important purpose in solving the reverse-mapping problem.
-%First, SSI is used to find the space of configurations that would satisfy a desired system parameter.
-%To apply SSI approaches, we frame the problem of solving for $f^{-1}(y_k) = \hat{\mathbf x}_k$ (i.e., find $\hat{\mathbf x}_k$, given $y_k$) as an SSI problem.
-%This is done by finding the intersection $\vec{w} : \vec{u} \bigcap \vec{v}$ between the surfaces $\vec{u}: y = y_k$ and $\vec{v}: y = f(\mathbf x)$.
-%In this case, $f$ is the forward mapping space.
-%The surface $\vec{w}$ can be used to extract valid configurations that will produce the behavior $\hat y$.
-%This approach can be expanded to satisfy a number of system-level properties at once.
-%For example, in the Wolf Sheep Predation model, a user might want to find configurations of a system that typically averages 100 sheep and 80 wolves.
-%Intricacies and extensions to this approach are discussed in Chapter \ref{ReverseMapping}: The Reverse-Mapping Problem.
 
 
 
