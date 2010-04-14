@@ -1,6 +1,7 @@
 # This script takes each row of a data set and processes it for use with AMF
 import sys
-import numpy
+from amf.regression import NLR
+import math
 
 no_entry = "NOENTRY"
 
@@ -44,6 +45,71 @@ def map_wolfsheep(tokens):
    return i0, i1, i2, i3, i4, wolf_extinct, wolf_population_nowolf, sheep_population, sheep_variance
 
 
+def map_aids(tokens):
+   """
+   The aids data looks like this:
+
+   condom-use  test-ferquency  hiv-  hiv+
+   0           1               2     3
+   FLOAT       FLOAT           LIST  LIST
+
+   the output is:
+   i0 i1  p0 p1 p2 p3
+
+   """
+
+   def sigmoid(p, x1):
+      """
+      p[0] - minimum asymptote
+      p[1] - max asymptote
+      p[2] - growth rate
+      p[3] - location of the inflexion point
+      """
+      return p[0] + (p[1] - p[0]) / (1 + math.e ** (-p[2] * (x1 - p[3])))
+
+   def negsigmoid(p, x1):
+      return 300 - sigmoid(p, x1)
+
+
+   def find_closest(data, val):
+      distances = [ (abs(item - val), idx) for idx, item in enumerate(data) ]
+      distances.sort()
+      closest = [ idx for dist, idx in distances if dist == distances[0][0] ]
+
+      return sum(closest) / len(closest)
+
+   
+   use, freq, hivminus, hivplus = tokens
+
+   # 0 because it starts near 0
+   # hivplus[-1] because the value will end up at hivplus[-1]
+   # 1.0 is just a random guess
+   # the inflection point is going to be able halfway there...
+   guessp = [0.0, hivplus[-1], .01, find_closest(hivplus, (hivplus[-1] - hivplus[0])/ 2.0)  ]
+   guessm = [300 - hivminus[0], 300 - hivminus[-1], .01, find_closest(hivminus, (hivminus[-1] - hivminus[0])/2.0) ]
+
+   nlr_hivminus = NLR(negsigmoid, guessm)
+   nlr_hivplus = NLR(sigmoid, guessp)
+
+   nlr_hivminus.train([ ((x,), y) for x,y in enumerate(hivminus)])
+   nlr_hivplus.train([ ((x,), y) for x,y in enumerate(hivplus)])
+
+   hmf = open('hivminus.txt', 'w')
+   hmf.write("\n".join("%d %f" % x for x in enumerate(hivminus)))
+   hmf.close()
+
+   hpf = open('hivplus.txt', 'w')
+   hpf.write("\n".join("%d %f" % x for x in enumerate(hivplus)))
+   hpf.close()
+
+   #print ("plot %f + (%f - "+repr(nlr_hivminus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f))), ") % tuple(nlr_hivminus.opt),
+   print ("plot 300 - (%f + (%f - "+repr(nlr_hivminus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), ") % tuple(nlr_hivminus.opt),
+   #print (repr(nlr_hivplus.opt[1])+" - (%f + (%f - "+repr(nlr_hivplus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), 'hivplus.txt' with dots, 'hivminus.txt' with dots") % tuple(nlr_hivplus.opt)
+   print ("(%f + (%f - "+repr(nlr_hivplus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), 'hivplus.txt' with dots, 'hivminus.txt' with dots") % tuple(nlr_hivplus.opt)
+
+
+   raw_input('..')
+
 
 
 def linear_scale(dataset):
@@ -74,7 +140,7 @@ def dump(dataset):
    print "\n".join( " ".join(str(item) for item in row) for row in dataset)
 
 def process_flocking():
-   parsed = parse(sys.argv[1])
+   parsed = parse(sys.argv[2])
 
    averaged = map(map_flocking, parsed)
 
@@ -83,7 +149,7 @@ def process_flocking():
    dump(scaled)
 
 def process_wolfsheep():
-   parsed = parse(sys.argv[1])
+   parsed = parse(sys.argv[2])
 
    averaged = map(map_wolfsheep, parsed)
 
@@ -91,6 +157,16 @@ def process_wolfsheep():
 
    dump(scaled)
    
+def process_aids():
+   parsed = parse(sys.argv[2])
+
+   averaged = map(map_aids, parsed)
+
+   scaled = linear_scale(averaged)
+
+   dump(scaled)
 
 
-process_wolfsheep()
+
+
+exec(sys.argv[1] + "()")
