@@ -150,7 +150,8 @@ Also, requiring the agents' behaviors to be describable as a Markov decision pro
 \label{sec:invfm}
 Approaching the reverse-mapping problem has been tackled before by ``inverting" the forward mapping.
 The idea is not new, but  \fw's approach of returning a functional approximation of the reverse space is novel.
-All of these approaches return a single solution, instead of a space and many of these approaches are online.
+All of these approaches return a single solution, instead of a space, and many of these approaches are online.
+This greatly reduces the usefulness of these approaches in making conclusions about the domain.
 
 Learning the reverse mapping is typically an ill-posed problem because if the forward mapping is many-to-one, this is trying to learn a one-to-many relationships.
 The major problem with directly learning this type of mapping is called the ``convexity problem" \cite{jordan-forward}, where if set of all possible solutions does not form a convex space, the average of inputs may land outside this space, and yield a poor result.
