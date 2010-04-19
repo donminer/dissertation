@@ -94,21 +94,22 @@ def map_aids(tokens):
    nlr_hivminus.train([ ((x,), y) for x,y in enumerate(hivminus)])
    nlr_hivplus.train([ ((x,), y) for x,y in enumerate(hivplus)])
 
-   hmf = open('hivminus.txt', 'w')
-   hmf.write("\n".join("%d %f" % x for x in enumerate(hivminus)))
-   hmf.close()
+   #hmf = open('hivminus.txt', 'w')
+   #hmf.write("\n".join("%d %f" % x for x in enumerate(hivminus)))
+   #hmf.close()
 
-   hpf = open('hivplus.txt', 'w')
-   hpf.write("\n".join("%d %f" % x for x in enumerate(hivplus)))
-   hpf.close()
+   #hpf = open('hivplus.txt', 'w')
+   #hpf.write("\n".join("%d %f" % x for x in enumerate(hivplus)))
+   #hpf.close()
 
    #print ("plot %f + (%f - "+repr(nlr_hivminus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f))), ") % tuple(nlr_hivminus.opt),
-   print ("plot 300 - (%f + (%f - "+repr(nlr_hivminus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), ") % tuple(nlr_hivminus.opt),
+   #print ("plot 300 - (%f + (%f - "+repr(nlr_hivminus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), ") % tuple(nlr_hivminus.opt),
    #print (repr(nlr_hivplus.opt[1])+" - (%f + (%f - "+repr(nlr_hivplus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), 'hivplus.txt' with dots, 'hivminus.txt' with dots") % tuple(nlr_hivplus.opt)
-   print ("(%f + (%f - "+repr(nlr_hivplus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), 'hivplus.txt' with dots, 'hivminus.txt' with dots") % tuple(nlr_hivplus.opt)
+   #print ("(%f + (%f - "+repr(nlr_hivplus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), 'hivplus.txt' with dots, 'hivminus.txt' with dots") % tuple(nlr_hivplus.opt)
 
+   print use, freq, nlr_hivplus.opt[0], nlr_hivplus.opt[1]
 
-   raw_input('..')
+   #raw_input('..')
 
 
 
