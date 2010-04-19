@@ -107,7 +107,7 @@ def map_aids(tokens):
    #print (repr(nlr_hivplus.opt[1])+" - (%f + (%f - "+repr(nlr_hivplus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), 'hivplus.txt' with dots, 'hivminus.txt' with dots") % tuple(nlr_hivplus.opt)
    #print ("(%f + (%f - "+repr(nlr_hivplus.opt[0])+") / (1 + 2.7182 ** (-%f * (x - %f)))), 'hivplus.txt' with dots, 'hivminus.txt' with dots") % tuple(nlr_hivplus.opt)
 
-   print use, freq, nlr_hivplus.opt[0], nlr_hivplus.opt[1]
+   return use, freq, nlr_hivplus.opt[0], nlr_hivplus.opt[1]
 
    #raw_input('..')
 
