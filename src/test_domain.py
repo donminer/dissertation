@@ -5,8 +5,8 @@ import time
 import os
 import numpy
 
-FM_TRAINING_ITERATIONS = 2
-FM_QUERY_ITERATIONS = 6
+FM_TRAINING_ITERATIONS = 3
+FM_QUERY_ITERATIONS = 8
 RM_TRAINING_ITERATIONS = 3
 
 
@@ -154,15 +154,18 @@ RM_TRAINING_ITERATIONS = %d
       total = len(self.rm_granularities)
       count = 0
 
+      rm = None
+
       for gran in self.rm_granularities:
          #print >> sys.stderr, "\n\n GRANULARITY %d !!!" % gran
          print >> sys.stderr, " %d/%d " % (count, total),
          count += 1
 
          for i in xrange(RM_TRAINING_ITERATIONS):
-
+            del rm
             # Training Time Experiment
             t = misc.StopWatch()
+
 
             # FIXME, this should be a configuration, instead of a manual change!
             rm = amf.ReverseMapping(fm, [(0.0, 1.0), (0.0, 1.0), (0.0, 1.0)], gran)
