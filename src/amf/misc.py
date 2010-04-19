@@ -11,7 +11,13 @@ def distance(v1, v2):
    if len(v1) != len(v2):
       raise ValueError, "distance: vectors %s and %s are different lengths." % (repr(v1), repr(v2))
 
-   return sum( (x2 - x1)**2 for x1, x2 in zip(v1, v2) ) / float(len(v1))
+   runsum = 0.0
+   for idx in xrange(len(v1)):
+      runsum += (v2[idx] - v1[idx]) ** 2
+
+   return runsum / len(v1)
+
+   #return sum( (x2 - x1)**2 for x1, x2 in zip(v1, v2) ) / float(len(v1))
 
 # subtract two lists from one another
 def list_sub(v1, v2):

@@ -25,7 +25,7 @@ class kNN(Regression):
    name = "kNN"
 
    #possible_ks = [2, 3, 4, 5, 6, 7, 10, 13, 17, 23, 29, 36, 44]
-   possible_ks = [2, 3, 5, 7, 13]
+   possible_ks = [5, 7, 13]
 
    def __init__(self):
       self.k = None

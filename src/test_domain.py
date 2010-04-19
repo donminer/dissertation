@@ -5,9 +5,9 @@ import time
 import os
 import numpy
 
-FM_TRAINING_ITERATIONS = 5
-FM_QUERY_ITERATIONS = 15
-RM_TRAINING_ITERATIONS = 15
+FM_TRAINING_ITERATIONS = 2
+FM_QUERY_ITERATIONS = 6
+RM_TRAINING_ITERATIONS = 3
 
 
 
@@ -31,15 +31,13 @@ RMQUERYTIME = 7
 
 
 # the amount to scale the y scale by
-MAGIC_YSCALE_FM_ACCURACY = .175
+MAGIC_YSCALE_FM_ACCURACY = .275
 
 OUTPUT_DIR = None
 
 class Experiment(object):
    def __init__(self, config_file_path):
       fh = open(sys.argv[1]).read()
-
-
 
       execd = {}
       exec(fh, execd)
@@ -165,7 +163,9 @@ RM_TRAINING_ITERATIONS = %d
 
             # Training Time Experiment
             t = misc.StopWatch()
-            rm = amf.ReverseMapping(fm, [(45.0, 75.0)], gran)
+
+            # FIXME, this should be a configuration, instead of a manual change!
+            rm = amf.ReverseMapping(fm, [(0.0, 1.0), (0.0, 1.0), (0.0, 1.0)], gran)
             t = t.read()
             #print >> sys.stderr, "took %.2f seconds to train" % t
 
@@ -223,7 +223,7 @@ RM_TRAINING_ITERATIONS = %d
       self.results.make_plot_RMTRAININGTIME()
       self.results.make_plot_RMACCURACYFM()
       self.results.make_plot_RMQUERYTIME()
-      self.results.make_plot_RMACCURACYABM()
+      #self.results.make_plot_RMACCURACYABM()
 
 def labelize(reg, parameters):
    return misc.stripspaces(reg.name + repr(parameters))

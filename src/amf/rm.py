@@ -67,7 +67,7 @@ class RMSimplex(object):
 
       for scorner, bcorner in self.edges:
          # check to see that this value is inside these edges
-         if not value > scorner[1][slp_num] and value < bcorner[1][slp_num]:
+         if not (value > scorner[1][slp_num] and value < bcorner[1][slp_num]):
             continue
 
          # this is the distance between the 2 corner values
@@ -91,9 +91,9 @@ class ReverseMapping(object):
    def __init__(self, trained_fm, ranges, granularity):
 
       self.fm = trained_fm
-      self.granularity = float(granularity)
+      self.granularity = granularity
       self.ranges = ranges
-      self.steps = tuple( (ma - mi) / self.granularity for mi, ma in self.ranges )
+      self.steps = tuple( (ma - mi) / float(self.granularity) for mi, ma in self.ranges )
 
 
 
@@ -108,9 +108,11 @@ class ReverseMapping(object):
       self.knots = {}
       self.simplexes = []
       self.build_knots()
+      print 'done building knots'
       self.build_simplexes()
+      print 'done building simplexes'
 
-   def build_knots(self, dim_vals = ()):
+   def build_knots(self, idx_vector = (), dim_vals = ()):
       cur_dim = len(dim_vals)
 
       cur_dim_min = self.ranges[cur_dim][0]
@@ -118,14 +120,15 @@ class ReverseMapping(object):
       cur_dim_step = (cur_dim_max - cur_dim_min) / self.granularity
 
       count = 0
+      idx = 0
       for this_dim_val in misc.xfrange(cur_dim_min, cur_dim_max, cur_dim_step):
-         new_vector = dim_vals + (_round(this_dim_val),)
-
-
+         new_vector = dim_vals + (this_dim_val,)
+         new_idx = idx_vector + (idx,)
+         idx += 1
 
          # we've got more dimensions, so just keep adding to the structure
          if cur_dim < (self.dim - 1):
-            self.build_knots(newlist, new_vector)
+            self.build_knots(new_idx, new_vector)
 
          # we've hit the last dimensions, let's find the knot
          else:
@@ -134,13 +137,13 @@ class ReverseMapping(object):
             if self.slp_dim == None:
                self.slp_dim = len(predicted)
 
-            self.knots[new_vector] = predicted
+            self.knots[new_idx] = predicted
 
    def build_simplexes(self, col = None):
       for key in sorted(self.knots.keys()):
-         for val, (mi, ma), s in zip(key, self.ranges, self.steps):
-
-            if _round(val) == _round(ma - s):
+         # check to see if this root is on the fringe and thus not actually a root
+         for idx in key:
+            if idx == (self.granularity - 1):
                break
          else:
             sims = self.simplexes_from_cube(key)
@@ -163,19 +166,24 @@ class ReverseMapping(object):
       for perm in self.__bin__:
          corner = []
          for idx in xrange(self.dim):
-            corner.append(_round(perm[idx] * self.steps[idx] + root[idx]))
+            corner.append(perm[idx] + root[idx])
          corner = tuple(corner)
 
-         try:
-            val = self.knots[corner]
-         except KeyError:
-            val = self.knots[self.wiggle(corner)]
+         val = self.knots[corner]
 
-         corners.append((corner, val))
-
-
+         corners.append((self.translate_idx(corner), val))
 
       return tuple(corners)
+
+   def translate_idx(self, vec_idx):
+      """ Translates a index to a configuration"""
+
+      corner = []
+      for idx in xrange(self.dim):
+         corner.append(vec_idx[idx] * self.steps[idx] + self.ranges[idx][0])
+
+      return tuple(corner)
+
 
    def simplexes_from_cube(self, root):
       cube_corners = self.cube_at_root(root)
