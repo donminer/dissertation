@@ -4,9 +4,10 @@ import amf.misc as misc
 import time
 import os
 import numpy
+import math
 
 FM_TRAINING_ITERATIONS = 3
-FM_QUERY_ITERATIONS = 8
+FM_QUERY_ITERATIONS = 14
 RM_TRAINING_ITERATIONS = 3
 
 
@@ -34,6 +35,17 @@ RMQUERYTIME = 7
 MAGIC_YSCALE_FM_ACCURACY = .275
 
 OUTPUT_DIR = None
+
+
+
+def sigmoid(p, x1):
+   """
+   p[0] - minimum asymptote
+   p[1] - max asymptote
+   p[2] - growth rate
+   p[3] - location of the inflexion point
+   """
+   return p[0] + (p[1] - p[0]) / (1 + math.e ** (-p[2] * (x1 - p[3])))
 
 class Experiment(object):
    def __init__(self, config_file_path):
@@ -130,8 +142,14 @@ RM_TRAINING_ITERATIONS = %d
                t = misc.StopWatch()
                p = fm.predict(config)
                t = t.read()
-               deviation = tuple( pv - yvalv  for pv,  yvalv in zip(p, yval) )
-               self.results.fm_report(label, tsize, FMACCURACY, deviation)
+               ## THIS IS DIFFERENT FOR AIDS ##
+
+               #print p
+               #raw_input('...')
+
+               avg_error = sum(abs(sigmoid(p, tZ) - sigmoid(yval, tZ)) for tZ in range(100))/100.0
+
+               self.results.fm_report(label, tsize, FMACCURACY, avg_error)
                self.results.fm_report(label, tsize, FMQUERYTIME, t)
             #print >> sys.stderr, "      Done"
 
@@ -141,76 +159,7 @@ RM_TRAINING_ITERATIONS = %d
          #      self.results.average(label, tsize, FMQUERYTIME)
       ###
 
-      
-      # use the largest training size for this experiment
-      tsize = max(self.training_sizes)
-
-      # use kNN for this experiment
-      dataset, validation = amf.data.random_subsets(full_data, [tsize, self.validation_size])
-      fm = amf.ForwardMapping(amf.regression.kNN, [], self.num_dep)
-      fm.train(dataset)
-      print >> sys.stderr, "\nTesting RM Training Time, Accuracy and Query Time"
-
-      total = len(self.rm_granularities)
-      count = 0
-
-      rm = None
-
-      for gran in self.rm_granularities:
-         #print >> sys.stderr, "\n\n GRANULARITY %d !!!" % gran
-         print >> sys.stderr, " %d/%d " % (count, total),
-         count += 1
-
-         for i in xrange(RM_TRAINING_ITERATIONS):
-            del rm
-            # Training Time Experiment
-            t = misc.StopWatch()
-
-
-            # FIXME, this should be a configuration, instead of a manual change!
-            rm = amf.ReverseMapping(fm, [(0.0, 1.0), (0.0, 1.0)], gran)
-            t = t.read()
-            #print >> sys.stderr, "took %.2f seconds to train" % t
-
-            self.results.rm_report(gran, RMTRAININGTIME, t)
-
-            # Error vs. Forward Mapping
-            for s in rm.simplexes:
-               # find the average config
-               configs = [ p[0] for p in s.corners]
-               avg_config = misc.col_average(configs)
-
-               # find the average value of the SLPs
-               slps = [ p[1] for p in s.corners ]
-               avg_values = misc.col_average(slps)
-            
-               deviations = misc.list_sub(avg_values, fm.predict(avg_config))
-               #print >> sys.stderr, "deviated %s from the fm" % repr(deviations)
-
-               self.results.rm_report(gran, RMACCURACYFM, deviations)
-
-            # Error vs. ABM
-            for config, slp in validation:
-               # this only does one SLP right now! FIXME
-               dist = rm.distance_to(0, config, slp)
-
-               if dist != None:
-                  #print >> sys.stderr, "configuration %s with value %s is %.3f away from the RM" \
-                  #   % (repr(config), repr(slp[0]), dist)
-
-                  self.results.rm_report(gran, RMACCURACYABM, dist)
-
-
-            # Query Time
-            for config, slp in validation:
-               t = misc.StopWatch()
-               rm.all_intersections(slp)
-               t = t.read()
-               #print >> sys.stderr, "query too %.2f seconds" % t
-
-               self.results.rm_report(gran, RMQUERYTIME, t)
-
-      ###
+   
 
       print >> sys.stderr, "\nDone"
 
@@ -223,9 +172,9 @@ RM_TRAINING_ITERATIONS = %d
       self.results.make_plot_FMTRAININGTIME()
       self.results.make_plot_FMACCURACY()
       self.results.make_plot_FMQUERYTIME()
-      self.results.make_plot_RMTRAININGTIME()
-      self.results.make_plot_RMACCURACYFM()
-      self.results.make_plot_RMQUERYTIME()
+      #self.results.make_plot_RMTRAININGTIME()
+      #self.results.make_plot_RMACCURACYFM()
+      #self.results.make_plot_RMQUERYTIME()
       #self.results.make_plot_RMACCURACYABM()
 
 def labelize(reg, parameters):
@@ -338,7 +287,7 @@ set title "Forward Mapping Training Time (%s)"
          for training_size in self._exp.training_sizes:
             key = (label, training_size)
 
-            maxerror = max([ abs(x[0]) for x in self._fm_results[key][exp_no]]) # FIXME
+            maxerror = max([ abs(x) for x in self._fm_results[key][exp_no]]) # FIXME
 
             maerr = max(maerr, maxerror)
 
@@ -369,7 +318,7 @@ set title "Forward Mapping Accuracy (%s)"
             key = (label, training_size)
 
             # this is the list of deviations
-            errors = [ abs(x[0]) for x in self._fm_results[key][exp_no]] # FIXME
+            errors = [ abs(x) for x in self._fm_results[key][exp_no]] # FIXME
 
             # average them
             median, lower, upper = misc.doublesided(errors)
@@ -518,7 +467,7 @@ set title "Reverse Mapping Accuracy vs. FM (%s)"
       for gran in self._exp.rm_granularities:
          times = self._rm_results[gran][exp_no]
 
-         avg, lower, upper = misc.doublesided( abs(x[0]) for x in times )  # FIXME : only works for 1 parameter!
+         avg, lower, upper = misc.doublesided( abs(x) for x in times )  # FIXME : only works for 1 parameter!
 
          print >> out_file, "%d %f %f %f" % (gran, avg, lower, upper)
 

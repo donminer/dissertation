@@ -3,6 +3,7 @@
 
 import random
 import copy
+import sys
 
 IND = 5
 DEP = 6

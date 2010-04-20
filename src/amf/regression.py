@@ -167,7 +167,7 @@ class NLR(Regression):
 
       y_array = scipy.array(misc.get_col(data, 1))
 
-      v, success = scipy.optimize.leastsq( self.error, self.initial, args=tuple(x_arrays + [y_array]) )
+      v, success = scipy.optimize.leastsq( self.error, self.initial, args=tuple(x_arrays + [y_array]), warning = False, maxfev = 25 )
 
       #print 'success?', success
       #print 'v=', v
