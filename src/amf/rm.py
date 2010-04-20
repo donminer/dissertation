@@ -107,6 +107,7 @@ class ReverseMapping(object):
 
       self.knots = {}
       self.simplexes = []
+      print 'building knots'
       self.build_knots()
       print 'done building knots'
       self.build_simplexes()
@@ -121,10 +122,13 @@ class ReverseMapping(object):
 
       count = 0
       idx = 0
+
       for this_dim_val in misc.xfrange(cur_dim_min, cur_dim_max, cur_dim_step):
          new_vector = dim_vals + (this_dim_val,)
          new_idx = idx_vector + (idx,)
          idx += 1
+
+
 
          # we've got more dimensions, so just keep adding to the structure
          if cur_dim < (self.dim - 1):
