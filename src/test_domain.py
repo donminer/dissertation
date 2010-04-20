@@ -5,11 +5,12 @@ import time
 import os
 import numpy
 
-FM_TRAINING_ITERATIONS = 3
-FM_QUERY_ITERATIONS = 8
-RM_TRAINING_ITERATIONS = 3
+FM_TRAINING_ITERATIONS = 2
+FM_QUERY_ITERATIONS = 15
+RM_TRAINING_ITERATIONS = 0
 
-
+INDEPENDENT = 5
+DEPENDENT = 4
 
 # EXPERIMENTS:
 #  For each regression X data set size:
@@ -31,7 +32,7 @@ RMQUERYTIME = 7
 
 
 # the amount to scale the y scale by
-MAGIC_YSCALE_FM_ACCURACY = .275
+MAGIC_YSCALE_FM_ACCURACY = .5
 
 OUTPUT_DIR = None
 
@@ -223,9 +224,9 @@ RM_TRAINING_ITERATIONS = %d
       self.results.make_plot_FMTRAININGTIME()
       self.results.make_plot_FMACCURACY()
       self.results.make_plot_FMQUERYTIME()
-      self.results.make_plot_RMTRAININGTIME()
-      self.results.make_plot_RMACCURACYFM()
-      self.results.make_plot_RMQUERYTIME()
+      #self.results.make_plot_RMTRAININGTIME()
+      #self.results.make_plot_RMACCURACYFM()
+      #self.results.make_plot_RMQUERYTIME()
       #self.results.make_plot_RMACCURACYABM()
 
 def labelize(reg, parameters):
@@ -345,45 +346,54 @@ set title "Forward Mapping Training Time (%s)"
       for reg, params in self._exp.regressions:
          label = labelize(reg, params)
 
-         gnuplot_script = open(plot_dir + 'plot-%s.gp' % reg.name, 'w')
-         print >> gnuplot_script, """
+
+         gnuplot_scripts = [ open(plot_dir + 'plot-%s%d.gp' % (reg.name,pn), 'w') for pn in range(DEPENDENT) ]
+         out_files = [ open(plot_dir + "%s%d" % (reg.name, pn), 'w') for pn in range(DEPENDENT) ]
+
+
+         for idx, gnuplot_script in enumerate(gnuplot_scripts):
+            print >> gnuplot_script, """
 set terminal png nocrop enhanced size 400, 400
-set output "plot-%s.png"
+set output "plot-%s%d.png"
 set xlabel "Data Set Size"
 set ylabel "Median Error"
 set key top right
 set title "Forward Mapping Accuracy (%s)"
-""" % (reg.name, self._exp.name)
+""" % (reg.name, idx, self._exp.name)
 
-         mi = int(numpy.floor(2 * self._exp.training_sizes[0] - self._exp.training_sizes[1]))
-         ma = int(numpy.ceil(2 * self._exp.training_sizes[-1] - self._exp.training_sizes[-2]))
-         print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
-         print >> gnuplot_script, "set yrange [0:%.4f]" % (maerr * 1.1 * MAGIC_YSCALE_FM_ACCURACY)
+            mi = int(numpy.floor(2 * self._exp.training_sizes[0] - self._exp.training_sizes[1]))
+            ma = int(numpy.ceil(2 * self._exp.training_sizes[-1] - self._exp.training_sizes[-2]))
 
-         print >> gnuplot_script, 'plot ',
+            print >> gnuplot_script, "set xrange [%d:%d]" % (mi, ma)
+            print >> gnuplot_script, "set yrange [0:%.4f]" % (maerr * 1.1 * MAGIC_YSCALE_FM_ACCURACY)
 
-         out_file = open(plot_dir + "%s" % reg.name, 'w')
-         print >> gnuplot_script, '"%s" with errorbars' % reg.name,
+            print >> gnuplot_script, 'plot ',
+
+            print >> gnuplot_script, '"%s%d" with errorbars' % (reg.name, idx),
+            print >> gnuplot_script, '\n',
+
+            gnuplot_script.close()
+   
 
          for training_size in self._exp.training_sizes:
             key = (label, training_size)
 
             # this is the list of deviations
-            errors = [ abs(x[0]) for x in self._fm_results[key][exp_no]] # FIXME
+            for idx, out_file in enumerate(out_files):
+               errors = [ abs(x[idx]) for x in self._fm_results[key][exp_no]]
 
             # average them
-            median, lower, upper = misc.doublesided(errors)
+               median, lower, upper = misc.doublesided(errors)
             
-            print >> out_file, "%d %f %f %f" % (training_size, median, lower, upper)
+               print >> out_file, "%d %f %f %f" % (training_size, median, lower, upper)
 
-         out_file.close()
-         print >> gnuplot_script, '\n',
-         gnuplot_script.close()
-         
-         curdir = os.path.abspath('.')
-         os.chdir(plot_dir)
-         os.system('gnuplot ' + 'plot-%s.gp' % reg.name)
-         os.chdir(curdir)
+         for idx, out_file in enumerate(out_files):
+            out_file.close()
+
+            curdir = os.path.abspath('.')
+            os.chdir(plot_dir)
+            os.system('gnuplot ' + 'plot-%s%d.gp' % (reg.name, idx))
+            os.chdir(curdir)
 
 
 

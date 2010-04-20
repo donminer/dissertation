@@ -38,6 +38,10 @@ class kNN(Regression):
 
       self.ind = len(temp_data[0][0])
 
+      # Remove all NOENTRY...
+      temp_data = tuple(x for x in temp_data if x != 'NOENTRY')
+
+
       # determine the best k with 10fold validation
 
 

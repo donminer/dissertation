@@ -52,7 +52,7 @@ def load(file_name):
       ind_list = []
       dep_list = []
       for idx, item in enumerate(sline):
-         (ind_list if vartype[idx] == IND else dep_list).append(float(item))
+         (ind_list if vartype[idx] == IND else dep_list).append(float(item) if item != 'NOENTRY' else 'NOENTRY')
 
    
       dataset.append( ( tuple(ind_list), tuple(dep_list) ) )
