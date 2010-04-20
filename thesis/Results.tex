@@ -169,12 +169,12 @@ Plots of the behavior space for this domain are shown in Figure \ref{fig:rii}.
 \includegraphics[scale=.5]{images/results_fires/fmtraining.png}
 \caption{The average length of time required by the forward mapping to train.
 The error bars show the 95\% confidence interval for the mean.}
-\label{fig:fmtraining}
+\label{fig:firefmtraining}
 \end{figure}
 
 Different training data set sizes, ranging from 20 to 200 (with a step of 20), were used to measure the amount of computation time the forward mapping requires to train a model.
 Each of the three regressions were retrained twenty times per training data set size.
-The results are plotted in Figure \ref{fig:fmtraining}.
+The results are plotted in Figure \ref{fig:firefmtraining}.
 This plot shows that kNN grows faster than the other two approaches with increasing data set sizes.
 This is because the 10-fold validation for picking $k$ requires a significant amount of time.
 Meanwhile, LOESS grows at a linear rate.
@@ -222,13 +222,13 @@ This trade off is demonstrated in the accuracy results.
 \centering
 \includegraphics[scale=.5]{images/results_fires/fmquery.png}
 \caption{...}
-\label{fig:fmquery}
+\label{fig:firefmquery}
 \end{figure}
 
 Measurements of the query time were performed at the same time as the accuracy measurements.
 The elapsed time was measured for every prediction call to the forward mappings.
 
-Queries to the forward mappings for the three approaches are fast.
+Queries to the forward mappings for the three approaches are fast, as illustrated in Figure \ref{fig:firefmquery}.
 The longest time for a query to execute was .0045 seconds for LOESS using a data set of size 200.
 This amount of time is instantaneous to a human user and thus satisfies the requirement that the forward mapping is fast for the user.
 As expected, data set size has no effect on the computation time of NLR because the model equation is always the same number of parameters.
@@ -332,6 +332,36 @@ Figure \ref{fig:flockfmacc}.
 Figure \ref{fig:aidsfmacc}.
 
 
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.4]{images/results_wolfsheep/fm-sheep-pop.png}
+\includegraphics[scale=.4]{images/results_wolfsheep/fm-wolf-pop.png}
+\caption{...}
+\label{fig:wolfsheeppop}
+\end{figure}
+
+Figure \ref{fig:wolfsheeppop}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.5]{images/results_wolfsheep/fm-sheep-var.png}
+\caption{...}
+\label{fig:wolfsheepvar}
+\end{figure}
+
+Figure \ref{fig:wolfsheepvar}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.5]{images/results_wolfsheep/fm-wolf-extict.png}
+\caption{...}
+\label{fig:wolfsheepextinct}
+\end{figure}
+
+Figure \ref{fig:wolfsheepextinct}.
+
+
+
   \subsubsection{Offline Computation Time}
 
 \begin{figure}[ht]
@@ -339,11 +369,20 @@ Figure \ref{fig:aidsfmacc}.
 \includegraphics[scale=.4]{images/results_flocking/fmtraining.png}
 \includegraphics[scale=.4]{images/results_aids/aids-fmtraining.png}
 \caption{...}
-\label{fig:flockfmtraining}
+\label{fig:fmtraining}
 \end{figure}
 
 Figure \ref{fig:fmtraining}.
 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.5]{images/results_wolfsheep/fm-training.png}
+\caption{...}
+\label{fig:wolfsheepfmtraining}
+\end{figure}
+
+Figure \ref{fig:wolfsheepfmtraining}.
 
 
 
@@ -354,10 +393,22 @@ Figure \ref{fig:fmtraining}.
 \includegraphics[scale=.4]{images/results_flocking/fmquery.png}
 \includegraphics[scale=.4]{images/results_aids/aids-fmquery.png}
 \caption{...}
-\label{fig:flockfmquery}
+\label{fig:fmquery}
 \end{figure}
 
 Figure \ref{fig:fmquery}.
+
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.5]{images/results_wolfsheep/fm-query.png}
+\caption{...}
+\label{fig:wolfsheepfmquery}
+\end{figure}
+
+Figure \ref{fig:wolfsheepfmquery}.
+
 
 
  \subsection{Reverse Mapping}
