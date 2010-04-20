@@ -167,7 +167,7 @@ Plots of the behavior space for this domain are shown in Figure \ref{fig:rii}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_fires/fmtraining.png}
-\caption{The average length of time required by the forward mapping to train.
+\caption{The average length of time required by the forward mapping for the Fires domain to train.
 The error bars show the 95\% confidence interval for the mean.}
 \label{fig:firefmtraining}
 \end{figure}
@@ -194,7 +194,8 @@ The error bars show that there is little variability in training time, meaning t
 \includegraphics[scale=.3333333]{images/results_fires/fmacc-kNN.png}
 \includegraphics[scale=.3333333]{images/results_fires/fmacc-LOESS.png}
 \includegraphics[scale=.3333333]{images/results_fires/fmacc-NLR.png}
-\caption{...}
+\caption{The median error (in ratio of trees burned down) for three different forward mapping regression methods.
+The error bars show the upper and lower quartile of the errors, over all trials.}
 \label{fig:fmacc}
 \end{figure}
 
@@ -221,7 +222,8 @@ This trade off is demonstrated in the accuracy results.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_fires/fmquery.png}
-\caption{...}
+\caption{The average number of seconds required to query the Fires forward mapping.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:firefmquery}
 \end{figure}
 
@@ -241,7 +243,8 @@ For every new point added, an additional point must be checked to see if it is l
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_fires/rmtraining.png}
-\caption{...}
+\caption{The average number of seconds required to train the Fires reverse mapping.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:rmtraining}
 \end{figure}
 
@@ -261,7 +264,8 @@ With a granularity of twenty-five, the training time was just under a quarter of
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_fires/rmaccfm.png}
-\caption{...}
+\caption{The median distance from the suggested tree density (0-100) to the one predicted by the forward mapping.
+The error bars show the upper and lower quartile of errors measured.}
 \label{fig:rmaccfm}
 \end{figure}
 
@@ -280,7 +284,8 @@ The reverse mappings trained with high granularities were often accurate within 
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_fires/rmaccabm.png}
-\caption{...}
+\caption{The median distance from the suggested tree density (0-100) to the actual tree density.
+The error bars show the upper and lower quartile of errors measured.}
 \label{fig:rmaccabm}
 \end{figure}
 The second way the accuracy of the reverse mapping is measured is how distant the piecewise configuration curve returned by the reverse mapping is from the actual configuration.
@@ -298,7 +303,8 @@ Since the same kNN forward mapping was used for all granularities, the error inc
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_fires/rmquery.png}
-\caption{...}
+\caption{The average number of seconds required to queury the Fires reverse mapping.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:rmquery}
 \end{figure}
 
@@ -316,7 +322,8 @@ The average query time increased linearly with the granularity because each addi
 \centering
 \includegraphics[scale=.4]{images/results_flocking/fmacc-kNN.png}
 \includegraphics[scale=.4]{images/results_flocking/fmacc-LOESS.png}
-\caption{...}
+\caption{The median error for the standard deviation of heading (on a zero-to-one scale) in the Flocking domain for two different forward mapping regression methods.
+The error bars show the upper and lower quartile of the errors, over all trials.}
 \label{fig:flockfmacc}
 \end{figure}
 
@@ -325,7 +332,8 @@ Figure \ref{fig:flockfmacc}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_aids/aids-fmacc.png}
-\caption{...}
+\caption{The median error showing the difference in people  (out of 350) between the original curve and the curve predicted by the forward mapping, on average, over all time steps.
+The error bars show the upper and lower quartile of the errors, over all trials.}
 \label{fig:aidsfmacc}
 \end{figure}
 
@@ -336,7 +344,8 @@ Figure \ref{fig:aidsfmacc}.
 \centering
 \includegraphics[scale=.4]{images/results_wolfsheep/fm-sheep-pop.png}
 \includegraphics[scale=.4]{images/results_wolfsheep/fm-wolf-pop.png}
-\caption{...}
+\caption{The median error in the average number of sheep (left) and the average number of wolves (right), scaled from zero to one.
+The error bars show the upper and lower quartile of the errors, over all trials.}
 \label{fig:wolfsheeppop}
 \end{figure}
 
@@ -345,7 +354,8 @@ Figure \ref{fig:wolfsheeppop}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_wolfsheep/fm-sheep-var.png}
-\caption{...}
+\caption{The median error of the variance in the number (scaled from zero to one) of sheep.
+The error bars show the upper and lower quartile of the errors, over all trials.}
 \label{fig:wolfsheepvar}
 \end{figure}
 
@@ -354,7 +364,8 @@ Figure \ref{fig:wolfsheepvar}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_wolfsheep/fm-wolf-extict.png}
-\caption{...}
+\caption{The error in prediction of the wolf population going extict or not.
+The error bars show the upper and lower quartile of the errors, over all trials.}
 \label{fig:wolfsheepextinct}
 \end{figure}
 
@@ -368,7 +379,8 @@ Figure \ref{fig:wolfsheepextinct}.
 \centering
 \includegraphics[scale=.4]{images/results_flocking/fmtraining.png}
 \includegraphics[scale=.4]{images/results_aids/aids-fmtraining.png}
-\caption{...}
+\caption{The average number of seconds required to train the Flocking (left) and AIDS (right) forward mappings.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:fmtraining}
 \end{figure}
 
@@ -378,7 +390,8 @@ Figure \ref{fig:fmtraining}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_wolfsheep/fm-training.png}
-\caption{...}
+\caption{The average number of seconds required to train the Wolf Sheep Predation forward mapping.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:wolfsheepfmtraining}
 \end{figure}
 
@@ -392,7 +405,8 @@ Figure \ref{fig:wolfsheepfmtraining}.
 \centering
 \includegraphics[scale=.4]{images/results_flocking/fmquery.png}
 \includegraphics[scale=.4]{images/results_aids/aids-fmquery.png}
-\caption{...}
+\caption{The average number of seconds required to query the Flocking (left) and AIDS (right) forward mappings.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:fmquery}
 \end{figure}
 
@@ -403,7 +417,8 @@ Figure \ref{fig:fmquery}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_wolfsheep/fm-query.png}
-\caption{...}
+\caption{The average number of seconds required to query the Wolf Sheep Predation forward mappings.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:wolfsheepfmquery}
 \end{figure}
 
@@ -418,7 +433,8 @@ Figure \ref{fig:wolfsheepfmquery}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_flocking/rmacc.png}
-\caption{...}
+\caption{The median distance from the suggested configuration to the one predicted by the forward mapping.
+The error bars show the upper and lower quartile of errors measured.}
 \label{fig:flockrmacc}
 \end{figure}
 
@@ -431,7 +447,8 @@ Figure \ref{fig:flockrmacc}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_flocking/rmtraining.png}
-\caption{...}
+\caption{The average number of seconds required to train the Flocking reverse mapping.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:flockrmtraining}
 \end{figure}
 
@@ -442,7 +459,8 @@ Figure \ref{fig:flockrmtraining}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_flocking/rmquery.png}
-\caption{...}
+\caption{The average number of seconds required to queury the Flocking reverse mapping.
+The error bars show the 95\% confidence interval for the mean.}
 \label{fig:flockrmquery}
 \end{figure}
 
