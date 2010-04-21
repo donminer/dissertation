@@ -5,8 +5,8 @@
 
 
 Four target domains are used to demonstrate \fw in action,  showing the effectiveness of \fw in a variety of different situations.
-In Chapter \ref{Results}: Results, experiments are performed on each of these ABMs to evaluate \fw.
-No modifications to \fw have to be performed to make \fw compatible with these domains, which shows that \fw is domain independent.
+In Chapter \ref{Results}, experiments are performed on each of these ABMs to evaluate \fw.
+No modifications to \fw have to be performed to make \fw compatible with these domains, which shows that \fw is domain-independent.
 In each of the domains enumerated in this chapter, I give a brief overview of what the ABM represents, what configuration parameters are available, and what system-level properties I have defined.
 
 \section{NetLogo Fires}\label{sec:Fires}
@@ -24,25 +24,25 @@ A fire is started in the left column, after which all trees in this column burn.
 Each burning tree then burns its adjacent trees (up, down, left, and right).
 This process continues until no more trees are adjacent to burning trees.
 
-The configuration space is one-dimensional and the system-level property space is one dimensional.
-The configuration parameter for this domain is the density $\rho$ of the forest, which in our experiments I range from 45 \% to 75\%.
+The configuration space and the system-level property space are both one-dimensional.
+The configuration parameter for this domain is the density $\rho$ of the forest, which in the experiments ranges from 45 \% to 75\%.
 This parameter changes the probability that a grid point contains a tree:
 during the initialization step, each grid point has a tree placed with probability $\rho$.
 The system-level property is the percentage of trees burned down, which is measured by dividing the number of trees that were burned by the total number of trees originally in the system.
 
 
 The Fires ABM is particularly interesting because it exhibits a threshold effect.
-There is a sharp transition from small amounts of the forest burning down and the entire forest burning down when the forest density increases past 58\%.
-The behavior space is not linear and exhibits high variance around 58\%, making this ABM moderately challenging, regardless of it only having one configuration parameter.
+There is a sharp transition from small amounts of the forest burning down to the entire forest burning down when the forest density increases past 58\%.
+The behavior space is not linear: it exhibits high variance around 58\%, making this ABM moderately challenging, despite having only a single configuration parameter.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  \section{NetLogo Flocking}
 
-The NetLogo Flocking ABM is a classic agent-based model based on rules devised by Reynolds \cite{reynolds1987}.
-As in the the original work, the emergent flocking behavior results from the summation of the following forces:
+The NetLogo Flocking ABM is a classic agent-based model based on rules devised by Reynolds (1987)\nocite{reynolds1987}.
+As in the original work, the emergent flocking behavior results from the summation of the following forces:
 \begin{itemize}
-	\item \textit{avoidance} -- repels agents that are too close to one another,
+	\item \textit{avoidance} -- repel agents that are too close to one another,
 	\item \textit{center} -- attract agents towards the center of the flock,
 	\item \textit{align} -- steer towards the average heading.
 \end{itemize}
@@ -55,11 +55,11 @@ As in the the original work, the emergent flocking behavior results from the sum
 \end{figure}
 
 The NetLogo implementation of flocking follows the original definition closely.
-There are six configuration parameters, as seen in Figure \ref{fig:flockingss}, however, only three are used:
+There are six configuration parameters, as seen in Figure \ref{fig:flockingss}: however, only three are used in my experiments:
 \begin{itemize}
-\item \textit{max-align-turn} -- the maximum amount of degrees an agent will turn to align its heading with its neighbors,
-\item \textit{max-cohere-turn} -- the maximum amount of degrees an agent will turn towards the center of the flock,
-\item \textit{max-separate-turn} -- the maximum amount of degrees an agent will turn away if another agent is within \textit{minimum-separation}.
+\item \textit{max-align-turn} -- the maximum number of degrees an agent will turn to align its heading with its neighbors,
+\item \textit{max-cohere-turn} -- the maximum number of degrees an agent will turn towards the center of the flock,
+\item \textit{max-separate-turn} -- the maximum number of degrees an agent will turn away if another agent is within \textit{minimum-separation}.
 \end{itemize}
 The other three configuration parameters available in the user interface (\textit{population}, \textit{vision}, and \textit{minimum-separation}) are excluded because they do not affect the system-level properties as directly as the three outlined above.
 The values of these parameters are kept constant throughout the experimentation performed for this thesis.
@@ -69,10 +69,10 @@ Two system-level properties are analyzed for this system:
 \item \textit{spread} -- measures how spread out the agents are.
 
 This metric is calculated as the average distance from each agent to its nearest neighbor.
-This calculation is an approximation to the true density, as it does not directly measure agents per patch.
+This calculation is an approximation to the true density, since it does not directly measure agents per patch.
 Approximating is necessary because determining the area that an individual flock covers is not trivial and sometimes subjective.
 In addition, a single instance could have several individual flocks, making this computation even more obscure.
-The distance to the average neighbor captures the information that density conveys: as the distance increases, the agents are more spread out, and thus less dense.
+The distance to the average neighbor captures the information that density conveys: as the distance increases, the agents are more spread out, and thus the flock is less dense.
 
 \begin{figure}[ht]
 \centering
@@ -83,16 +83,15 @@ The distance to the average neighbor captures the information that density conve
 
 \item \textit{stddev-heading} -- measures the standard deviation of the agent headings.
 
-This metric is used to determine how much the agents in the ABM agree on the direction they are heading.
-Configurations with agents that flock smoothly in one direction typically have a very low \textit{stddev-heading} value.
-Meanwhile, more chaotic configurations will have a relatively high \textit{stddev-heading} value.
-This contrast is illustrated in Figure \ref{fig:swarmVSflock}.
+This metric is used to determine how much the agents in the ABM agree on the direction in which they are heading.
+Configurations with agents that flock smoothly in one direction have a very low \textit{stddev-heading} value.
+Meanwhile, more chaotic configurations have a relatively high \textit{stddev-heading} value, as is illustrated in Figure \ref{fig:swarmVSflock}.
 
 \end{itemize}
 
 The Flocking ABM has the role in testing \fw that it is less challenging than Wolf Sheep Predation, but more complex than Fires.
 The system-level properties change in a more monotonic and predictable manner than the other domains, but still remains sufficiently complex.
-The behaviors are not linear and the configuration space is three-dimensional, making this problem still nontrivial. 
+The behaviors are not linear and the configuration space is three-dimensional, making this problem nontrivial. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -100,7 +99,7 @@ The behaviors are not linear and the configuration space is three-dimensional, m
 
 The AIDS ABM is a model of how AIDS spreads in humans.
 There are a number of agents in a two-dimensional world that move around randomly.
-Agents that collide have a chance to couple, and thten have a chance to spread AIDS if one partner has AIDS (\textit{HIV+} and one does not (\textit{HIV-}).
+Agents that collide have a chance to couple, and then have a chance to spread AIDS if one partner has AIDS (\textit{HIV+}) and one does not (\textit{HIV-}).
 Individuals that know they have the disease will not spread it to people without it.
 Only individuals that have AIDS but do not know (\textit{HIV?}) can spread the disease.
 Eventually, once there are no more people unknowingly spreading AIDS, the population is segregated into people who have AIDS and know it, and people that do not have it.
@@ -131,7 +130,7 @@ A screen capture of the domain running in NetLogo is shown in Figure \ref{fig:ai
 
 
 There are five configuration parameters available in the NetLogo implementation of this ABM.
-However only two are used for the intents of this dissertation:
+However, only two are used for the purposes of this dissertation:
 \begin{itemize}
   \item \textit{average-condom-use} -- The probability that one of the two individuals will insist on using a condom.
 
@@ -143,13 +142,14 @@ The difference between a high value and a low value is illustrated in Figure \re
   \item \textit{average-test-frequency} -- The frequency that an individual will get tested for AIDS, per year.
 
 Getting tested decreases the population of the individuals that have AIDS but do not know it, directly reducing the number of agents capable of spreading the disease.
-This parameter has as similar effect as \textit{average-condom-use}, as seen in Figure \ref{fig:aids_test}.
+This parameter has a similar effect as \textit{average-condom-use}, as seen in Figure \ref{fig:aids_test}.
 \end{itemize}
-The other parameters, \textit{initial-people}, \textit{average-coupling-tendency} (chance a couple will form), and \textit{average-commitment} (how long a couple stays together) are not used.
+The other parameters---\textit{initial-people}, \textit{average-coupling-tendency} (chance a couple will form), and \textit{average-commitment} (how long a couple stays together)---are not used.
 I chose not to incorporate these in my experiments because they change the system-level behavior in a similar way to the two parameters that I do use.
 In addition, condom usage and test frequency may be more easily affected by public policy than coupling tendency and how long a couple are committed for.
+Testing these real-world hypotheses are something \fw could bse used for.
 
-The AIDS domain is used to specifically demonstrate the usage of parametric models to describe system-level behaviors over time.
+The AIDS domain is used specifically to demonstrate the use of parametric models to describe system-level behaviors over time.
 For this domain, I will use \fw to model the plots of the populations, such as the ones in Figures \ref{fig:aids_condom} and \ref{fig:aids_test}.
 Nonlinear regression is used to perform curve fitting on representative parametric models, using training instances to learn the parameters.
 Thus, the forward mapping maps the two configuration parameters to predicted values of the parameters of the model.
@@ -178,10 +178,10 @@ The parameters are used as the new data set, instead of the original scatter plo
 The NetLogo Wolf Sheep Predation ABM has been the running example throughout this dissertation.
 In this ABM, there are three major entities: wolves, sheep and grass.
 Wolves eat sheep and sheep eat grass.
-The grass naturally regrows, meanwhile wolves and sheep occasionally reproduce.
-Every time step sheep and wolves lose some energy and die naturally if their energy reaches zero.
+The grass naturally regrows; meanwhile, wolves and sheep occasionally reproduce.
+At every time step, sheep and wolves lose some energy and die naturally if their energy reaches zero.
 A screen capture of the Wolf Sheep Predation ABM in NetLogo is shown in Figure \ref{fig:wolfsheepss}.
-The configuration controls are in the top left, the monitors are in the bottom left and the visualization of the domain is on the right.
+The configuration controls are in the top left; the monitors are in the bottom left; and the visualization of the domain is on the right.
 
 \begin{figure}[ht]
 \centering
@@ -192,14 +192,14 @@ The configuration controls are in the top left, the monitors are in the bottom l
 
 The populations of a running Wolf Sheep Predation system are constantly changing.
 Therefore, measuring properties is not as straightforward as in the Fires ABM.
-Changes in populations can range from small oscillations to high magnitude oscillations, depending on the configuration parameters.
+Changes in populations can range from small oscillations to high-magnitude oscillations, depending on the configuration parameters.
 Quantitatively capturing these properties is challenging, but is possible with \fw.
 A plot of a relatively normal (not too stable and not too high-magnitude) population is shown in Figure \ref{fig:wsp_norm}.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.666667]{images/wolfsheep/wolfsheep_normal.png}
-\caption{Plot of a stable populations in a Wolf Sheep Predation system.}
+\caption{Plot of stable populations in a Wolf Sheep Predation system.}
 \label{fig:wsp_norm}
 \end{figure}
 
@@ -243,13 +243,12 @@ A plot of a relatively normal (not too stable and not too high-magnitude) popula
 The configuration space is five-dimensional, making this domain nontrivial to analyze.
 The configuration parameters, along with some general observations, are as follows:
 \begin{itemize}
-   \item \textit{sheep-gain-from-food} -- the amount of energy sheep gain from eating grass.
+   \item \textit{sheep-gain-from-food} -- the amount of energy that sheep gain from eating grass.
 
 This parameter has interesting effects on the system.
 The effect of changing this parameter from the stable norm is shown in Figure \ref{fig:wsp_sheepfood}.
 
-At lower values, the population of the sheep has difficulty not going extinct.
-This almost always results in the wolf population going extinct.
+At lower values, the sheep population has difficulty not going extinct, which almost always results in the wolf population also going extinct, even if the sheep eventually stabilize.
 
 At higher values, sheep live longer and quickly become overpopulated, which causes the grass to become a scarce resource.
 With little grass left, the sheep begin to die off.
@@ -262,27 +261,27 @@ sheep population is very low.
    \item \textit{wolf-gain-from-food} -- the amount of energy wolves gain from eating a sheep.
 
 This parameter affects the system in a similar way as \textit{sheep-gain-from-food}.
-Lower values cause the wolves to go extinct, while higher values cause more drastic oscillations in wolf and sheep populations.
+Lower values cause the wolves to go extinct, while higher values cause more dramatic oscillations in wolf and sheep populations.
 The effect of changing this parameter from the stable norm is  shown in Figure \ref{fig:wsp_wolffood}.
 
-   \item \textit{sheep-reproduce} -- the percent chance that a sheep will reproduce, per time step.
+   \item \textit{sheep-reproduce} -- the probability that a sheep will reproduce, per time step.
 
 This parameter has the interesting property that when it is increased, the wolf population increases, but the sheep population remains relatively constant.
 When \textit{sheep-reproduce} is too low, the sheep population has difficulties sustaining its numbers, which causes the wolf population to be very low.
 The effect of changing this parameter from the stable norm is  shown in Figure \ref{fig:wsp_sheepsex}.
 
-   \item \textit{wolf-reproduce} -- the percent chance that a wolf will reproduce, per time step.
+   \item \textit{wolf-reproduce} -- the probability that a wolf will reproduce, per time step.
 
 This parameter has relatively little effect on the system, in comparison to the other parameters.
-The populations oscillate more when the reproduction rate is higher and more stable with it lower.
+The populations oscillate more when the reproduction rate is higher and are more stable when it is lower.
 The effect of changing this parameter from the stable norm is  shown in Figure \ref{fig:wsp_wolfsex}.
 
-   \item \textit{grass-regrowth-time} -- the amount of time steps a patch of grass takes to regrow.
+   \item \textit{grass-regrowth-time} -- the number of time steps that a patch of grass takes to regrow.
 
 This is perhaps the strangest behaving configuration parameter.
 At higher values, not enough grass grows to sustain a large sheep population, which causes the wolves to go extinct.
-At lower values, sheep rarely every die, until they become overpopulated and eat all the grass.
-At this point, there is a mass extinction, which causes the wolves to typically go extinct.
+At lower values, sheep rarely ever die, until they become overpopulated and eat all the grass.
+At this point, there is a mass extinction, which typically causes the wolves to go extinct.
 This parameter is similar to that of \textit{sheep-gain-from-food} in terms of system-level behavior.
 
 \end{itemize}
@@ -292,21 +291,21 @@ Even more diverse behaviors can be observed by adjusting several parameters at o
 Several system-level properties have been developed for this domain.
 To sample many of these properties and to provide more consistent results, each random configuration is sampled a number of times and averaged.
 \begin{itemize}
-\item \textit{sheep-extinct?} and \textit{wolves-extinct?} -- the probability that the sheep and wolf populations will reach zero, respectively.
+\item \textit{sheep-extinct?} and \textit{wolves-extinct?} -- the probabilies that the sheep and wolf populations will reach zero, respectively.
 
-The probability of sheep and wolf extinction is measured by sampling the same configuration numerous times and calculating the percentage of instances they went extinct.
-Most often with a specific configuration, the sheep or wolves always go extinct or always do not go extinct.
-However, there are borderline configurations in which the sheep or wolves will go extinct while the system is stabilizing into a rhythm.
+The probability of sheep and wolf extinction is measured by sampling the same configuration numerous times and calculating the percentage of instances in which they went extinct.
+Most often with a specific configuration, the sheep or wolves either always go extinct or never go extinct.
+However, there are borderline configurations in which the sheep or wolves will sometimes (but not always) go extinct while the system is stabilizing into a rhythm.
 This metric is useful in distinguishing between these three situations.
 Wolves will always go extinct if there are no sheep, but sheep can exist without wolves.
 Therefore, the value of \textit{wolves-extinct} is always higher than \textit{sheep-extinct?}.
 
-\item \textit{sheep-average} and \textit{wolf-average} -- the average sheep and wolves given they did not go extinct, respectively.
+\item \textit{sheep-average} and \textit{wolf-average} -- the average number of sheep and wolves, given that they did not go extinct, respectively.
 
 The average sheep and wolf populations are calculated by averaging the populations at every time step in instances in which they did not go extinct.
 Not including extinct populations in the average is important because these instances will introduce significant amounts of bias.
-This metric describes how large the population can expected to be.
-Along with \textit{sheep-variance} and \textit{wolf-variance}, the averages describes the nature of the population and how it changes.
+This metric describes how large the population is expected to be.
+Along with \textit{sheep-variance} and \textit{wolf-variance}, the averages describe the nature of the populations and how they change.
 
 \item \textit{sheep-variance} and \textit{wolf-variance} -- the variance of the sheep and wolf population over the course of a run.
 
@@ -315,7 +314,7 @@ This metric describes how much the population changes from time step to time ste
 
 \end{itemize}
 
-The Wolf Sheep Predation ABM is interesting because its behaviors are not linear and are not monotonic.
+The Wolf Sheep Predation ABM is interesting because its behaviors are neither linear nor monotonic.
 That is, as many of the configuration parameters increase, the resulting system-level behavior does not change in a linear manner.
 This property of the behavior space makes many of the system-level properties difficult to predict.
 In addition, there are five configuration parameters, which makes the configuration space five-dimensional.
