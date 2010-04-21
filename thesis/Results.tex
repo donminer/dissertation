@@ -497,16 +497,36 @@ Naturally, problems with more system-level properties will require more time.
 
   \subsubsection{Accuracy vs. Forward Mapping}
 
+The accuracy of the reverse mapping is measured as how well it approximates the forward mapping.
+To measure this, for each simplex in the reverse mapping, the center point of the simplex has its system-level property values predicted with the forward mapping, and with the average the values at the corners.
+The values at the knots have no error, since they were generated with the forward mapping.
+Therefore, the points furthest away from these corners are most likely to have the greatest error.
+
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_flocking/rmacc.png}
-\caption{The median distance from the suggested configuration to the one predicted by the forward mapping.
+\caption{The median difference in the forward mapping and the reverse mapping in predictions for the Flocking domain.
 The error bars show the upper and lower quartile of errors measured.}
 \label{fig:flockrmacc}
 \end{figure}
 
-Figure \ref{fig:flockrmacc}.
+Results for the accuracy of the flocking domain are shown in Figure \ref{fig:flockrmacc}.
+The median error of the reverse mapping with a granularity of 40 is about .007, which pales in comparison to the .05 error (see Figure \ref{fig:flockfmacc}) between the forward mapping and the actual ABM.
+Therefore, the error incurred by the reverse mapping is relatively insignificant, especially when sometimes the error can cancel out the forward mapping error (i.e., the error from the reverse mapping and forward mapping is not additive).
 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=.5]{images/results_aids/aids-rmacc.png}
+\caption{The median difference in the forward mapping and the reverse mapping in predictions for the AIDS domain.
+The error bars show the upper and lower quartile of errors measured.}
+\label{fig:aidsrmacc}
+\end{figure}
+
+Similar conclusions can be made about the accuracy of the reverse mapping for the AIDS domain, which are plotted in Figure \ref{fig:aidsrmacc}.
+The median error for this domain with a granularity of 50 is below one person.
+That is, in the most erroneous place in each simplex, the reverse mapping will predict the forward mapping's prediction within one person.
+This error is about six times less than the error incurred by the forward mapping, for this domain.
 
 
 
@@ -515,25 +535,61 @@ Figure \ref{fig:flockrmacc}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_flocking/rmtraining.png}
-\caption{The average number of seconds required to train the Flocking reverse mapping.
+\includegraphics[scale=.5]{images/results_aids/aids-rmtraining.png}
+\caption{The average number of seconds required to train the Flocking (left) and AIDS (right) reverse mappings.
 The error bars show the 95\% confidence interval for the mean.}
-\label{fig:flockrmtraining}
+\label{fig:farmtraining}
 \end{figure}
 
-Figure \ref{fig:flockrmtraining}.
+
+
+The process of training the reverse mapping involves querying the forward mapping to generate the knots and then to build the simplical complex from these knots.
+Figure \ref{fig:farmtraining} shows the training time, based on granularity for the Flocking and AIDS domains.
+At 40 granularity, the reverse mappings required approximately 9 seconds and 225 seconds to train for the AIDS domain and the Flocking domain, respectively.
+
+For both the AIDS and Flocking domains, the required amount of time to train is acceptable, since it is computed offline.
+However, there is a very large difference for the same granularity, given just one dimension difference in the configuration space (AIDS has two configuration parameters, while Flocking has three).
+Unfortunately, the training time and memory is exponential in respect to the dimensionality.
+Since each dimension is split granularity $g$ times, there are a total of $2 g^d$ simplexes, where $d$ is the dimensionality of the configuration space.
+Therefore, to memory required and the computation time required grow quickly with more dimensions.
+The results from the Wolf Sheep Predation (with a configuration space dimensionality of five) are omitted because a granularity low enough to allow the experiments to run in a reasonable amount of time yielded poor accuracy.
+
+Possible general methods for avoiding this problem are left as future work, which include optimization using the forward mapping and scaling granularity.
+The simplest fix is to sample less configuration parameters at once and to learn individual reverse mappings for subsets of the configuration space.
+Much information and qualitative information can still be gathered from these smaller mappings.
+
 
   \subsubsection{Online Computation Time}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_flocking/rmquery.png}
-\caption{The average number of seconds required to queury the Flocking reverse mapping.
+\includegraphics[scale=.5]{images/results_aids/aids-rmquery.png}
+\caption{The average number of seconds required to query the Flocking (left) and AIDS (right) reverse mappings.
 The error bars show the 95\% confidence interval for the mean.}
-\label{fig:flockrmquery}
+\label{fig:farmquery}
 \end{figure}
 
-Figure \ref{fig:flockrmquery}.
+Figure \ref{fig:farmquery}.
 
+Querying a reverse mapping requires the submapping for each system-level property to be searched for intersections.
+Each simplex must be checked for intersections, so the running time of the query is based directly on the number of simplexes.
+Since the number of simplexes grow at $O(g^d)$, the query is polynomial time, in respect to granularity.
+This relationship is reflected in the results shown in Figure \ref{fig:farmquery}.
+Similar to the training time, the query time for Flocking and AIDS are significantly different due to the additional configuration dimension in the Flocking domain.
+In both these domains, queries were generally less than half a second, which is acceptable performance.
+
+
+
+\section{Summary and Conclusions}
+
+In summary, the forward mapping performed exceptionally well in comparison to the baselines provided.
+The forward mapping is an accurate and quick tool for predicting real-valued system-level properties, as well as predicting the probability of a threshold effect (such as wolf extinction).
+\fw was able to provide a solution to this problem in a general manner, by applying the same approaches to all four domains.
+
+The reverse mapping solutions generated by \fw model the forward mapping accurately and in a general manner.
+However, the computational and space complexity grow quickly with dimensionality, which make this approach intractable for highly-dimensional domains.
+For the one-, two-, and three-dimensional configuration spaces presented in the results, granularities of forty produced accurate results within a reasonable about of time.
 
 
 
