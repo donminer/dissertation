@@ -3,7 +3,7 @@
 
 \label{Results}
 
-In this chapter, I discuss experiments that test \fw for accuracy and computational efficiency.
+In this chapter, I discuss experiments that test the  accuracy and computational efficiency of \fw.
 These experiments also serve as examples of \fw being applied to a variety of ABMs.
 In the next section, the different evaluation criteria are outlined.
 Each of these metrics will be applied to a number of domains using a number of different techniques for the forward mapping.
@@ -319,9 +319,9 @@ The average query time increased linearly with the granularity because each addi
   \subsubsection{Accuracy}
 
 The accuracy of the forward mapping was measured in the three remaining domains (Flocking, AIDS and Wolf Sheep Predation).
-In all domains, both k-nearest neighbor and LOESS outperformed the baseline of predicting the mean value over all system-level properties, for all queries.
+In all domains, both k-nearest neighbor and LOESS outperformed the baseline of predicting the mean value over all system-level property values.
 Also, all experiments demonstrate that, in general, accuracy increases as data set size increases.
-However, the decrease in error from increasing data set size is not linear, as the benefits of larger datasets lessens as the size increases.
+However, the decrease in error from increasing data set size is not a linear relationship, as the benefits of larger datasets lessens as the size increases.
 In general, kNN performed better than LOESS.
 Non-linear regression has been omitted from these experiments for the reason that it is difficult to determine a suitable base-model and initial guess for a multi-dimensional space.
 
@@ -340,8 +340,7 @@ Plots showing the relationship between data set size and median error are shown 
 KNN outperformed LOESS, but not significantly, eventually approaching a median error of .05 with a training set size of 325.
 LOESS approached an error of .06 with the same training set size.
 These error values are linearly scaled such that the maximum standard deviation witnessed is exactly 1.0 and the minimum standard deviation witnessed is exactly 0.0.
-The baseline is not shown in these graphs because it is not within the $y$-range of the plot.
-On average, predicting the mean value had an error of .306, over all 4000 data set instances.
+The baseline is not shown in these graphs because it is not within the $y$-range of the plot: on average, predicting the mean value had an error of .306, over all 4000 data set instances.
 
 
 \begin{figure}[ht]
@@ -361,8 +360,8 @@ This error is measured by taking the average difference between the predicted cu
 To calculate this, the value for each time step, for both functions is calculated.
 The deviations are averaged, which yields the median error plotted in Figure \ref{fig:aidsfmacc}.
 
-Note that the AIDS domain technically does not adhere to one of the major assumptions: in order to split the forward-mapping problem into several subproblems, the system-level property values must be independent of one another.
-This is not the case since all the parameters are part of the same sigmoid function.
+Note that the AIDS domain technically does not adhere to one of the major assumptions used in \fw: in order to split the forward-mapping problem into several subproblems, the system-level property values must be independent of one another.
+This is not the case since all the parameters are part of the same model function.
 However, I found that in this particular case, the forward mapping predicted the values of the HIV population adequately.
 
 
@@ -408,7 +407,7 @@ The error bars show the upper and lower quartile of the errors, over all trials.
 
 Next, forward mappings were used to predict whether or not the wolf population would go extinct.
 This property is different from the others, since it is a binary property: either the wolves go extinct or they do not.
-The forward mapping solution predicts the probability that the wolves go extinct, so the errors shown in Figure \ref{fig:wolfsheepextinct} do not quite mean the same thing as in other plots.
+The forward mapping solution predicts the probability that the wolves go extinct, so the errors shown in Figure \ref{fig:wolfsheepextinct} do not quite have the same meaning as the other plots.
 The data in the training set is either labeled as wolves having gone extinct or not.
 Therefore, a prediction of .9 would yield an error of .1 if the wolves went extinct, and an error of .9 if they did not.
 From the plot in Figure \ref{fig:wolfsheepextinct}, we can see that a forward mapping can be used to predict if the wolves will go extinct correctly the vast majority of the time (at least 75\%).
@@ -441,7 +440,7 @@ To measure the average training, several forward mappings for all three domains 
 Figure \ref{fig:fmtraining} shows the training time for the Flocking domain and the AIDS domain.
 Even with training sets as large as 350, the forward mappings were able to be trained in less than 2.5 seconds for the Flocking domain and 8 seconds for the AIDS domain.
 Figure \ref{fig:wolfsheepfmtraining} shows the training time for the Wolf Sheep Predation domain, which yields a similarly shaped curve.
-The difference in training time, even if the data set size is the same, is directly resultant of the number of system-level properties because each is learned individually.
+The difference in training time between domains, even if the data set size is the same, is directly resultant of the number of system-level properties because each is learned individually.
 Note that if kNN had $k$ preselected, it would require no training time.
 
 
@@ -485,7 +484,7 @@ The error bars show the 95\% confidence interval for the mean.}
 \end{table}
 
 
-Online computation time is the time required, on average, to query the forward mapping.
+Online computation time is the average time required to query the forward mapping.
 Since the forward mapping intends to replace the need for manual experimentation with ABMs, the forward mapping query should be significantly faster than actually running the ABM.
 The average number of seconds required to query each of the ABMs in these experiments are listed in Table \ref{table:runtimes}.
 As shown in Figure \ref{fig:fmquery} and Figure \ref{fig:wolfsheepfmquery}, the average query time is far below that of actually running the ABM.
@@ -543,7 +542,7 @@ The error bars show the 95\% confidence interval for the mean.}
 
 
 
-The process of training the reverse mapping involves querying the forward mapping to generate the knots and then to build the simplical complex from these knots.
+The process of training the reverse mapping involves querying the forward mapping to generate the knots and then building the simplical complex from these knots.
 Figure \ref{fig:farmtraining} shows the training time, based on granularity for the Flocking and AIDS domains.
 At 40 granularity, the reverse mappings required approximately 9 seconds and 225 seconds to train for the AIDS domain and the Flocking domain, respectively.
 
@@ -551,10 +550,11 @@ For both the AIDS and Flocking domains, the required amount of time to train is 
 However, there is a very large difference for the same granularity, given just one dimension difference in the configuration space (AIDS has two configuration parameters, while Flocking has three).
 Unfortunately, the training time and memory is exponential in respect to the dimensionality.
 Since each dimension is split granularity $g$ times, there are a total of $2 g^d$ simplexes, where $d$ is the dimensionality of the configuration space.
-Therefore, to memory required and the computation time required grow quickly with more dimensions.
+The coefficient of ``2" comes from the fact that each grid location is split into two simplexes.
+Therefore, the memory required and the computation time required grow quickly with more dimensions.
 The results from the Wolf Sheep Predation (with a configuration space dimensionality of five) are omitted because a granularity low enough to allow the experiments to run in a reasonable amount of time yielded poor accuracy.
 
-Possible general methods for avoiding this problem are left as future work, which include optimization using the forward mapping and scaling granularity.
+Possible general methods for avoiding this computational problem are left as future work, which include optimization using the forward mapping and scaling granularity.
 The simplest fix is to sample less configuration parameters at once and to learn individual reverse mappings for subsets of the configuration space.
 Much information and qualitative information can still be gathered from these smaller mappings.
 
@@ -570,7 +570,7 @@ The error bars show the 95\% confidence interval for the mean.}
 \label{fig:farmquery}
 \end{figure}
 
-Figure \ref{fig:farmquery}.
+
 
 Querying a reverse mapping requires the submapping for each system-level property to be searched for intersections.
 Each simplex must be checked for intersections, so the running time of the query is based directly on the number of simplexes.
@@ -585,9 +585,9 @@ In both these domains, queries were generally less than half a second, which is 
 
 In summary, the forward mapping performed exceptionally well in comparison to the baselines provided.
 The forward mapping is an accurate and quick tool for predicting real-valued system-level properties, as well as predicting the probability of a threshold effect (such as wolf extinction).
-\fw was able to provide a solution to this problem in a general manner, by applying the same approaches to all four domains.
+\fw was able to provide a general solution to this problem, proven by applying the same approaches to all four domains.
 
-The reverse mapping solutions generated by \fw model the forward mapping accurately and in a general manner.
+The reverse mapping solutions generated by \fw model the forward mapping accurately.
 However, the computational and space complexity grow quickly with dimensionality, which make this approach intractable for highly-dimensional domains.
 For the one-, two-, and three-dimensional configuration spaces presented in the results, granularities of forty produced accurate results within a reasonable about of time.
 
