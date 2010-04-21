@@ -318,6 +318,13 @@ The average query time increased linearly with the granularity because each addi
 
   \subsubsection{Accuracy}
 
+The accuracy of the forward mapping was measured in the three remaining domains (Flocking, AIDS and Wolf Sheep Predation).
+In all domains, both k-nearest neighbor and LOESS outperformed the baseline of predicting the mean value over all system-level properties, for all queries.
+Also, all experiments demonstrate that, in general, accuracy increases as data set size increases.
+However, the decrease in error from increasing data set size is not linear, as the benefits of larger datasets lessens as the size increases.
+In general, kNN performed better than LOESS.
+Non-linear regression has been omitted from these experiments for the reason that it is difficult to determine a suitable base-model and initial guess for a multi-dimensional space.
+
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.4]{images/results_flocking/fmacc-kNN.png}
@@ -327,7 +334,15 @@ The error bars show the upper and lower quartile of the errors, over all trials.
 \label{fig:flockfmacc}
 \end{figure}
 
-Figure \ref{fig:flockfmacc}.
+Both LOESS and kNN were tested for training a forward mapping to predict the standard deviation of heading in the Flocking ABM.
+A forward mapping was trained fifteen times for each data set of the same size, each being queried one thousand times.
+Plots showing the relationship between data set size and median error are shown in Figure \ref{fig:flockfmacc}. 
+KNN outperformed LOESS, but not significantly, eventually approaching a median error of .05 with a training set size of 325.
+LOESS approached an error of .06 with the same training set size.
+These error values are linearly scaled such that the maximum standard deviation witnessed is exactly 1.0 and the minimum standard deviation witnessed is exactly 0.0.
+The baseline is not shown in these graphs because it is not within the $y$-range of the plot.
+On average, predicting the mean value had an error of .306, over all 4000 data set instances.
+
 
 \begin{figure}[ht]
 \centering
@@ -337,7 +352,18 @@ The error bars show the upper and lower quartile of the errors, over all trials.
 \label{fig:aidsfmacc}
 \end{figure}
 
-Figure \ref{fig:aidsfmacc}.
+Four forward mappings were trained to predict four parameters of a generalized logistic function that models the number of people with HIV, in respect to time.
+The model used was:
+\[ \mathrm{y} = p_0 + \displaystyle \frac{p_1 - p_0}{1 + e ^ {-p_2  (\mathrm{t} - p_3) } }, \]
+where $\mathbf p$ is the vector of parameters $p_0, p_1, p_2,$ and $p_3$ and $t$ is the time step.
+As the data set size increases from 25 to 300, the median error drops from nine people to just over five, as seen in Figure \ref{fig:aidsfmacc}.
+This error is measured by taking the average difference between the predicted curve and the actual curve from the validation set.
+To calculate this, the value for each time step, for both functions is calculated.
+The deviations are averaged, which yields the median error plotted in Figure \ref{fig:aidsfmacc}.
+
+Note that the AIDS domain technically does not adhere to one of the major assumptions: in order to split the forward-mapping problem into several subproblems, the system-level property values must be independent of one another.
+This is not the case since all the parameters are part of the same sigmoid function.
+However, I found that in this particular case, the forward mapping predicted the values of the HIV population adequately.
 
 
 \begin{figure}[ht]
@@ -345,11 +371,19 @@ Figure \ref{fig:aidsfmacc}.
 \includegraphics[scale=.4]{images/results_wolfsheep/fm-sheep-pop.png}
 \includegraphics[scale=.4]{images/results_wolfsheep/fm-wolf-pop.png}
 \caption{The median error in the average number of sheep (left) and the average number of wolves (right), scaled from zero to one.
-The error bars show the upper and lower quartile of the errors, over all trials.}
+The error bars show the upper and lower quartile of the errors, over all trials.
+Predicting the mean population value yields an error of .106 and .17 for sheep and wolf populations, respectively.}
 \label{fig:wolfsheeppop}
 \end{figure}
 
-Figure \ref{fig:wolfsheeppop}.
+The next round of experiments tested the effectiveness of the forward mapping approach in predicting four properties of the Wolf Sheep Predation domain: the average sheep population, the average wolf population, the sheep population variance, and wolf extinction.
+A forward mapping was trained eight times for each data set of the same size, each being queried two hundred times.
+The forward mappings outperformed simply predicting the mean value in all four cases, with sufficient training sets.
+
+The median errors for the wolf population and the sheep population are shown in Figure \ref{fig:wolfsheeppop}.
+As the training set size approached 400, the error for the sheep population forward mapping approached 2\% of the range of values in the data set, which is five times more accurate than predicting the mean.
+The forward mapping for the wolf population was more difficult to learn, which is evident from the baseline of .17 being significantly higher than the baseline for the sheep population prediction.
+The median error for the wolf population forward mapping approaches 4\% of the range of values in the data set, which is 4.25 times more accurate than predicting the mean.
 
 \begin{figure}[ht]
 \centering
@@ -359,19 +393,28 @@ The error bars show the upper and lower quartile of the errors, over all trials.
 \label{fig:wolfsheepvar}
 \end{figure}
 
-Figure \ref{fig:wolfsheepvar}.
+Forward mappings were used to predict the variance in sheep populations.
+Populations with higher variance fluctuated more than ones with lower variance.
+The median error for predicting the variance, based on data set size is shown in Figure \ref{fig:wolfsheepvar}, along with a baseline of .058.
+With a training set size of 400, the learned forward mapping outperformed the baseline five-fold.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_wolfsheep/fm-wolf-extict.png}
-\caption{The error in prediction of the wolf population going extict or not.
+\caption{The error in prediction of the wolf population going extinct or not.
 The error bars show the upper and lower quartile of the errors, over all trials.}
 \label{fig:wolfsheepextinct}
 \end{figure}
 
-Figure \ref{fig:wolfsheepextinct}.
+Next, forward mappings were used to predict whether or not the wolf population would go extinct.
+This property is different from the others, since it is a binary property: either the wolves go extinct or they do not.
+The forward mapping solution predicts the probability that the wolves go extinct, so the errors shown in Figure \ref{fig:wolfsheepextinct} do not quite mean the same thing as in other plots.
+The data in the training set is either labeled as wolves having gone extinct or not.
+Therefore, a prediction of .9 would yield an error of .1 if the wolves went extinct, and an error of .9 if they did not.
+From the plot in Figure \ref{fig:wolfsheepextinct}, we can see that a forward mapping can be used to predict if the wolves will go extinct correctly the vast majority of the time (at least 75\%).
+Also, with a data set size of 400, the forward mapping is more than twice as accurate in comparison to the baseline.
 
-
+In conclusion, the \fw approach of solving the forward-mapping problem is sufficiently accurate in predicting system-level behavior in these domains.
 
   \subsubsection{Offline Computation Time}
 
@@ -384,9 +427,6 @@ The error bars show the 95\% confidence interval for the mean.}
 \label{fig:fmtraining}
 \end{figure}
 
-Figure \ref{fig:fmtraining}.
-
-
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=.5]{images/results_wolfsheep/fm-training.png}
@@ -395,7 +435,14 @@ The error bars show the 95\% confidence interval for the mean.}
 \label{fig:wolfsheepfmtraining}
 \end{figure}
 
-Figure \ref{fig:wolfsheepfmtraining}.
+Offline computation time refers to the required amount of time to train a forward mapping.
+Recall that kNN determines the best $k$ using 10-fold cross validation and LOESS performs the initialization and smoothing step.
+To measure the average training, several forward mappings for all three domains were trained for varying data set sizes.
+Figure \ref{fig:fmtraining} shows the training time for the Flocking domain and the AIDS domain.
+Even with training sets as large as 350, the forward mappings were able to be trained in less than 2.5 seconds for the Flocking domain and 8 seconds for the AIDS domain.
+Figure \ref{fig:wolfsheepfmtraining} shows the training time for the Wolf Sheep Predation domain, which yields a similarly shaped curve.
+The difference in training time, even if the data set size is the same, is directly resultant of the number of system-level properties because each is learned individually.
+Note that if kNN had $k$ preselected, it would require no training time.
 
 
 
@@ -410,8 +457,6 @@ The error bars show the 95\% confidence interval for the mean.}
 \label{fig:fmquery}
 \end{figure}
 
-Figure \ref{fig:fmquery}.
-
 
 
 \begin{figure}[ht]
@@ -422,9 +467,31 @@ The error bars show the 95\% confidence interval for the mean.}
 \label{fig:wolfsheepfmquery}
 \end{figure}
 
-Figure \ref{fig:wolfsheepfmquery}.
+
+\begin{table}[ht]
+  \caption{Average Time for Individual Runs of ABMs}
+  \centering
+  \begin{tabular}{c c}
+    \hline \hline
+    ABM & Average Time Per Run (seconds)\\
+    \hline
+    Fires & 0.17\\
+    Flocking & 8.20\\
+    AIDS & 4.61\\
+    Wolf Sheep Predation & 6.51\\
+    \hline
+  \end{tabular}
+  \label{table:runtimes}
+\end{table}
 
 
+Online computation time is the time required, on average, to query the forward mapping.
+Since the forward mapping intends to replace the need for manual experimentation with ABMs, the forward mapping query should be significantly faster than actually running the ABM.
+The average number of seconds required to query each of the ABMs in these experiments are listed in Table \ref{table:runtimes}.
+As shown in Figure \ref{fig:fmquery} and Figure \ref{fig:wolfsheepfmquery}, the average query time is far below that of actually running the ABM.
+For example, about two thousand Flocking forward mapping queries can be performed per Flocking ABM run.
+Both LOESS and kNN have a linear rate of growth, which is as expected, because as more points are added to the training set, the more points that must be iterated over.
+Naturally, problems with more system-level properties will require more time.
 
  \subsection{Reverse Mapping}
 
@@ -440,7 +507,8 @@ The error bars show the upper and lower quartile of errors measured.}
 
 Figure \ref{fig:flockrmacc}.
 
-  \subsubsection{Accuracy vs. System Run}
+
+
 
   \subsubsection{Offline Computation Time}
 
