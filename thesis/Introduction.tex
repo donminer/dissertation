@@ -69,6 +69,41 @@ The main goal of the \framework is to bridge the gap between agent-level paramet
 Qualitative analysis of an ABM's system-level properties will be a more efficient process using \fw, since researchers can interact with an abstraction of the system's controls.
 In addition, the models learned by \fw can be inspected to gather quantitative data about the correlations between system-level properties and agent-level parameters.
 
+\section{Uses of Agent-Based Modeling and the Applicability of \fw}
+
+Agent-based modeling is useful for a wide variety of tasks, which include simulations of real-life systems, swarm intelligence, and artificial life.
+
+Researchers experimenting with real-world systems may consider using agent-based models because experimenting with the real system may be too difficult, expensive, or impossible.
+A number of these researcher projects, including ant simulations, locust simulations and pedestrian simulations, are discussed in more detail in Chapter \ref{Background}.
+In many projects, the researchers are interested in determining what system-level properties result from a range of different configurations.
+The experiments typically involve adjusting one or two parameters systematically and then measuring the resultant system-level properties.
+The samples are then analyzed with plots and other visualization to draw conclusions about the effect of changing configuration parameters on the system-level outcome.
+\fw is able to improve upon the standard approach of systematic sampling and plotting used in many of these projects.
+\fw builds mappings from configuration parameters to system-level properties, which can be used to build smoother and more accurate plots and to impute values for configurations that were not directly sampled.
+
+Although swarm intelligence algorithms are not typically considered agent-based models, they do fit the paradigm: they are implemented at the agent-level and the agents produce useful system-level behavior.
+One of these algorithms is Ant-Colony Optimization \cite{dorigo2004aco}, in which a population of virtual ants work together to perform a number of optimization tasks.
+Another is Particle Swarm Optimization \cite{kennedy1995pso}, in which a population of particles move around a search space while sharing the location of local maxima with other particles.
+The objective of these types of approaches is to find the best possible solution in the shortest amount of time.
+However, a major drawback from a user's standpoint is configuring these systems.
+The configuration parameters are not directly correlated with performance and finding the optimal configuration manually can be difficult.
+\fw can be used to find and suggest configurations that will maximize the performance of these types of approaches.
+
+Artificial life is a field in which real-life systems are recreated in computer simulation.
+A subset of this field deals with multi-agent systems, in which researchers try to realistically recreate systems such as bird flocking \cite{reynolds1987} and crowds of pedestrians \cite{shao2007autonomous}\cite{pelechano2007controlling}.
+Projects such as these have been used in the movie industry \cite{maes1995artificial} and for other computer graphics applications.
+Similar to other ABMs, these types of systems are controlled by unintuitive agent-level properties.
+\fw can be used in this type of application to suggest configurations that will exhibit some desired system-level behavior.
+Otherwise, configurations that produce a desired system-level property would have to be found manually.
+
+There are two properties of ABMs that limit \fw from working with any ABM.
+First, the configuration space must be less than four configuration parameters in order for the reverse-mapping solution to be computationally tractable (the forward-mapping problem is not as affected by dimensionality).\footnote{See Section \ref{curseofdim} for a detailed discussion on the tractability of high-dimensional configuration spaces in \fw.}
+Second, the system-level properties that are to be analyzed must be \textit{predictable}.
+That is, if the value of the property being measured is not strongly correlated with the configuration parameters, then \fw will not be able to learn the mappings.
+An unpredictable system-level property is typically too random.
+Users must be careful in selecting system-level properties that are in fact affected by changes in configurations.
+\fw can be used to determine which properties are predictable by attempting to train a model of it.
+If the model does not produce accurate results, then the property is not predictable.
 
 \section{Wolves, Sheep and Grass}
 
@@ -132,7 +167,7 @@ In  Chapter \ref{Results} (Results), I will show that the intuitive disconnect i
 \section{Overview of the \framework}
 
 
-The foundation of this work is framing the problem of building a meta-model of an ABM as two sub-problems: the \textit{forward-mapping problem} and the \textit{reverse-mapping problem}.
+The foundation of this work is framing the problem of ABM meta-model building as two sub-problems: the \textit{forward-mapping problem} and the \textit{reverse-mapping problem}.
 In Chapter \ref{ForwardMapping} (The Forward-Mapping Problem), I will discuss how \fw maps given values of the agent-level parameters to expected system-level property values with standard regression approaches.
 In Chapter \ref{ReverseMapping} (The Reverse-Mapping Problem), I will discuss how \fw maps a set of desired system-level property values to a set of agent-level parameters that would generate this behavior.
 My general approach to solving the reverse-mapping problem is to interpolate configurations using the forward mapping to approximate a smooth and continuous surface.
