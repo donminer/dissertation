@@ -116,10 +116,10 @@ This process can be very time-consuming, depending on several factors:
   \item Granularity -- more fine-grained sampling will take more time, since more points must be sampled.
   \item Dimensionality -- more agent-level control parameters result in a larger search space and naturally more points to sample.
 \end{itemize}
-A 120-observation sample of the NetLogo \textit{Fires} model\footnote{See Chapter \ref{Results} for detailed results.} \cite{fires} requires about thirty seconds\footnote{Most experiments are executed on a 3.0 Ghz Pentium 4 running Arch Linux.} to generate.
+A 120-observation sample of the NetLogo \textit{Fires} model\footnote{See Chapter \ref{Results} for detailed results.} \cite{fires} requires roughly thirty seconds\footnote{Most experiments are executed on a 3.0 Ghz Pentium 4 running Arch Linux.} to generate.
 A large sample of 50,000 observation of a Reynolds boid flock \cite{reynolds1987} took approximately four days.
 
-The user is required enough understanding of the domain to specify to \fw which  ranges of values should be sampled.
+The user is required to have enough understanding of the domain to specify to \fw which  ranges of values should be sampled.
 \fw is not able to automatically infer which value ranges are interesting, so these must be explicitly defined.
 
 This sampling process is easily parallelizable.
