@@ -27,7 +27,7 @@ This process continues until no more trees are adjacent to burning trees.
 The configuration space and the system-level property space are both one-dimensional.
 The configuration parameter for this domain is the density $\rho$ of the forest, which in the experiments ranges from 45 \% to 75\%.
 This parameter changes the probability that a grid point contains a tree:
-during the initialization step, each grid point has a tree placed with probability $\rho$.
+during the initialization step, each grid point has a tree placed in it with probability $\rho$.
 The system-level property is the percentage of trees burned down, which is measured by dividing the number of trees that were burned by the total number of trees originally in the system.
 
 
@@ -57,9 +57,9 @@ As in the original work, the emergent flocking behavior results from the summati
 The NetLogo implementation of flocking follows the original definition closely.
 There are six configuration parameters, as seen in Figure \ref{fig:flockingss}: however, only three are used in my experiments:
 \begin{itemize}
-\item \textit{max-align-turn} -- the maximum number of degrees an agent will turn to align its heading with its neighbors,
-\item \textit{max-cohere-turn} -- the maximum number of degrees an agent will turn towards the center of the flock,
-\item \textit{max-separate-turn} -- the maximum number of degrees an agent will turn away if another agent is within \textit{minimum-separation}.
+\item \textit{max-align-turn} -- the maximum number of degrees through which an agent will turn to align its heading with its neighbors,
+\item \textit{max-cohere-turn} -- the maximum number of degrees through which an agent will turn towards the center of the flock,
+\item \textit{max-separate-turn} -- the maximum number of degrees through which an agent will turn away if another agent is within \textit{minimum-separation}.
 \end{itemize}
 The other three configuration parameters available in the user interface (\textit{population}, \textit{vision}, and \textit{minimum-separation}) are excluded because they do not affect the system-level properties as directly as the three outlined above.
 The values of these parameters are kept constant throughout the experimentation performed for this thesis.
@@ -70,9 +70,9 @@ Two system-level properties are analyzed for this system:
 
 This metric is calculated as the average distance from each agent to its nearest neighbor.
 This calculation is an approximation to the true density, since it does not directly measure agents per patch.
-Approximating is necessary because determining the area that an individual flock covers is not trivial and sometimes subjective.
+Approximating is necessary because determining the area that an individual flock covers is not trivial and is sometimes subjective.
 In addition, a single instance could have several individual flocks, making this computation even more obscure.
-The distance to the average neighbor captures the information that density conveys: as the distance increases, the agents are more spread out, and thus the flock is less dense.
+The distance to the average neighbor captures the information that density conveys: as the distance increases, the agents are more spread out; thus the flock is less dense.
 
 \begin{figure}[ht]
 \centering
@@ -85,12 +85,12 @@ The distance to the average neighbor captures the information that density conve
 
 This metric is used to determine how much the agents in the ABM agree on the direction in which they are heading.
 Configurations with agents that flock smoothly in one direction have a very low \textit{stddev-heading} value.
-Meanwhile, more chaotic configurations have a relatively high \textit{stddev-heading} value, as is illustrated in Figure \ref{fig:swarmVSflock}.
+Meanwhile, more chaotic (or ``swarming") configurations have a relatively high \textit{stddev-heading} value, as is illustrated in Figure \ref{fig:swarmVSflock}.
 
 \end{itemize}
 
-The Flocking ABM has the role in testing \fw that it is less challenging than Wolf Sheep Predation, but more complex than Fires.
-The system-level properties change in a more monotonic and predictable manner than the other domains, but still remains sufficiently complex.
+The role of the Flocking ABM in testing \fw that it is less challenging than Wolf Sheep Predation, but more complex than Fires.
+The system-level properties change in a more monotonic and predictable manner than the other domains, but still remain sufficiently complex.
 The behaviors are not linear and the configuration space is three-dimensional, making this problem nontrivial. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -147,7 +147,7 @@ This parameter has a similar effect as \textit{average-condom-use}, as seen in F
 The other parameters---\textit{initial-people}, \textit{average-coupling-tendency} (chance a couple will form), and \textit{average-commitment} (how long a couple stays together)---are not used.
 I chose not to incorporate these in my experiments because they change the system-level behavior in a similar way to the two parameters that I do use.
 In addition, condom usage and test frequency may be more easily affected by public policy than coupling tendency and how long a couple are committed for.
-Testing these real-world hypotheses are something \fw could bse used for.
+Testing these real-world hypotheses are something \fw could be used for.
 
 The AIDS domain is used specifically to demonstrate the use of parametric models to describe system-level behaviors over time.
 For this domain, I will use \fw to model the plots of the populations, such as the ones in Figures \ref{fig:aids_condom} and \ref{fig:aids_test}.
@@ -278,7 +278,7 @@ The effect of changing this parameter from the stable norm is  shown in Figure \
 
    \item \textit{grass-regrowth-time} -- the number of time steps that a patch of grass takes to regrow.
 
-This is perhaps the strangest behaving configuration parameter.
+This is perhaps the configuration parameter with the strangest behavior.
 At higher values, not enough grass grows to sustain a large sheep population, which causes the wolves to go extinct.
 At lower values, sheep rarely ever die, until they become overpopulated and eat all the grass.
 At this point, there is a mass extinction, which typically causes the wolves to go extinct.

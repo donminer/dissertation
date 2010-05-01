@@ -22,6 +22,8 @@ Computation time is also an important factor in evaluating \fw.
 Interactions with the user need to be fast in order to make using \fw more convenient than manually inspecting the target ABM.
 The response time when a user interacts with \fw is the \textit{online} time and is far more important than the \textit{offline} time, the one-time computation requirement to learn the forward or reverse mapping.
 
+Statistical significance is measured with a Student's t-test and a p-value threshold of 0.001.
+
 
  \subsection{Forward Mapping}
 
@@ -30,7 +32,7 @@ Accuracy measures how closely the forward mapping represents the true behavior s
 To measure accuracy, I use the difference (error) $\varepsilon$ between the predictions for a system level property $\hat y$ that the forward mapping produces and the actual value $y$ for a sampled point: $\varepsilon = |\hat y - y|$.
 This measurement is performed many times for a single domain to produce the median error and the upper and lower quartiles of the errors.
 Median and quartile errors were used to visualize the distribution of the errors.
-The standard error metric was not used because the errors were not normally distributed and plotting with error bars gave misleading visualization.
+The standard error metric was not used because the errors were not normally distributed and plotting with error bars gave a misleading visualization.
 
 The errors are gathered by performing cross validation.
 Two subsets of data points are randomly pulled from the master set of samples to create a training set and a validation set.
@@ -41,7 +43,7 @@ The error is calculated for varying size data sets to show the relationship betw
 
   \subsubsection{Offline Computation Time}
 
-Offline computation time is the average amount of time that the forward mapping uses to train a model, measured as the elapsed clock time the pre-processing takes, given a training set.
+Offline computation time is the average amount of time that the forward mapping uses to train a model, measured as the elapsed time taken by the pre-processing.
 The models were trained on a computer using a 3.4GHz Pentium D.
 The size of the training set is varied to determine how forward mapping training time is affected by the training set size.
 Each forward mapping method is compared to the others.
@@ -52,7 +54,7 @@ Therefore, an approximation of the amount of time required to generate a trainin
 
   \subsubsection{Online Computation Time}
 
-Online computation time is the average amount of time \fw takes to return the results of a user-submitted query.
+Online computation time is the average amount of time that \fw takes to return the results of a user-submitted query.
 This is measured by performing a large number of queries and calculating the average run time.
 The size of the training set can affect the amount of time a query will take with some algorithms.
 In these cases, the size of the training set is varied to determine how query time correlates to training set size.
@@ -60,10 +62,10 @@ In these cases, the size of the training set is varied to determine how query ti
  \subsection{Reverse Mapping}
 
   \subsubsection{Accuracy vs. Forward Mapping}
-Accuracy of the reverse mapping is measured in two ways.
+The accuracy of the reverse mapping is measured in two ways.
 The first is how accurately the reverse mapping models the forward mapping.
 Recall that \fw solves the reverse mapping by building an invertible approximation of the forward mapping.
-This metric determines if this approach is doing what is expected to do.
+This metric determines whether this approach is doing what is expected to do.
 The effect that granularity has on this accuracy is also measured by learning the same mapping with increasingly higher granularity.
 
 \begin{figure}[ht]
@@ -75,8 +77,8 @@ The effect that granularity has on this accuracy is also measured by learning th
 
 The error is presented as an ``average worst-case scenario."
 The points of the reverse mapping space that are likely to have the highest error are those points that are the furthest from the corners of the simplex.
-An illustration of this point is presented in Figure \ref{fig:mosterror}.
-This point will have the highest error if the forward mapping is monotonically changing from one side of the simplex to the other (i.e., there are no local maxima or minima within the space).
+An illustration of this concept is presented in Figure \ref{fig:mosterror}.
+On average, this point will have the highest error if the forward mapping is monotonically changing from one side of the simplex to the other (i.e., there are no local maxima or minima within the space).
 Note that the reverse mapping value will be identical to the forward mapping prediction at the knots, since the forward mapping was used to infer their values.
 
 Calculating the approximate upper bound on error, within a simplex, involves interpolating the system-level property value at the simplex midpoints.
@@ -129,14 +131,14 @@ For the experiments in this chapter, the three algorithms described in Chapter \
  \item k-nearest neighbor (KNN):
   \begin{itemize}
    \item Custom implementation with Python.
-   \item 10-fold cross validation is used to determine the best $k$ out of a set of user-specified $k$ values.
+   \item 10-fold cross validation is used to determine the best $k$ out of a set of user-specified\footnote{For the experiments presented in this chapter, the possible values for $k$ were 5, 7, and 13.} $k$ values.
   \end{itemize}
 
  \item robust locally weighted regression and smoothing scatterplots (LOESS)
   \begin{itemize}
    \item Custom implementation with Python.
    \item A good window is selected manually for each domain. Changing this configuration parameter per sample size does not affect accuracy, as it does with kNN.
-   \item Performs one smoothing operation. I found that increasing the number of smoothing operations beyond one provided limited improvement in accuracy and occasionally worsen accuracy. Finding an optimal smoothing with cross validation, per training set, would be computationally expensive.
+   \item Performs one smoothing operation. I found that increasing the number of smoothing operations beyond one provided limited improvement in accuracy and in some cases worsened accuracy. Finding an optimal smoothing with cross validation, per training set, would be computationally expensive.
   \end{itemize}
 
  \item nonlinear regression (NLR)
@@ -181,7 +183,7 @@ The error bars show the 95\% confidence interval around the mean.}
 Different training data set sizes, ranging from 20 to 200 (with a step size of 20), were used to measure the amount of computation time that the forward mapping requires to train a model.
 Each of the three regressions were retrained twenty times per training data set size.
 The results are plotted in Figure \ref{fig:firefmtraining}.
-This plot shows that kNN grows faster than the other two approaches with increasing data set sizes.
+This plot shows that the time required by kNN grows faster than the other two approaches with increasing data set sizes.
 This increase occurs because the 10-fold cross validation for selecting $k$ requires a significant amount of time.
 Meanwhile, LOESS grows at a linear rate.
 The training time for NLR is insignificant in comparison to the other approaches.
@@ -211,13 +213,13 @@ For each of these trained models, 2500 points from a validation set were used to
 The configuration of each validation instance was passed into the forward mapping to retrieve a predicted value.
 This predicted value was then compared to the sampled value from the validation instance to produce an error value.
 
-The accuracy of the forward mapping is very high, for all three approaches: all three approaches predict the amount of trees burned down with an error of less than 1\%.
-The median error, along with the upper quartile and lower quartile are plotted in Figure \ref{fig:fmacc}.
+The accuracy of the forward mapping is very high, for all three approaches: they each predict the amount of trees burned down with an error of less than 1\%.
+The median error, along with the upper quartile and lower quartile, are plotted in Figure \ref{fig:fmacc}.
 
-Both KNN and LOESS perform better with more data points, however with a sample size greater than 80, the accuracy is not affected very much.
-Overall, KNN had a lower median error than LOESS, but not by a statistically significant amount\footnote{Put some information on the t-test here.}.
-NLR performed significantly worse than the other two approaches and experienced more variance in its errors.
-Interestingly, the accuracy of NLR only improved slightly from a data sample size of 20 to a data sample size of 200.
+Both KNN and LOESS perform better with more data points; however, with a sample size greater than 80, the accuracy is not affected very much.
+Overall, KNN had a lower median error than LOESS.
+NLR performed significantly (with $p < 0.001$) worse than the other two approaches and experienced more variance in its errors.
+Interestingly, the accuracy of NLR only slightly improved from a data sample size of 20 to a data sample size of 200.
 Since NLR is a parametric approach, the optimal model for a small number of points will be very similar to the optimal model for a large number of points from the same distribution.
 Meanwhile, locally weighted nonparametric approaches have the ability to fit sections of the behavior space more closely as more points are provided.
 This tradeoff is demonstrated in the accuracy results.
@@ -270,16 +272,16 @@ With a granularity of 25, the training time was just under a quarter of a second
 \centering
 \includegraphics[scale=.5]{images/results_fires/rmaccfm.png}
 \caption{The median distance from the suggested tree density (0-100) to the one predicted by the forward mapping.
-The error bars show the upper and lower quartile of errors measured.}
+The error bars show the upper and lower quartiles of errors measured.}
 \label{fig:rmaccfm}
 \end{figure}
 
 The reverse mapping accuracy is measured in two ways.
-First, the median error of the reverse mapping with respect to the predicted values of the forward mapping are measured.
+First, the median error of the reverse mapping with respect to the predicted values of the forward mapping is measured.
 Also, the granularity is varied to determine its effect on accuracy.
 This metric is measured by taking each simplex in the reverse mapping and selecting the furthest point from the corners.
-Each of these points are then passed to the forward mapping to provide a prediction, which is then compared to the interpolated value within the simplex.
-The difference between these two denote the error of the values within the simplex, with respect to the forward mapping it is approximating. 
+Each of these points is then passed to the forward mapping to provide a prediction, which is then compared to the interpolated value within the simplex.
+The difference between these two corresponds to the error of the values within the simplex, with respect to the forward mapping it is approximating. 
 
 Figure \ref{fig:rmaccfm} shows the effect of granularity on median error.
 The error decreases with higher granularity, eventually approaching a median error of .01\% of trees burned down for about half of the queries.
@@ -300,7 +302,7 @@ Each of the 2500 instances from the validation set were used for each of the rev
 
 The results in Figure \ref{fig:rmaccabm} show that the median error remains fairly constant, regardless of granularity.
 The reason for this is that the error incurred by the approximation of the forward mapping is insignificant in comparison to the error of kNN.
-Since the same kNN forward mapping was used for all granularities, the error incurred by the reverse mapping is not noticeable or statistically significant.
+Since the same kNN forward mapping was used for all granularities, the error incurred by the reverse mapping is relatively very small.
 
 
 \subsubsection{Reverse Mapping Query Time}
@@ -324,12 +326,12 @@ The average query time increased linearly with the granularity because each addi
   \subsubsection{Accuracy}
 
 The accuracy of the forward mapping was measured in the three remaining domains (Flocking, AIDS, and Wolf Sheep Predation).
-In all domains, both k-nearest neighbor and LOESS significantly\footnote{[outline of statistical significance of kNN vs. LOESS for each domain here]} outperformed the baseline of predicting the mean value of each system-level property values.
+In all domains, both k-nearest neighbor and LOESS significantly (with $p < 0.001$) outperformed the baseline of predicting the mean value of each system-level property values.
 Also, all of the experiments demonstrate that, in general, accuracy increases as data set size increases.
 However, the decrease in error from increasing data set size is not a linear relationship: the benefits of larger datasets lessen as the size increases.
 
-In general, kNN performed significantly\footnote{[outline of statistical significance for each domain here]} better than LOESS.
-Non-linear regression has been omitted from these experiments for the reason that it is difficult to determine a suitable base-model and initial guess for a multi-dimensional space.
+In general, kNN performed significantly (with $p < 0.001$) better than LOESS.
+Non-linear regression has been omitted from these experiments because it is difficult to determine a suitable base-model and initial guess for a multi-dimensional space.
 
 \begin{figure}[ht]
 \centering
@@ -341,9 +343,9 @@ The error bars show the upper and lower quartile of the errors, over all trials.
 \end{figure}
 
 Both LOESS and kNN were tested for training a forward mapping to predict the standard deviation of heading in the Flocking ABM.
-A forward mapping was trained fifteen times for each data set of a given size, each being queried one thousand times.
-Plots showing the relationship between data set size and median error are shown in Figure \ref{fig:flockfmacc}. 
-KNN outperformed LOESS, but not significantly, eventually approaching a median error of .05 with a training set size of 325.
+A forward mapping was trained fifteen times for each data set of a given size, each being queried 1,000 times.
+The relationship between data set size and median error is shown in Figure \ref{fig:flockfmacc}. 
+KNN outperformed LOESS, but only slightly, eventually approaching a median error of .05 with a training set size of 325.
 LOESS approached an error of .06 with the same training set size.
 These error values are linearly scaled such that the maximum standard deviation witnessed is 1.0 and the minimum standard deviation witnessed is 0.0.
 The baseline is not shown in these graphs because it is not within the $y$-range of the plot: on average, predicting the mean value had an error of .306, over all 4000 data set instances.
@@ -383,11 +385,11 @@ Predicting the mean population value yields an error of .106 and .17 for sheep a
 
 The next round of experiments tested the effectiveness of the forward mapping approach in predicting four properties of the Wolf Sheep Predation domain: the average sheep population, the average wolf population, the sheep population variance, and wolf extinction.
 A forward mapping was trained eight times for each data set of the same size, each being queried 200 times.
-The forward mappings significantly\footnote{[outline of statistical significance for each domain here]}outperformed simply predicting the mean value in all four cases, with sufficient training sets.
+The forward mappings significantly (with $p < 0.001$) outperformed simply predicting the mean value in all four cases, with sufficient training sets.
 
 The median errors for the wolf population and the sheep population are shown in Figure \ref{fig:wolfsheeppop}.
 As the training set size approached 400, the error for the sheep population forward mapping approached 2\% of the range of values in the data set, which is five times more accurate than predicting the mean.
-The forward mapping for the wolf population was more difficult to learn, which is evident from the baseline of .17 being significantly higher than the baseline for the sheep population prediction.
+The forward mapping for the wolf population was more difficult to learn, which is evident from the baseline of .17 being significantly higher (with $p < 0.001$) than the baseline for the sheep population prediction.
 The median error for the wolf population forward mapping approaches 4\% of the range of values in the data set, which is 4.25 times more accurate than predicting the mean.
 
 \begin{figure}[ht]
@@ -416,8 +418,8 @@ This property is different from the others, since it is a binary property: eithe
 The forward mapping solution predicts the probability that the wolves go extinct, so the errors shown in Figure \ref{fig:wolfsheepextinct} do not quite have the same meaning as the other plots.
 The data in the training set is either labeled as wolves having gone extinct or not.
 Therefore, a prediction of .9 would yield an error of .1 if the wolves went extinct, and an error of .9 if they did not.
-From the plot in Figure \ref{fig:wolfsheepextinct}, we can see that a forward mapping can be used to predict whether the wolves will go extinct correctly the majority of the time (at least 75\%).
-Also, with a data set size of 400, the forward mapping is significantly\footnote{[outline of statistical significance for each domain here]} moe accurate than the baseline.
+Figure \ref{fig:wolfsheepextinct} shows that a forward mapping can be used to predict whether the wolves will go extinct correctly the majority of the time (at least 75\%).
+Also, with a data set size of 400, the forward mapping is significantly (with $p < 0.001$) more accurate than the baseline.
 
 In conclusion, the \fw approach of solving the forward-mapping problem is sufficiently accurate in predicting system-level behavior in these domains.
 
@@ -503,7 +505,7 @@ Naturally, problems with more system-level properties will require more time.
 
   \subsubsection{Accuracy vs. Forward Mapping}
 
-The accuracy of the reverse mapping is measured as how well it approximates the forward mapping.
+The accuracy of the reverse mapping is measured by how well it approximates the forward mapping.
 To measure this error, for each simplex in the reverse mapping, the center point of the simplex has its system-level property values predicted with the forward mapping, and with the average of the values at the corners.
 The values at the knots have no error, since they were generated by the forward mapping.
 Therefore, the points furthest away from these corners are most likely to have the greatest error.
@@ -549,13 +551,13 @@ The error bars show the 95\% confidence interval around the mean.}
 
 
 
-The process of training the reverse mapping involves querying the forward mapping to generate the knots and then building the simplical complex from these knots.
+The process of training the reverse mapping involves querying the forward mapping to generate the knots and then building the simplicial complex from these knots.
 Figure \ref{fig:farmtraining} shows the training time, as a function of granularity, for the Flocking and AIDS domains.
 At a granularity of 40, the reverse mappings required approximately 9 seconds and 225 seconds, respectively, for the AIDS domain and the Flocking domain.
 
 For both the AIDS and Flocking domains, the required amount of time to train is acceptable, since it is computed offline.
 However, there is a very large difference for the same granularity, given just one dimension difference in the configuration space (AIDS has two configuration parameters, while Flocking has three).
-Unfortunately, the training time and memory is exponential in respect to the dimensionality.
+Unfortunately, the training time and memory is exponential with respect to the dimensionality.
 Since each dimension is split by the granularity $g$ times, there are a total of $2 g^d$ simplexes, where $d$ is the dimensionality of the configuration space.
 The coefficient of ``2" comes from the fact that each grid location is split into two simplexes.
 Therefore, the memory required and the computation time required grow exponentially as the dimensionality increases.
@@ -596,7 +598,7 @@ The forward mapping is an accurate and fast tool for predicting real-valued syst
 
 The reverse mapping solutions generated by \fw model the forward mapping accurately.
 However, the computational and space complexity grow quickly with dimensionality, which make this approach intractable for highly-dimensional domains.
-For the one-, two-, and three-dimensional configuration spaces presented in the results, granularities of forty produced accurate results within a reasonable amount of time.
+For the one-, two-, and three-dimensional configuration spaces presented in the results, granularities of 40 produced accurate results within a reasonable amount of time.
 
 
 

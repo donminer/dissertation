@@ -11,7 +11,7 @@ These properties are typically non-explicit, and dependent in complex ways on th
 % Discuss how system-level properties are identified
 % Discuss how system-level properties are mathematically defined
 Identifying which system-level properties of an ABM to analyze is the first step of using the \framework.
-Deciding which features should be measured is a task for the user of the framework and will be influenced by what that user finds interesting or what that user needs to analyzed.
+Deciding which features should be measured is a task for the user of the framework and will be influenced by what that user finds interesting or what that user needs to analyze.
 Each system-level parameter is defined as a mathematical measurement of the behavior in terms of observable features of the ABM.
 For example, the average number of sheep in the Wolf Sheep Predation model is a system-level property of the system that is calculated by averaging the number of sheep measured in each time step over the lifetime of the system.
 The framework utilizes the user-provided mathematical definition to create a data set that is used in the forward mapping.
@@ -35,7 +35,7 @@ Understanding this assumption and its consequences is important in defining syst
 % Explain what stable means
 %  the sampling error is normally distributed 
 % For example, the percentage of trees burned down
-\fw assumes that the naturally occurring error for sampled values of a system-level property must have the following feature: the expected mean and expected median of the behaviors should be identical.
+\fw assumes that the naturally occurring error for sampled values of a system-level property must have the following feature: the expected mean and expected median of the behaviors should be approximately the same.
 In other words, the errors should be expected to be evenly distributed around some value $\bar y$, in  both magnitude and quantity.
 Errors following a normal distribution will have this property.
 For example, the percentage of trees burned down in the Fires\footnote{The Fires model is discussed in more detail in Section \ref{sec:Fires}.} model will vary from run to run, but for the most part will be centered around one value for a particular configuration.
@@ -59,11 +59,11 @@ Unfortunately, this average is not useful in any way, since it does not tell how
 %% It will show a large number of wolf populations at zero and then a bell-curve like structure near the true value.
 %% Show the median and the mean
 
-To remedy this problem, the population measure can be decomposed into two components: the average populations in the case where the wolves become extinct and the case when they do not.
+To remedy this problem, the population measure can be decomposed into two components: the average populations in the case where the wolves become extinct and in the case when they do not.
 The average number of wolves $\bar w$ can be then be posed as:
 \[\bar w = \mathrm{P}(extinct) * (\bar w | extinct) + (1 - \mathrm{P}(extinct)) * (\bar w | \neg extinct) \]
 where $extinct$ is true when the wolves became extinct, $\mathrm{P}(extinct)$ is the probability that the wolves become extinct, and $(\bar w | \neg extinct)$ is the average number of wolves, given that they do not become extinct.
-The value of $(\bar w | extinct)$ is zero, so the left hand side of the above equation is zero.
+The value of $(\bar w | extinct)$ is zero, so the left-hand side of the above equation is zero.
 Therefore, the equation can be simplified to:
 \[\bar w = (1 - \mathrm{P}(extinct)) * (\bar w | \neg extinct) \]
 
@@ -89,7 +89,7 @@ These two values explain the the behavior of this particular Wolf Sheep Predatio
 \begin{figure}[ht]
 \centering
 \includegraphics{images/num_wolves.pdf}
-\caption{A histogram of the number of wolves after many successive runs shows that the average number of wolves is a poor measure the system behavior.}
+\caption{A histogram of the number of wolves after many successive runs shows that the average number of wolves is a poor measure of the system behavior.}
 \label{fig:num_wolves}
 \end{figure}
 
@@ -98,9 +98,9 @@ These two values explain the the behavior of this particular Wolf Sheep Predatio
 In many situations, non-stable system-level properties are the result of some sort of \textit{threshold effect}.
 Threshold effects are sudden changes in behavior, given a small change in the configuration.
 Threshold effects are also sometimes referred to as \textit{tipping points}.
-In ABMs that incorporate random behavior, configurations that are on a boundary of a threshold effect can exhibit erratic behavior,as in the Wolf Sheep Predation example.
+In ABMs that incorporate random behavior, configurations that are on a boundary of a threshold effect can exhibit erratic behavior, as in the Wolf Sheep Predation example.
 Typically, this problem can be overcome by decomposing the property into several sub-properties that describe the threshold effect. 
-This approach is what was needed to provide useful and accurate information in the Wolf Sheep Predation example.
+This approach provides useful and accurate information in the Wolf Sheep Predation example.
 
 \section{Common Classes of System-Level Properties}
 
@@ -111,7 +111,7 @@ Through the course of identifying a number of system-level properties in a varie
 \subsection{Average of a Value}
 % average value over the life of a system
 One of the simplest measurements is the average value of a property over the life of the system, which is useful for measuring behavior that converges over time.
-To measure this property, the property is measured every time step up until a predetermined stopping point, and then averaged.
+To measure this property, the property is measured every at time step until a predetermined stopping point, and then averaged.
 
 \begin{figure}[ht]
 \centering
@@ -125,13 +125,13 @@ A few modifications to this simple approach are possible.
 First, the recording of values can be delayed for a number of time steps to allow the system to converge.
 If convergence is ignored, the values recorded before convergence may bias the results in an unexpected way.
 To remedy this, only the points post-convergence are used for the average.
-The next step is to determine what this ``post-convergence" happens.
-The simplest method is to determine a duration of time in which most model will have converged.
+The next step is to determine when this ``post-convergence" happens.
+The simplest method is to determine a duration of timeaftern which the model will usually have converged.
 Another naive method is to just sample for a very long time.
 As time passes, the average will converge to the convergent value, since more values representing the convergent behavior will factor into the average.
-A more advanced technique would be to detect when the system values have stopped changing significantly and start measuring from there.
+A more advanced technique would be to detect when the system values have stopped changing significantly and start measuring at that point.
 
-In Figure \ref{fig:traffic_converge} (a plot from the NetLogo Traffic Basic ABM), the maximum speed and minimum speed of the vehicles converge to .65 and 0, respectively.
+In Figure \ref{fig:traffic_converge} (a plot from the NetLogo Traffic Basic ABM), the maximum and minimum speeds of the vehicles converge to .65 and 0, respectively.
 However, before time step 650, the behavior was quite different than the eventual convergent behavior.
 If each time step (0 to 1250) were averaged, the maximum speed value would be biased to be larger than .65.
 This number has some meaning, but not the ``average top speed" that was expected.
@@ -139,8 +139,8 @@ The average should be comprised of values after time step 650 to match the actua
 
 This class of measurement should not be used on properties that diverge (i.e., fail to converge on a single value over time).
 In divergent cases, the average will continue to increase or decrease as more time steps are used in the measurement.
-Instead, the average value should converges as more time steps are measured.
-The value produced by the forward and reverse mappings will be inaccurate and meaningless if this property does not hold because the value would be dependent on how many time steps the system was sampled, and would have very little to do with the value of the behavior itself.
+Instead, the average value should converge as more time steps are measured.
+The values produced by the forward and reverse mappings will be inaccurate and meaningless if this property does not hold because the value would be dependent on how many time steps the system was sampled, and would have very little to do with the value of the behavior itself.
 
 \subsection{Variance of a Value}
 % variance of a value over the life of a system
@@ -157,7 +157,7 @@ Figure \ref{fig:variance_compare} shows a comparison between two situations in w
 
 Similar to averaging system-level properties over time, only values after convergence should be used to calculate the variance.
 This must be done to avoid biasing the variance of the behavior after it has converged.
-Taking this problem into consideration is particularly important in this for the variance metric because systems' behaviors typically vary significantly before convergence.
+Taking this problem into consideration is important for the variance metric because systems' behaviors typically vary significantly before convergence.
 
 Also similar to the average value metric, this variance metric should not be used on behaviors that diverge.
 As a divergent property value continues to increase or decrease, the variance will increase.
@@ -194,11 +194,11 @@ The framework works only with scalar values and is unable to naturally predict h
 % therefore, it may seem that it is impossible to measure behaviors over time, since these properties change.
 % With a change of perspective, this is possible.
 % to measure a system-level behavior that changes over time, the system-level properties used by \fw are scalars that represent this behavior in a parametric model.
-To circumvent this issue, the system-level properties could be parameters of a parametric model that represents a behavior that changes over time.
+To circumvent this issue, the system-level properties can be parameters of a parametric model that represents a behavior that changes over time.
 Predicting each behavior is essentially a nonlinear regression problem, in which the independent variable is time and the dependent variable is the property.
 
 % The parameters are the system-level properties are learned in the forward mapping process and can be used to predict the parameters of the model.
-The parameters of the behavior's parametric model are learned in the forward mapping process as individual prediction problems: $N$ different forward mappings will be learned for each of the $N$ parameters.
+The parameters of the behavior's parametric model are learned in the forward mapping process as individual prediction problems: $N$ different forward mappings will be learned, one for each of the $N$ parameters.
 The value for each parameter is predicted by the corresponding mapping, given the system's agent-level configuration.
 These predicted parameters can be plugged into the parametric model to generate a curve that represents the behavior over time.
 
@@ -241,7 +241,7 @@ With these observations, the information necessary create a wave-like parametric
 \end{itemize}
 The behavior within each period is linear, so it can be described as a simple linear model:
    \[speed(t) = \displaystyle \frac{A}{T} ~{} t + h.\]
-Since this behavior is periodic, modulus $T$ is used to reset the behavior back to the minimum spread.
+Since this behavior is periodic, modulus $T$ is used to reset the behavior back to the minimum spread:
    \[speed(t) = \displaystyle \frac{A}{T} ~{} (t~{}\mathrm{mod}~{} T) + h. \]
 The forward-mapping problem would involve predicting values for $A, T,$ and $h$, given the configuration of the system.
 For each experiment, nonlinear regression is used to find good values for $A, T,$ and $h$, which are recorded as the dependent variables.
@@ -254,7 +254,7 @@ The sampling process may begin once the system-level properties are defined.
 %  1. Retrieve raw data from the simulation
 %  2. Compute on that data to generate the properties of interest
 The \fw sampling process consists of two major steps:
-(1) retrieve raw data (i.e., observed agent behaviors each time step) from the simulation; and (2) use that data to compute the values of the system-level properties (e.g., average and variance of specific behaviors).
+(1) retrieve raw data (i.e., observed agent behaviors at each time step) from the simulation; and (2) use that data to compute the values of the system-level properties (e.g., average and variance of specific behaviors).
 Instead of performing the calculations while sampling, I prefer a method of computing the actual statistics from a raw data set.
 This process permits new statistics to be measured using the raw data at a later point in time without having to re-sample the system.
 
@@ -262,9 +262,9 @@ This process permits new statistics to be measured using the raw data at a later
 The \fw uses an evenly distributed random sampling technique.
 Ranges for parameters are passed to the sampling program and random values within these ranges are generated for each experimental configuration.
 %  this is useful for changing the size of the dataset dynamically
-This technique is flexible because it allows the side of the data set to be changed dynamically for testing purposes.
+This technique is flexible because it allows the size of the data set to be changed dynamically for testing purposes.
 Also, new points can be sampled to increase the accuracy of the data set in a particular area.
-The initial regression algorithms I have selected to assume \fw  work with randomly distributed data.
+The regression algorithms used with \fw assume randomly distributed data.
 % More advanced sampling techniques could be used in the future.
 More advanced sampling techniques could be used in future work.
 
@@ -299,7 +299,7 @@ The sampling process consists of four distinct steps:
 %  the sampling program is given the ranges that are to be sampled,
 %  and the data values that are needed
 The sampling program is written in Java so that it can interface with NetLogo's Java API, which is used to run the ABMs.
-All of the user provided information is passed to this program in a text configuration file.
+All of the user-provided information is passed to this program in a text configuration file.
 A program that generates values in an identical format to the default sampling program could replace the default sampling program.
 Replacing the default sampling program would be useful for taking more control of the sampling process; for instance, to implement an advanced sampling strategy.
 

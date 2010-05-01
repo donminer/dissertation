@@ -15,24 +15,24 @@ For this reason, \fw strives to return the \textit{space of configurations} that
 This general method of developing a reverse mapping can be contrasted with optimization methods (see Section \ref{sec:invfm}).
 Finding a set of configuration parameters that satisfies a system-level property, by definition, is an optimization problem.
 However, instead of a single point being returned as in most optimization methods, a reverse mapping returns the space of all points that would satisfy the configuration.
-This has a number of benefits, such as being able to visualize and inspect the entire solution space.
+This approach has a number of benefits, such as being able to visualize and inspect the entire solution space.
 Analysis of how the solution space changes with respect to the configuration parameters can be performed.
 Different solutions that produce similar results can be selected from a number of good solutions based on some exterior preference on configurations.
 That is, although all points in a solution space should be satisfactory, some points may be more desirable for a number of reasons, such as points with lower expected variance.
 
-In this chapter, I give details of how \fw provides two solutions to this problem, in general, then discusses actual implementations of the solutions.
-Throughout this chapter, I use the NetLogo Fires ABM\footnote{More on the Fires model is discussed in Section \ref{sec:Fires}.} as an example.
+In this chapter, I give details of how \fw provides one solutions to this problem then discusses actual implementations of the solution.
+Throughout this chapter, I use the NetLogo Fires ABM\footnote{Details of the Fires model is discussed in Section \ref{sec:Fires}.} as an example.
 The Fires domain is simple and has solution spaces that are easy to visualize.
 Other domains, such as Wolf Sheep Predation, have too many dimensions to make graphing feasible.
 The arguments made with the aid of the Fires domain scale to larger dimensions.
 
 
 
-\section{\fw Approach: Simplical Complex Inversion}
-The first \fw reverse-mapping approach is a novel approach I developed, named \textit{Simplical Complex Inversion} (SCI).
-A simplical complex is a set of adjacent simplexes (multi-dimensional triangles) that together segregate a space.
-In abstract terms, SCI builds an invertible approximation of the forward mapping in the form of a simplical complex.
-This apprach is used because regression is not easily invertible.
+\section{\fw Approach: simplicial Complex Inversion}
+The first \fw reverse-mapping approach is a novel approach I developed, named \textit{simplicial Complex Inversion} (SCI).
+A simplicial complex is a set of adjacent simplexes (multi-dimensional triangles) that partition the space.
+In abstract terms, SCI builds an invertible approximation of the forward mapping in the form of a simplicial complex.
+This approach is used because regression is not easily invertible.
 I have found that inverting even the simplest approaches such as K-nearest neighbor and LOESS are either difficult to implement or computationally expensive (Section \ref{sec:functional}).
 By approximating a representation of the forward mapping that is invertible, solving the reverse-mapping problem becomes computationally tractable.
 These direct inversion approaches are generally not preferred over SCI, since they are dependent on the forward mapping approach used and SCI is applicable to any forward-mapping technique.
@@ -51,19 +51,19 @@ Since each solution space represents which configurations satisfy a particular s
 \[ \hat{\mathbf S} = \hat S_0 \cap \hat S_1 \cap \ldots \cap \hat S_{|\mathbf S|}.\]
 All points at the intersection of these spaces should satisfy all system-level properties at once.
 
-Simplical Complex Inversion has three phases.
-First, regression is used to infer the system-level property values for several ``knots"\footnote{The term ``knot" is taken from Multilinear Interpolation\cite{davies1997multidimensional} (section \ref{sec:multilinear}).} in the configuration space.
+simplicial Complex Inversion has three phases.
+First, regression is used to infer the system-level property values for several ``knots"\footnote{The term ``knot" is taken from Multilinear Interpolation \cite{davies1997multidimensional} (section \ref{sec:multilinear}).} in the configuration space.
 The locations of these knots are used to segregate the configuration space into a number of simplexes.
-This segregated configuration space is referred to as a \textit{simplical complex} \cite{munkres1993simplicial}.
+This segregated configuration space is referred to as a \textit{simplicial complex} \cite{munkres1993simplicial}.
 Next, the intersection between each of these simplexes and a plane representing the target system-level property is found.
 That is, SCI derives the equation of the hyperplane through each simplex that satisfies the target system-level property.
-A piecewise linear represention the configurations that would satisfy the target system-level property is pieced together from all the intersections.
+A piecewise linear represention of the configurations that would satisfy the target system-level property is constructed from all the intersections.
 Figure \ref{fig:ISFlow} illustrates the SCI process; the rest of this subsection dscusses these steps in detail.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=1]{images/ISflow.pdf}
-\caption{The flow of stages in the Simplical Complex Inversion approach to the reverse-mapping problem in a two-dimensional configuration space.}
+\caption{The flow of stages in the simplicial Complex Inversion approach to the reverse-mapping problem in a two-dimensional configuration space.}
 \label{fig:ISFlow}
 \end{figure}
 
@@ -106,9 +106,9 @@ An inferred system-level property value is returned.
 Each data knot in an $n$-dimensional\footnote{$n$ refers to the dimensionality of the configuration space for the rest of this chapter.}  configuration space is represented by a vector of configuration space parameter values ($\mathbf x$) and the system-level property value ($y$):
 \[<x_1, x_2, ..., x_n, y>.\]
 
-The configuration space is then segregated with Delaunay triangulation\cite{delaunay1934sphere} into adjacent simplexes (simplical complex).
+The configuration space is then segregated with Delaunay triangulation \cite{delaunay1934sphere} into adjacent simplexes (simplicial complex).
 These simplexes have $n + 1$ corners (e.g., they are triangles if $n=2$ and lines if $n=1$) and spans $(n+1)$-dimensional space.
-Note that the behavior space resides in $(n+1)$-dimensional space, but the simplexes are $n$-dimensional objects (e.g., a tetrahedron in four-dimensional space if $n=3$ space or a line segment in two-dimensional space if $n=1$).
+Note that the behavior space resides in $(n+1)$-dimensional space, but the simplexes are $n$-dimensional objects (e.g., a tetrahedron in four-dimensional space if $n=3$ or a line segment in two-dimensional space if $n=1$).
 This is because the system-level property $y$ is not taken into consideration for the the Delaunay triangulation.
 The relationships between these objects' dimensionality and different dimensional configuration spaces are outlined in Table \ref{table:dims}.
 For example, in the Fires ABM (1-dimensional configuration space), the space is segregated into line segments that reside in two-dimensional space.
@@ -149,7 +149,7 @@ If a point is within all the facets and lies on the hyperplane, the point is on 
 For example, in the Fires ABM, the two points defining a line segment reside on a line that extends infinitely in both directions.
 Meanwhile, the facets are defined by the points individually.
 If a behavior space point lies on the line and resides between the two facet points, the point is a plausible configration that would generate the desired system-level behavior.
-This explanation expands to two-dimensional configuration spaces, which has triangles as simplexes and line as facets.
+This explanation expands to two-dimensional configuration spaces, which have triangles as simplexes and line as facets.
 If a point lies on the plane defined by the the points, and is within the boundaries of the line segment facets, the point is realistic.
 
 
@@ -168,10 +168,10 @@ The process to find the intersection between the system-level property hyperplan
 \begin{enumerate}
    \item Pair off each corner with every other corner, in every possible combination. These point pairs define the edges of the simplex.
    \item Determine which edges intersect with the hyperplane. An edge intersects with the hyperplane if the target system-level property value  is between the $y$-values for the two points that define the edge. From the intermediate-value theorem, the plane must intersect with this line segment at some point, at least once.
-   \item Use linear interpolation to determine at which point on the edge line segment the intersection occurs.
+   \item Use linear interpolation to determine at which point on the edge line segment on which the intersection occurs.
 For example, suppose that the corners have $y$-values of 2 and 4 and the target system-level property value is 3.
 The location of the intersection is halfway between the corners.
-   \item The set of all edge intersection points lie on the hyperplane that intersects the simplex. Use these points to define the intersecting hyperplane.
+   \item The set of all edge intersection points lies on the hyperplane that intersects the simplex. Use these points to define the intersecting hyperplane.
 \end{enumerate}
 This approach circumvents the need for modeling the actual simplexes as equations, which can be challenging to implement.
 Two illustrative examples of this intersection method are shown in Figure \ref{fig:simint}.
@@ -179,12 +179,12 @@ In the example on the right-hand side in Figure \ref{fig:simint}, the two-dimens
 However, only three of these points are needed to define the plane because the fourth point is coplanar and thus redundant.
 This illustrates the fact that not every edge has to be checked for intersection, only enough points to define the intersecting hyperplane.
 Since the intersecting hyperplane is $(n-1)$D, $n$ points are needed.
-SCI uses the following standard representation for a plane, where $\mathbf C$ is a vector of constants and $\mathbf x$ is the vector of configuration parameters and system-level property:
+SCI uses the following standard representation for a plane, where $\mathbf C$ is a vector of constants and $\mathbf x$ is the vector of configuration parameters and system-level properties:
 \[\mathbf C \cdot \mathbf x + D = 0\]
 \[C_0 x_0 + C_1 x_0 + ... + C_n x_n + C_{n+1} x_{n+1} + D = 0. \]
 
 This approach is very general and will work in most cases; however, when the plane intersects with either a corner point or an edge only, no plane can be defined because not enough non-colinear points can be found.
-To circumvent this problem, SCI considers the boundaries of the simplex as not part of the simplex.
+To circumvent this problem, SCI considers the boundaries of the simplex not to be part of the simplex.
 Thus, a point that intersects with only the corner or an edge will not be considered in the final piecewise intersection.
 
 \subsection{Recombination of Solution Spaces}
@@ -228,7 +228,7 @@ x_{n+1} \end{array} \right] = \mathbf 0
 \] 
 To solve this system of equations, SCI reduces the coefficient matrix to reduced row echelon form (RREF).
 What remains is a system of reduced linear equations that are more concise in defining the intersection.
-From the check performed as the first step, any intersectios returned by the solution of this system of equations is guaranteed to be within the simplex.
+From the check performed as the first step, any intersections returned by the solution of this system of equations is guaranteed to be within the simplex.
 
 
 The RREF can reveal that the system is either overspecified or underspecified.
@@ -237,7 +237,7 @@ A system of equations is overspecified if there is a row in RREF that is all zer
 This row translates to $0 = D$, which is not true.
 That is, there is no possible configuration of $\mathbf x$ that will satisfy this specific equation.
 Thus, the set of system-level properties the user has provided is not able to be created with this ABM.
-This is typical if the user has specified too many requirements of the system-level properties.
+This situation is typical if the user has specified too many requirements of the system-level properties.
 In this case, the user should remove some less important system-level property requirements and allow the system to suggest values for them.
 
 RREF reveals that the system is underspecified if there are any rows with multiple non-zero values in it, other than $D$. For example, consider the row pulled from a matrix in RREF:
@@ -261,18 +261,18 @@ Individual simplexes may be separated into several subsimplexes.
 These new simplexes are composed of the original simplex's corners, in addition to new corners.
 The new corners have their system-level property value inferred from the forward mapping.
 Once these new simplexes have been formed, nothing special has to be performed to accommodate them in the general SCI algorithm.
-In addition, even if the granularity has been increased for a specific query, the finer grained simplexes can remain to increase the accuracy of future queries.
+In addition, even if the granularity has been increased for a specific query, the finer-grained simplexes can remain to increase the accuracy of future queries.
 
 Dynamic adjustment of the granularity process can be performed automatically to increase the accuracy of simplexes that contain significant amounts of variability between the system-level property values at the corners.
 Increasing the granularity will reduce the variance, since points closer to one another will have increasingly similar values.
 
 The effect of the granularity on accuracy is dependent on the nature of the forward-mapping regression method used.
-If the forward-mapping produces overfit or otherwise inaccurate predictions, the reverse-mapping produces will be inaccurate as well.
+If the forward-mapping produces overfit or otherwise inaccurate predictions, the predictions that the reverse mapping produce will be inaccurate as well.
 This difficulty should be dealt with in the forward-mapping solving step, not the reverse-mapping solving step.
 This is because the purpose of SCI is to model the forward-mapping, not the domain.
 
 An empirical analysis of the relationship between granularity and accuracy is provided in Chapter \ref{Results}.
-The accuracy is measured as the approximate total difference between the continuous forward-mapping function and the continuous simplical complex.
+The accuracy is measured as the approximate total difference between the continuous forward-mapping function and the continuous simplicial complex.
 In addition, suggestions made from SCI are validated against an actual system run of the target ABM.
 The error between the desired system-level property values and the actual system-level property values are measured.
 This measurement is redundant, since the error between the actual run and the reverse-mapping solution should be the sum of the forward mapping error and the reverse mapping error (in respect to the forward mapping).
@@ -282,7 +282,7 @@ This measurement is redundant, since the error between the actual run and the re
 
 Figure \ref{fig:rii} illustrates the progression of SCI from step to step when used for the Fires ABM.
 First, the forward-mapping problem is solved, with any regression method.
-Then, the knots are formed in evenly spaced intervals: in this case intervals of 1\% tree density (see top right image in Figure \ref{fig:rii}).
+Then, the knots are formed in evenly spaced intervals: in this case, intervals of 1\% tree density (see top right image in Figure \ref{fig:rii}).
 The simplexes in the case of the Fires ABM are line segments, since the configuration space is one-dimensional.
 Therefore, linear interpolation between the points produces the simplexes (see bottom left image in Figure \ref{fig:rii}).
 Each segment is also the only edge of the simplex.
@@ -361,19 +361,19 @@ This approach is effectively searching through the regression space created by t
 Some regression approaches can be directly inverted.
 This has the benefit that no approximation, such as SCI, has to be performed, however, a functional inversion is algorithm-dependent, meaning a new method must be implemented for each regression.
 
-I will provide functional inversions of kNN and NLR, as examples.
+I will describe functional inversions of kNN and NLR, as examples.
 kNN is conceptually and computationally difficult to invert.
 The ``forward mapping" of kNN is:
-What is the average of the values for the $k$ nearest point to configuration vector $\mathbf c$?
+What is the average of the values for the $k$ nearest points to configuration vector $\mathbf c$?
 The inverse of this statement is:
 What space covered by $k$ neighboring points would produce the average $p$?
-One way to compute this, would be to generate a structure similar to a Voronoi diagram that segregates the space into sections.
-Every point within a section has the same k-nearest neighbors, which is iterated over to find averages that are close enough.
-This search can be computationally intensive as the number of sections can be large with large high values for $k$.
+One way to compute this would be to generate a structure similar to a Voronoi diagram that segregates the space into sections.
+Every point within a section has the same $k$ nearest neighbors, which are iterated over to find averages that are close enough.
+This search can be computationally intensive, since the number of sections can be large with relatively high values of $k$.
 Also, since this space is discontinuous, finding a desired average may be impossible.
 With SCI, continuous transitions are inserted between the discontinuous spaces, allowing intersections to be inferred, even if no average exists.
 
-Nonlinear regression, on the other hand, is rather simple to invert with algebra, with certain parametric models.
+Nonlinear regression, on the other hand, is rather simple to invert with algebra, at least for certain parametric models.
 Basically, inverting NLR reduces to satisfying the following equation:
 \[f(\mathbf x, \beta) - y = 0,\]
 where $\beta$ are the learned model parameters and $y$ is the desired system-level property value.
@@ -382,21 +382,21 @@ Inverting nonlinear regression, in particular, is useful because it provides an 
 
 
 \section{Using Reverse Mappings}
-The main purpose of generating a reverse mapping is to gain understanding of the space of configurations that generate a particular system-level behavior.
+The main purpose of generating a reverse mapping is to gain an understanding of the space of configurations that generate a particular system-level behavior.
 The relationships between configuration parameters can be inferred by analyzing these spaces.
-For example, when one configuration parameter value is reduced and the other is increased a specific amount, the resulting system-level behavior may be the same.
+For example, when one configuration parameter value is reduced and the other is increased by a specific amount, the resulting system-level behavior may be the same.
 The equations returned by SCI provide this mathematical representation in a piecewise way.
-This deeper understanding of how a system-level property can be produced is more faster and potentially more valuable than having a researcher manually study a domain to gain understanding of how the configurations affect system-level behavior.
+This deeper understanding of how a system-level property can be produced is faster and potentially more valuable than having a researcher manually study a domain to gain an understanding of how the configurations affect system-level behavior.
 
 The reverse mapping can be used to suggest a configuration when a user wishes to see a particular behavior exhibited in the ABM.
 For example, suppose the user of \fw wants to determine what an execution of a Fire ABM that burns down 80\% of the trees looks like.
 SCI can suggest what density of trees should be used.
-Typically, the user would have to go through an iterative process of guessing a possible configuration, then executing the ABM to determine if the configuration generated the behavior or not.
+Typically, the user would have to go through an iterative process of guessing a possible configuration, then executing the ABM to determine whether the configuration generated the behavior or not.
 This is effectively manual hill climbing, and can be unintuitive, difficult and tedious.
 
 To suggest a configuration with \fw, the user queries the reverse mapping with the desired system-level property values.
 SCI returns the space of configurations that would satisfy this query.
-Any point in this space will be satisfactory; however the user must select one.
+Any point in this space will be satisfactory; however, the user must select one.
 Whether this point is selected arbitrarily or not is up to the user.
 To select an arbitrary point, a random simplex is chosen.
 Then, a set of values that will satisfy the system of equations associated with that simplex are derived.
@@ -404,9 +404,9 @@ Free variables have their values randomly selected, within the range of the simp
 The fixed variables are fixed, so their values are already given.
 Together, these points provide the user with a suitable point in the solution space to configure the target ABM.
 
-Certain points in the solution space can be considered better than others, even if they should produce similar output.
+Certain points in the solution space may be considered better than others, even if they should produce similar output.
 Typically, areas of the space that have minimal variance are safer choices for configuration suggestions, since the expected error is less.
-As an aside, the action of removing high variance areas of the space is possible by adding a binary valued system-level property that separates the space into ``high variance" and ``low variance" spaces, given a specified threshold.
+As an aside, the action of removing high-variance areas of the space is possible by adding a binary-valued system-level property that separates the space into ``high-variance" and ``low-variance" spaces, given a specified threshold.
 This approach has the benefit that the selection of configurations with low variance is performed inside the framework, instead of by the user.
 
 
@@ -414,6 +414,6 @@ This approach has the benefit that the selection of configurations with low vari
 
 \section{Summary}
 The reverse-mapping problem is the problem of finding a one-to-many mapping that maps system-level property values to the set of ABM configurations that would exhibit that behavior.
-\fw uses one of two algorithms I devised, named SCI and QT, that build an \textit{invertible} approximation of the forward mapping.
+\fw uses SCI, an approach that build an \textit{invertible} approximation of the forward mapping.
 This approximated mapping can be inverted and thus return the inverse of the forward mapping.
-Results detailing the computational time required offline, the computational time required per query, and the accuracy of the reverse mappings developed by \fw are discussed in Chapter \ref{Results}.
+Results detailing the computational time required offline, the computational time required per query, and the accuracy of the reverse mappings developed by \fw are discussed in the next chapter.

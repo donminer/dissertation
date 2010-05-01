@@ -4,7 +4,7 @@
 \label{Background}
 
 The purpose of this chapter is to provide necessary background information for understanding concepts related to the \framework.
-In contrast to Chapter \ref{RelatedWork}, the previous research presented in this chapter do not share the same motivation as \fw, but provide a foundation upon which \fw builds.
+In contrast to Chapter \ref{RelatedWork}, the previous research presented in this chapter does not share the same motivation as \fw, but provide a foundation upon which \fw builds.
 
 \fw uses preexisting research in two major areas:
 agent-based modeling and regression.
@@ -39,7 +39,7 @@ In contrast, if this were to done from the observer perspective in NetLogo, the 
 \end{quote}
 This code computes the change in the x-coordinate and the y-coordinate, given that the agent should move 2 units.
 Then, it adds the result to the agent's original x- and y-coordinates.
-Finally, it sets this turtle's x- and y-coordinates to the new x- and y-coordinates.
+Finally, it sets this agent's x- and y-coordinates to the new x- and y-coordinates.
 This process is cumbersome.
 The agent-based property of models provides an intuitive way to build multi-agent systems.
 
@@ -53,7 +53,7 @@ To answer this question, Epstein then poses the \textit{Generativist's Experimen
 Situate an initial population of autonomous heterogeneous agents in a relevant spatial environment; allow them to interact according to simple local rules, and thereby generate---or ``grow"---the macroscopic regularity from the bottom up. \cite{epstein1999agent}
 \end{quote}
 If a model accurately generates the emergent behavior of the target system, then that ABM could provide a theory for why that behavior emerges.
-Agent-based models are particularly well-suited to answer the Generativist's question.
+Agent-based models are particularly well suited to answer the Generativist's question.
 
 
 
@@ -113,7 +113,7 @@ The flocking behavior is emergent and would therefore be difficult to program di
 
 Boid flocking has been used in a number of applications, such as visualizing time-varying data \cite{1382896}, clustering documents \cite{cui2006flocking}, controlling unmanned air vehicles \cite{crowther2003flocking}, and art \cite{Boyd}.
 
-Boids has remained one of my core inspirations for developing \fw.
+Boids have remained one of my core inspirations for developing \fw.
 The system is simple, yet exhibits a number of seemingly unpredictable system-level behaviors.
 
 \subsubsection{Social Insect Behavior}
@@ -126,7 +126,7 @@ An agent-based model approach has been used to model how army ants form traffic 
 The particular species of army ants discussed in this work forms two-way highways to reduce the number of head-on collisions while ants are searching for food and returning with food.
 The authors show how the turning rates and perception of the individual ants affect the efficiency of the ants.
 They found that when the turning rate is too high, ants are too willing to steer off course and intersect the path of other ants.
-On the other hand, when the turning rate is too low, ants will not adjust their heading to avoid head on collisions.
+On the other hand, when the turning rate is too low, ants will not adjust their heading to avoid head-on collisions.
 By tuning their model to optimize highway performance, they reached an accurate model of the traffic flow in army ants.
 The result of this research is an accurate model that describes the individual and group behavior of ants in a traffic situation.
 
@@ -177,7 +177,7 @@ Researchers use this tool to observe a top-level view that can be used to analyz
 Hypothetical modifications to the environment can be performed in simulation to determine whether they would improve the traffic situation.
 
 In these simulations, one of the main goals is to model human society so that hypothetical changes can be made to see the changes in the behavior of the system.
-This way, the researchers do not have to use real humans in social experiments.
+As a result, the researchers do not have to use real humans in social experiments.
 \fw could be helpful in answering this type of research problem.
 A desired system-level property could be used to determine suitable configurations by solving the reverse-mapping problem.
 
@@ -194,7 +194,7 @@ In this section, I survey the most popular of these framewworks.
 \subsubsection{The Swarm Simulation System}
 Swarm is one of the original agent-based modeling platforms, originally developed at the Santa Fe Institute in the 1990s.
 Swarm is currently supported and hosted\footnote{The Swarm website: http://www.swarm.org/} by an independent organization called the Swarm Development Group.
-The developers' motivation were to enable researchers to focus less on implementation and more on actual experimentation \cite{minar1996swarm}.
+The developers' motivation was to enable researchers to focus less on implementation and more on actual experimentation \cite{minar1996swarm}.
 To achieve this goal, they implemented a number of libraries in Objective-C and Java that aid in the creation of ``swarm" objects, the building blocks of a Swarm simulation.
 The swarm objects manage the agents and handle the time schedulers that queue the order of agent actions.
 Also, agents can be nested as hierarchies in swarm objects to allow for heterogeneous collections of agents.
@@ -218,7 +218,7 @@ Repast's feature set is quite comprehensive and extensible. Repast's features ar
    \item The \textit{adaptive behaviors module} provides built-in adaptive agent behaviors that use techniques such as genetic algorithms and neural networks.
    \item The \textit{domains module} helps define environments, such as social systems, geographic information systems, and computational game theory.
 \end{enumerate}
-All these modules function together to provide a modular programming environment for a diverse set of multi-agent systems.
+All of these modules function together to provide a modular programming environment for a diverse set of multi-agent systems.
    
     % Repast
 \subsubsection{Breve}
@@ -271,7 +271,7 @@ Also, it is easy to retrieve turtles that are in contact with a patch and to ret
 This makes turtle interactions with the environment simple to implement.
 
 NetLogo also includes a built-in user interface and user interface editor.
-The interface consists of controls, monitorsm and the domain visualization.
+The interface consists of controls, monitors and the domain visualization.
 Users define controls that bind to global variables and buttons that bind to function calls.
 In addition, users can add monitors and plots, which show a variable's value or plot a variable's value over time.
 These are useful tools in conveying information that the domain visualization cannot.
@@ -284,7 +284,7 @@ HubNet is a server/client tool that allows several users of a system to interact
 
 NetLogo can be interacted with from an external Java API.
 A NetLogo ``workspace" is instantiated as an object and can be used to send commands and to query current variable values.
-This capability is useful for an number of tasks.
+This capability is useful for a number of tasks.
 First, sometimes NetLogo's language is not expressive enough and some may find programming in Java more familiar.
 In addition, external Java libraries (such as machine learning libraries) can be used without modification by integrating with NetLogo from its Java API.
 Also, a sequential experiment system can be implemented in Java if a user would like to run experiments without BehaviorSpace.
@@ -355,7 +355,7 @@ Also, the mappings built by the regression models should be smooth.
 This smoothness property is important for the tractability of finding the reverse mapping, since bumpy surfaces will naturally yield more intersections than smooth ones.
 Therefore, regression methods that smooth the data, such as LOESS, are effective in this situation.
 
-In the course of testing \fw, I used three regression techniques: k-nearest neighbor, LOESS, least-squares nonlinear regression.
+In the course of testing \fw, I used three regression techniques: k-nearest neighbor, LOESS, and least-squares nonlinear regression.
 
   % Figure of Fires domain, boids domain, wolf/sheep predation domain behavior graphs
   % So far, I have implemented the following regression algorithms to work with \fw: K-Nearest Neighbor, LOESS (Locally weighted scatterplot smoothing, least-squares Non-Linear Regression, Multilinear Interpolation
@@ -375,19 +375,19 @@ Therefore, KNN requires little to no configuration or tailoring to a particular 
 
     % Slow with large data sets because of all the distance calculations needed.
       % Can be sped up with advanced nearest neighbor search, such as a kd-tree or local sensitivity hashing.
-However, when implemented naively, the running-time scales linearly with the size of the data set because the process of finding the nearest neighbors requires a scan of all data points.
-This search time can be reduced with the implementation of faster searching techniques, such as locality-sensitive hashing \cite{gionis1999similarity}, among other methods.
+However, when implemented naively, the runtime scales linearly with the size of the data set because the process of finding the nearest neighbors requires a scan of all data points.
+This search time can be reduced with the implementation of faster searching techniques, such as locality-sensitive hashing \cite{gionis1999similarity}.
 Even with faster neighbor-locating techniques, some sort of search is required for each query to KNN.
 
 Selecting $k$ is an important step, as different values of $k$ will fit the data better than others.
 If $k$ is too low, the regression will be overfit since it is ignoring many of the points.
 If $k$ is too large, the regression will be overgeneralized and provide a mapping that is too smooth.
-Unfortunately, the nature of the data and the size of the data set determine which $k$ is best.
+The nature of the data and the size of the data set determine which $k$ is best.
 To determine a proper $k$, I use the standard technique of using 10-fold validation to determine which in a set of candidate $k$ values results in the least average error.
 
 The spaces generated by KNN are not continuous (particularly if the neighbors are not weighted).
 This is because similar points will have the same neighbors and, in effect, have the same predicted value.
-There are inflection points one side of where the k-nearest neighbors will include a particular data point, whereas on the other side it will not.
+There are inflection points, one side of which the k-nearest neighbors will include a particular data point, whereas on the other side it will not.
 At this separation, there will be a discontinuity in predicted values.
 This can be a problem for solving the reverse-mapping problem because the intersection between hyperplanes generated by KNN will not intersect smoothly.
 This can be remedied by using KNN in conjunction with multilinear interpolation.
@@ -400,15 +400,14 @@ This can be remedied by using KNN in conjunction with multilinear interpolation.
 Robust Locally Weighted Regression and Smoothing Scatterplots (LOESS) is a mature nonparametric regression technique for fitting curves to data   \cite{cleveland1979robust,cleveland1988locally}.
 Similar to k-nearest neighbor, LOESS uses local points to infer values of new data points.
 LOESS also iteratively smooths the regression curve, allowing for variable magnitudes of smoothing.
-This is important for particularly noisy data sets.
-The role of LOESS in the testing of \fw is that it is more robust than KNN, yet still nonparametric.
+This is particularly important for noisy data sets.
 
     % Concept - take some subset of neighbors, weight them, and then perform linear regression on them
 Abstractly, LOESS fits a new $\hat y_i$ to every $\mathbf x_i$ to replace the original noisy $y_i$.
 Then, LOESS iteratively smooths each $\hat y_i$ to reduce variability.
 Specifically, LOESS follows the following steps:
 \begin{enumerate}
-   \item Initialization step -- For each $\mathbf x_i$, weight all other points $x_j$, where $j = 1...n$, based on a weighting function $W(\mathbf x_i, \mathbf x_j)$. which weights closer points higher. Perform weighted linear regression to infer $\hat y_i$.
+   \item Initialization step -- For each $\mathbf x_i$, weight all other points $x_j$, where $j = 1...n$, based on a weighting function $W(\mathbf x_i, \mathbf x_j)$, which weights closer points higher. Perform weighted linear regression to infer $\hat y_i$.
    \item Smoothing step -- For each $\mathbf x_i$, weight all other points based on $w_i$, as well as a new weight function $\delta$, which returns a magnitude inversely proportional to $y_i - \hat y_i$ (i.e., the larger the distance, the lesser the weight). Perform weighted linear regression to infer $\hat y_i'$.
    \item Set each $\hat y_i$ to $\hat y_i'$.
    \item Repeat the the smoothing step as many times as necessary.
@@ -440,7 +439,7 @@ In this approach, a parametric model is provided by the user that represents the
 This is typically done based on some sort of intuition provided by the user.
 For example, the data may appear sinusoidal or quadratic, in which case a model involving sine curves or quadratic polynomials, respectively, would be appropriate.
     % Accuracy is largely dependent on the model
-Similarly to how linear regression will not model nonlinear relationships well, certain nonlinear models will not model other nonlinear relationships.
+Just as linear regression will not model nonlinear relationships well, certain nonlinear models will not model other nonlinear relationships.
 Therefore, accuracy is largely dependent on the selection of the correct model.
 
 Optimization techniques, such as Gauss-Newton or Levenberg-Marquardt \cite{mor1977levenberg}, are used to adjust nonlinear model parameters in order to minimize the least squares metric \cite{gallant1975nonlinear}.
